@@ -1,6 +1,8 @@
 import 'package:decimal/decimal.dart';
 
+import '../../core/engine/calc_result.dart';
 import '../../core/input/input_buffer.dart';
+import '../../core/input/last_operation.dart';
 
 /// Everything the calculator screen renders (ARCHITECTURE "State").
 ///
@@ -13,6 +15,10 @@ final class CalcState {
     this.buffer = const InputBuffer.empty(),
     this.preview,
     Decimal? ans,
+    this.result,
+    this.error,
+    this.justEvaluated = false,
+    this.lastOperation,
   }) : ans = ans ?? Decimal.zero;
 
   /// The tokens the user has typed so far.
@@ -24,8 +30,23 @@ final class CalcState {
   /// §9 the last `=` result, persisted between launches.
   final Decimal ans;
 
+  /// The value of the last successful `=` (§5 `=` row).
+  final Decimal? result;
+
+  /// The error of the last failed `=`; the buffer is kept so it can be fixed.
+  final CalcError? error;
+
+  /// §5 after `=`: a digit/function/constant starts a new expression, an
+  /// operator continues from the result.
+  final bool justEvaluated;
+
+  /// §5 the operator + right operand a second `=` repeats.
+  final LastOperation? lastOperation;
+
   bool get isEmpty => buffer.isEmpty;
 
   @override
-  String toString() => 'CalcState($buffer, preview: $preview, ans: $ans)';
+  String toString() =>
+      'CalcState($buffer, preview: $preview, result: $result, '
+      'error: $error, ans: $ans)';
 }

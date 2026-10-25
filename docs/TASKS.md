@@ -52,7 +52,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `)` only when valid, `±` wrap/unwrap, ⌫ removes `sin(` in one step; tests.
 - [x] **T17 CalculatorController + live preview** — Read: §5 (live preview), ARCHITECTURE (State).
   Riverpod Notifier with `onKey(CalcKey)`; preview rule. Done when: controller tests with MemoryKvStore pass.
-- [ ] **T18 Equals, repeat =, Ans, after-= behaviour** — Read: §5 (rows `=`, after `=`, `Ans`), §9 (Ans).
+- [x] **T18 Equals, repeat =, Ans, after-= behaviour** — Read: §5 (rows `=`, after `=`, `Ans`), §9 (Ans).
   Done when: `5+3===`→14; digit after `=` starts new; operator after `=` continues; Ans persists; tests.
 
 ## Phase 3 — Calculator UI

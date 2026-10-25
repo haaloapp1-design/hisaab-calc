@@ -1,3 +1,4 @@
+import 'package:calculator/core/engine/calc_result.dart';
 import 'package:calculator/core/engine/token.dart';
 import 'package:calculator/core/input/calc_key.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
@@ -299,6 +300,246 @@ void main() {
       ]);
 
       expect(calc().ans, Decimal.parse('8'));
+    });
+  });
+
+  group('equals (§5)', () {
+    test('evaluates, shows the result and stores Ans', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().result, Decimal.parse('8'));
+      expect(calc().ans, Decimal.parse('8'));
+      expect(calc().preview, isNull);
+      expect(calc().error, isNull);
+      expect(calc().justEvaluated, isTrue);
+    });
+
+    test('repeating = applies the last operation', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.equals,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().result, Decimal.parse('14'));
+      expect(calc().ans, Decimal.parse('14'));
+    });
+
+    test('repeating = uses the last operator and its operand', () async {
+      await press(<CalcKey>[
+        CalcKey.digit2,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.multiply,
+        CalcKey.digit4,
+        CalcKey.equals,
+      ]);
+      expect(calc().result, Decimal.parse('14'));
+
+      await press(<CalcKey>[CalcKey.equals]);
+
+      expect(calc().result, Decimal.parse('56'));
+    });
+
+    test('repeating = handles a negative operand', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.multiply,
+        CalcKey.subtract,
+        CalcKey.digit2,
+        CalcKey.equals,
+      ]);
+      expect(calc().result, Decimal.parse('-10'));
+
+      await press(<CalcKey>[CalcKey.equals]);
+
+      expect(calc().result, Decimal.parse('20'));
+    });
+
+    test('persists Ans to the store', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+      ]);
+      await controller().persistDone;
+
+      expect(
+        await store.getString(CalculatorController.ansKey),
+        '8',
+      );
+    });
+
+    test('a digit after = starts a new expression', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.digit7,
+      ]);
+
+      expect(tokens(), <Token>[const NumberToken('7')]);
+      expect(calc().result, isNull);
+      expect(calc().error, isNull);
+      expect(calc().preview, isNull);
+      expect(calc().justEvaluated, isFalse);
+    });
+
+    test('a function after = starts a new expression', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.sin,
+        CalcKey.digit3,
+        CalcKey.digit0,
+      ]);
+
+      expect(tokens(), <Token>[
+        const FunctionToken('sin'),
+        const NumberToken('30'),
+      ]);
+      expect(calc().preview, Decimal.parse('0.5'));
+    });
+
+    test('an operator after = continues from the result', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.multiply,
+        CalcKey.digit2,
+      ]);
+
+      expect(tokens(), <Token>[
+        const NumberToken('8'),
+        const OperatorToken(OperatorType.multiply),
+        const NumberToken('2'),
+      ]);
+      expect(calc().preview, Decimal.parse('16'));
+
+      await press(<CalcKey>[CalcKey.equals]);
+
+      expect(calc().result, Decimal.parse('16'));
+    });
+
+    test('the Ans key after = inserts the result', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.ans,
+      ]);
+
+      expect(tokens(), <Token>[const NumberToken('8')]);
+    });
+
+    test('a postfix after = applies to the result', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.square,
+      ]);
+
+      expect(tokens(), <Token>[
+        const NumberToken('8'),
+        const PostfixToken(PostfixType.square),
+      ]);
+      expect(calc().preview, Decimal.parse('64'));
+    });
+
+    test('± after = toggles the result', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.toggleSign,
+      ]);
+
+      expect(tokens(), <Token>[
+        const LeftParenToken(),
+        const UnaryToken(negative: true),
+        const NumberToken('8'),
+        const RightParenToken(),
+      ]);
+      expect(calc().preview, Decimal.parse('-8'));
+    });
+
+    test('an error keeps the buffer so it can be fixed', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.divide,
+        CalcKey.digit0,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().error, CalcError.divideByZero);
+      expect(calc().result, isNull);
+      expect(calc().justEvaluated, isFalse);
+      expect(tokens(), <Token>[
+        const NumberToken('5'),
+        const OperatorToken(OperatorType.divide),
+        const NumberToken('0'),
+      ]);
+
+      await press(<CalcKey>[
+        CalcKey.backspace,
+        CalcKey.digit2,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().error, isNull);
+      expect(calc().result, Decimal.parse('2.5'));
+    });
+
+    test('= on an empty buffer does nothing', () async {
+      await press(<CalcKey>[CalcKey.equals]);
+
+      expect(calc().result, isNull);
+      expect(calc().error, isNull);
+      expect(tokens(), isEmpty);
+    });
+
+    test('= on a bare number keeps it on a repeated =', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.equals,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().result, Decimal.parse('5'));
+      expect(calc().ans, Decimal.parse('5'));
+      expect(tokens(), <Token>[const NumberToken('5')]);
+    });
+
+    test('an incomplete expression reports a syntax error', () async {
+      await press(<CalcKey>[
+        CalcKey.digit2,
+        CalcKey.add,
+        CalcKey.equals,
+      ]);
+
+      expect(calc().error, CalcError.syntax);
+      expect(tokens(), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.add),
+      ]);
     });
   });
 }
