@@ -142,4 +142,36 @@ void main() {
       const BorderRadius.vertical(bottom: Radius.circular(AppRadii.header)),
     );
   });
+
+  testWidgets('the Settings header adds its 22 px bottom padding', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        BlueHeader(
+          title: 'Settings',
+          rounded: true,
+          bottomPadding: AppSizes.headerSettingsPaddingBottom,
+          onBack: () {},
+        ),
+      ),
+    );
+
+    final Container box = headerBox(tester);
+    expect(
+      box.padding,
+      const EdgeInsets.fromLTRB(
+        AppSizes.screenPadding,
+        AppSizes.headerPaddingTop,
+        AppSizes.screenPadding,
+        AppSizes.headerSettingsPaddingBottom,
+      ),
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('blue-header'))).height,
+      AppSizes.headerPaddingTop +
+          AppSizes.minTapTarget +
+          AppSizes.headerSettingsPaddingBottom,
+    );
+  });
 }

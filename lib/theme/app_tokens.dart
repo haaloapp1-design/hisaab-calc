@@ -35,6 +35,12 @@ abstract final class AppColors {
   // Segmented control
   static const Color segmentedInactive = Color(0xFFE4E9FF);
 
+  // Settings
+  static const Color divider = Color(0xFFEDF0FA);
+  static const Color selectorTrack = Color(0xFFEEF1FB);
+  static const Color switchOff = Color(0xFFC9CFE3);
+  static const Color dangerBorder = Color(0xFFF3C9B5);
+
   // Navigation
   static const Color navDivider = Color(0xFFEDF0FA);
 
@@ -77,6 +83,9 @@ abstract final class AppRadii {
 
   static const double card = 18;
   static const double cardLarge = 20;
+
+  static const double settingsTrack = 10;
+  static const double settingsPill = 8;
 }
 
 /// Heights, paddings, gaps and other measurements.
@@ -91,6 +100,7 @@ abstract final class AppSizes {
   static const double sheetScientificContentGap = 12;
 
   static const double headerPaddingTop = 20;
+  static const double headerSettingsPaddingBottom = 22;
   static const double hubHeaderPaddingTop = 24;
   static const double hubHeaderPaddingBottom = 20;
   static const double headerSubtitleGap = 6;
@@ -113,6 +123,32 @@ abstract final class AppSizes {
   static const double angleChipPaddingH = 12;
   static const double angleChipGap = 6;
   static const double angleRowBottomGap = 8;
+
+  // Settings (screen 05)
+  static const double settingsPaddingTop = 18;
+  static const double settingsSectionGap = 18;
+  static const double settingsTitleGap = 8;
+  static const double settingsTitleInset = 4;
+  static const double settingsCardPaddingH = 16;
+  static const double settingsCardPaddingV = 6;
+  static const double settingsRowPaddingV = 10;
+  static const double settingsTrackPadding = 3;
+  static const double settingsPillPaddingV = 6;
+  static const double settingsPillPaddingH = 10;
+  static const double settingsPillGap = 2;
+  static const double accentDot = 28;
+  static const double accentDotGap = 10;
+  static const double accentSelectedBorder = 3;
+  static const double accentRing = 2;
+  static const double switchWidth = 50;
+  static const double switchHeight = 30;
+  static const double switchPadding = 3;
+  static const double switchKnob = 24;
+  static const double stepperButton = 32;
+  static const double stepperGap = 8;
+  static const double stepperValueWidth = 40;
+  static const double clearButtonHeight = 36;
+  static const double clearButtonPaddingH = 14;
 
   static const double keyHeightBasic = 60;
   static const double keyHeightScientific = 46;
@@ -146,6 +182,7 @@ abstract final class AppMotion {
   static const Duration keyPress = Duration(milliseconds: 80);
   static const double keyPressScale = 0.96;
   static const double keyPressDarken = 0.06;
+  static const Duration toggle = Duration(milliseconds: 120);
 }
 
 /// Font sizes and weights from the DESIGN type table.
@@ -284,6 +321,33 @@ abstract final class AppTypography {
   static const TextStyle navLabel = TextStyle(
     fontFamily: fontFamily,
     fontSize: 12,
+    fontWeight: medium,
+  );
+
+  // Settings (screen 05)
+  static const TextStyle sectionLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: bold,
+  );
+  static const TextStyle settingsPill = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: regular,
+  );
+  static const TextStyle settingsValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: medium,
+  );
+  static const TextStyle stepperGlyph = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: regular,
+  );
+  static const TextStyle clearButton = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
     fontWeight: medium,
   );
 }

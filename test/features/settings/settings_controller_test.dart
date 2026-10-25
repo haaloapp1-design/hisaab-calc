@@ -142,4 +142,33 @@ void main() {
       expect(reopened.read(settingsProvider).accent, AccentSwatch.violet);
     });
   });
+
+  group('clearSavedData', () {
+    test('removes the stored JSON and returns to the defaults', () async {
+      await store.setString(
+        SettingsController.key,
+        const Settings(
+          accent: AccentSwatch.rust,
+          haptics: false,
+        ).encode(),
+      );
+      await controller().restoreDone;
+      expect(settings().accent, AccentSwatch.rust);
+
+      await controller().clearSavedData();
+
+      expect(settings(), const Settings());
+      expect(await store.getString(SettingsController.key), isNull);
+    });
+
+    test('a pending write cannot reappear after the delete', () async {
+      await controller().restoreDone;
+
+      controller().setAccent(AccentSwatch.teal);
+      await controller().clearSavedData();
+
+      expect(settings().accent, AccentSwatch.cobalt);
+      expect(await store.getString(SettingsController.key), isNull);
+    });
+  });
 }

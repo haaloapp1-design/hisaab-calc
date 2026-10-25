@@ -6,6 +6,7 @@ import '../../shared/widgets/blue_header.dart';
 import '../../shared/widgets/segmented.dart';
 import '../../shared/widgets/white_sheet.dart';
 import '../../theme/app_tokens.dart';
+import '../settings/settings_page.dart';
 import 'calc_state.dart';
 import 'calculator_controller.dart';
 import 'keypads/basic_keys.dart';
@@ -48,7 +49,7 @@ class CalculatorPage extends ConsumerWidget {
               title: 'Calculator',
               actionIcon: Icons.tune_rounded,
               actionTooltip: 'Settings',
-              onAction: _openSettings,
+              onAction: () => _openSettings(context),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(
@@ -130,6 +131,12 @@ class CalculatorPage extends ConsumerWidget {
     );
   }
 
-  /// T26 pushes the Settings page.
-  void _openSettings() {}
+  /// Pushes the Settings screen over the shell, full screen like screen 05.
+  void _openSettings(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const SettingsPage(),
+      ),
+    );
+  }
 }

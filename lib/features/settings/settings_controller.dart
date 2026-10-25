@@ -60,6 +60,19 @@ class SettingsController extends Notifier<Settings> {
   void setHistoryRetention(HistoryRetention value) =>
       _save(state.copyWith(historyRetention: value));
 
+  /// SPEC §3 "Clear all saved data": drops the stored settings and returns to
+  /// the defaults. Pending writes are allowed to finish first so a queued
+  /// value cannot reappear after the delete.
+  Future<void> clearSavedData() async {
+    _changed = true;
+    await _lastPersist;
+    await ref.read(kvStoreProvider).remove(key);
+    if (!ref.mounted) {
+      return;
+    }
+    state = const Settings();
+  }
+
   /// Writes [next] and schedules its JSON for storage. Equal values are a
   /// no-op, so a rebuild does not touch the store.
   void _save(Settings next) {

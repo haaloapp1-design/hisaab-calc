@@ -5,6 +5,7 @@ import 'package:calculator/features/calculator/calculator_page.dart';
 import 'package:calculator/features/calculator/widgets/display.dart';
 import 'package:calculator/features/calculator/widgets/calc_key_button.dart';
 import 'package:calculator/features/calculator/widgets/keypad.dart';
+import 'package:calculator/features/settings/settings_page.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/shared/widgets/segmented.dart';
 import 'package:calculator/shared/widgets/white_sheet.dart';
@@ -369,5 +370,31 @@ void main() {
 
     expect(find.byType(CalcKeyButton), findsNWidgets(20));
     expect(find.byKey(const Key('angle-controls')), findsNothing);
+  });
+
+  testWidgets('the Settings header action opens the Settings page', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.byTooltip('Settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsPage), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(BlueHeader),
+        matching: find.text('Settings'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byType(CalcKeyButton), findsNothing);
+
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SettingsPage), findsNothing);
+    expect(find.byType(CalcKeyButton), findsNWidgets(20));
   });
 }

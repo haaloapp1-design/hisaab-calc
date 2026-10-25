@@ -140,6 +140,21 @@ class CalculatorController extends Notifier<CalcState> {
     _lastPersist = _lastPersist.then((_) => store.setString(modeKey, mode.name));
   }
 
+  /// SPEC §3 "Clear all saved data": forget the persisted `Ans` and mode and
+  /// return the calculator to its launch state.
+  Future<void> clearSavedData() async {
+    _ansChanged = true;
+    _modeChanged = true;
+    await _lastPersist;
+    final store = ref.read(kvStoreProvider);
+    await store.remove(ansKey);
+    await store.remove(modeKey);
+    if (!ref.mounted) {
+      return;
+    }
+    state = CalcState();
+  }
+
   /// SPEC §1.3 alternates: sin→sin⁻¹ … x²→x³, xʸ→ʸ√x.
   static CalcKey? _secondAlternate(CalcKey key) => switch (key) {
     CalcKey.sin => CalcKey.sinInverse,

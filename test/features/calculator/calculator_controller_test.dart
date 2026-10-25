@@ -682,4 +682,33 @@ void main() {
       expect(calc().openBrackets, 0);
     });
   });
+
+  group('clearSavedData', () {
+    test('forgets Ans and the mode and returns to the launch state', () async {
+      await store.setString(CalculatorController.ansKey, '12');
+      await store.setString(CalculatorController.modeKey, 'scientific');
+      await controller().restoreDone;
+      expect(calc().ans, Decimal.fromInt(12));
+      expect(calc().mode, CalcMode.scientific);
+
+      await controller().clearSavedData();
+
+      expect(calc(), isA<CalcState>());
+      expect(calc().ans, Decimal.zero);
+      expect(calc().mode, CalcMode.basic);
+      expect(calc().buffer.isEmpty, isTrue);
+      expect(calc().result, isNull);
+      expect(await store.getString(CalculatorController.ansKey), isNull);
+      expect(await store.getString(CalculatorController.modeKey), isNull);
+    });
+
+    test('a pending Ans write cannot reappear after the delete', () async {
+      await press(<CalcKey>[CalcKey.digit7, CalcKey.equals]);
+
+      await controller().clearSavedData();
+
+      expect(await store.getString(CalculatorController.ansKey), isNull);
+      expect(calc().ans, Decimal.zero);
+    });
+  });
 }
