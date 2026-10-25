@@ -84,7 +84,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 - [x] **T28 History store** — Read: §10.
   Done when: add/skip-duplicate/max 500/retention cleanup/grouping helpers tested.
-- [ ] **T29 History page** — Read: SPEC §2. Screen 04 (`docs/screens/04-history-memory.html`).
+- [x] **T29 History page** — Read: SPEC §2. Screen 04 (`docs/screens/04-history-memory.html`).
   Done when: `=` adds entries; grouped list; tap loads into calculator; search; copy all; clear with confirm.
 - [ ] **T30 Memory** — Read: §9, SPEC §2.
   Done when: M1..M10 persisted; Memory tab with MR/M+/M−; memory chip on display; tests.

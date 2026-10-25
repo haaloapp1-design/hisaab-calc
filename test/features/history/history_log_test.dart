@@ -241,6 +241,42 @@ void main() {
     });
   });
 
+  group('search and clipboard text', () {
+    final HistoryEntry sum = entry(0, expression: '1800 + 21');
+    final HistoryEntry percent = entry(
+      1,
+      expression: '15% of 4800',
+      mode: HistoryMode.scientific,
+    );
+
+    test('matches the expression or the result, ignoring case', () {
+      final List<HistoryEntry> list = <HistoryEntry>[sum, percent];
+
+      expect(HistoryLog.search(list, '1800'), <HistoryEntry>[sum]);
+      expect(HistoryLog.search(list, '4800'), <HistoryEntry>[percent]);
+      expect(HistoryLog.search(list, '2'), <HistoryEntry>[sum]);
+      expect(HistoryLog.search(list, '  '), same(list));
+      expect(HistoryLog.search(list, 'nothing'), isEmpty);
+    });
+
+    test('entryText uses an ASCII minus for copying', () {
+      final HistoryEntry negative = entry(2, expression: '5 − 9');
+
+      expect(HistoryLog.entryText(negative), '5 - 9 = 4');
+    });
+
+    test('asText joins one line per entry, newest first', () {
+      final List<HistoryEntry> list = <HistoryEntry>[sum, percent];
+
+      expect(
+        HistoryLog.asText(list),
+        '${HistoryLog.entryText(sum)}\n'
+        '${HistoryLog.entryText(percent)}',
+      );
+      expect(HistoryLog.asText(<HistoryEntry>[]), '');
+    });
+  });
+
   group('JSON', () {
     test('round-trips the list', () {
       final List<HistoryEntry> list = <HistoryEntry>[

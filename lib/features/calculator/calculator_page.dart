@@ -9,6 +9,7 @@ import '../../shared/widgets/white_sheet.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../settings/settings_controller.dart';
+import '../settings/settings_format.dart';
 import '../settings/settings_model.dart';
 import '../settings/settings_page.dart';
 import 'calc_state.dart';
@@ -52,10 +53,7 @@ class CalculatorPage extends ConsumerWidget {
     );
 
     final bool scientific = calc.mode == CalcMode.scientific;
-    final NumberFormatOptions format = NumberFormatOptions.localized(
-      decimalPlaces: settings.decimalPlaces,
-      useGrouping: settings.thousandsSeparator,
-    );
+    final NumberFormatOptions format = numberFormatFor(settings);
 
     return ColoredBox(
       color: palette.primary,
@@ -107,10 +105,7 @@ class CalculatorPage extends ConsumerWidget {
                   Display(
                     expression: calc.justEvaluated
                         ? ''
-                        : formatExpression(
-                            calc.buffer.tokens,
-                            options: format,
-                          ),
+                        : formatExpression(calc.buffer.tokens, options: format),
                     result: formatNumber(calc.displayValue, options: format),
                     preview: calc.result == null && calc.preview != null,
                     error: calc.error,

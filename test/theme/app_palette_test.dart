@@ -16,6 +16,7 @@ void main() {
     expect(palette.onPrimaryMuted, AppColors.onPrimaryMuted);
     expect(palette.onPrimaryFaint, AppColors.onPrimaryFaint);
     expect(palette.dividerOnPrimary, AppColors.dividerOnPrimary);
+    expect(palette.historyDivider, AppColors.historyDivider);
     expect(palette.sheet, AppColors.sheet);
     expect(palette.background, AppColors.background);
     expect(palette.keyNumber, AppColors.keyNumber);
@@ -67,6 +68,7 @@ void main() {
         palette.onPrimaryMuted,
         palette.onPrimaryFaint,
         palette.dividerOnPrimary,
+        palette.historyDivider,
         palette.keyOperator,
         palette.keyOperatorBorder,
         palette.segmentedInactive,
@@ -129,10 +131,7 @@ void main() {
     expect(light.lerp(dark, 1).background, dark.background);
 
     final AppPalette half = light.lerp(dark, 0.5);
-    expect(
-      half.background,
-      Color.lerp(light.background, dark.background, 0.5),
-    );
+    expect(half.background, Color.lerp(light.background, dark.background, 0.5));
     expect(half.lerp(null, 0.5), half);
   });
 }

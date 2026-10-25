@@ -1,5 +1,6 @@
 import 'package:calculator/core/engine/formatter.dart';
 import 'package:calculator/core/engine/token.dart';
+import 'package:calculator/core/engine/tokenizer.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -382,10 +383,10 @@ void main() {
       );
 
       expect(formatNumber(d('600'), options: options), '600.00');
-      expect(formatExpression(
-        <Token>[const NumberToken('1800')],
-        options: options,
-      ), '1800');
+      expect(
+        formatExpression(<Token>[const NumberToken('1800')], options: options),
+        '1800',
+      );
     });
 
     test('an unknown locale falls back to the dot/comma pair', () {
@@ -395,6 +396,58 @@ void main() {
 
       expect(options.decimalSeparator, '.');
       expect(options.groupSeparator, ',');
+    });
+  });
+
+  group('sourceFromDisplay (history round-trip)', () {
+    test('drops the thousands marks and maps the locale decimal mark', () {
+      const NumberFormatOptions german = NumberFormatOptions(
+        decimalSeparator: ',',
+        groupSeparator: '.',
+      );
+
+      expect(sourceFromDisplay('1.234,5', options: german), '1234.5');
+      expect(sourceFromDisplay('1,234.5'), '1234.5');
+      expect(
+        sourceFromDisplay(
+          '1,234.5',
+          options: const NumberFormatOptions(useGrouping: false),
+        ),
+        '1,234.5',
+      );
+    });
+
+    test('keeps the glyphs the tokenizer already understands', () {
+      const String display = 'sin(30) + √(144) − 5² × π';
+
+      expect(sourceFromDisplay(display), display);
+    });
+
+    test('a formatted expression tokenizes back to the same text', () {
+      const NumberFormatOptions german = NumberFormatOptions(
+        decimalSeparator: ',',
+        groupSeparator: '.',
+      );
+      final List<Token> tokens = <Token>[
+        const NumberToken('1800'),
+        const OperatorToken(OperatorType.add),
+        const NumberToken('21.5'),
+        const OperatorToken(OperatorType.multiply),
+        const FunctionToken('sin'),
+        const NumberToken('30'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.subtract),
+        const FunctionToken('√'),
+        const NumberToken('144'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.multiply),
+        const ConstantToken(MathConstant.pi),
+      ];
+      final String display = formatExpression(tokens, options: german);
+
+      final String source = sourceFromDisplay(display, options: german);
+
+      expect(formatExpression(tokenize(source), options: german), display);
     });
   });
 }

@@ -53,6 +53,33 @@ abstract final class HistoryLog {
     return next.length == entries.length ? entries : next;
   }
 
+  /// SPEC §2 search: entries whose expression or result contains [query],
+  /// ignoring case. A blank query keeps the list instance.
+  static List<HistoryEntry> search(List<HistoryEntry> entries, String query) {
+    final String needle = query.trim().toLowerCase();
+    if (needle.isEmpty) {
+      return entries;
+    }
+    return entries
+        .where(
+          (HistoryEntry entry) =>
+              entry.expression.toLowerCase().contains(needle) ||
+              entry.result.toLowerCase().contains(needle),
+        )
+        .toList(growable: false);
+  }
+
+  /// The clipboard text of one entry: `expression = result`.
+  ///
+  /// Copied numbers use the ASCII minus (BUSINESS_LOGIC §8.5), so a copied
+  /// calculation pastes into another calculator unchanged.
+  static String entryText(HistoryEntry entry) =>
+      '${entry.expression} = ${entry.result}'.replaceAll('−', '-');
+
+  /// "Copy all" text: one [entryText] line per entry, newest first.
+  static String asText(List<HistoryEntry> entries) =>
+      entries.map(entryText).join('\n');
+
   /// Drops entries older than [retentionDays] days before [now]; null
   /// (Forever) keeps everything. Called on start-up (§10).
   static List<HistoryEntry> prune(

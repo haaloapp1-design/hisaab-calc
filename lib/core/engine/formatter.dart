@@ -113,6 +113,28 @@ String formatExpression(
   return buffer.toString();
 }
 
+/// Turns an expression line rendered by [formatExpression] back into source
+/// the tokenizer can read (BUSINESS_LOGIC §10: a history entry is
+/// re-tokenized when it is loaded into the calculator).
+///
+/// The glyphs the tokenizer already understands (`×`, `÷`, `−`, `²`, `³`,
+/// `√`, `ʸ√`, `π`, ...) are left alone. Only the locale number marks are
+/// normalised: the thousands separator is dropped and the locale decimal mark
+/// becomes `.`. Function inverse names keep their `⁻¹` suffix.
+String sourceFromDisplay(
+  String display, {
+  NumberFormatOptions options = const NumberFormatOptions(),
+}) {
+  String source = display;
+  if (options.useGrouping && options.groupSeparator.isNotEmpty) {
+    source = source.replaceAll(options.groupSeparator, '');
+  }
+  if (options.decimalSeparator.isNotEmpty && options.decimalSeparator != '.') {
+    source = source.replaceAll(options.decimalSeparator, '.');
+  }
+  return source;
+}
+
 bool _needsExpressionSpace(Token? previous, Token token) {
   if (previous == null) {
     return false;

@@ -4,12 +4,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/engine/angle_mode.dart';
 import '../../core/engine/calc_engine.dart';
 import '../../core/engine/calc_result.dart';
+import '../../core/engine/formatter.dart';
 import '../../core/engine/token.dart';
+import '../../core/engine/tokenizer.dart';
 import '../../core/input/calc_key.dart';
 import '../../core/input/input_buffer.dart';
 import '../../core/input/last_operation.dart';
 import '../../core/input/value_tokens.dart';
 import '../../core/storage/kv_store_provider.dart';
+import '../history/history_controller.dart';
+import '../history/history_entry.dart';
+import '../settings/settings_controller.dart';
+import '../settings/settings_format.dart';
 import 'calc_state.dart';
 
 /// The calculator screen's state machine: `CalcKey` → [InputBuffer] → preview,
@@ -136,8 +142,53 @@ class CalculatorController extends Notifier<CalcState> {
     }
     _modeChanged = true;
     state = state.copyWith(mode: mode);
+    _persistMode(mode);
+  }
+
+  /// SPEC §2 / BUSINESS_LOGIC §10: loads a saved expression into the buffer.
+  ///
+  /// [expression] is the display line stored in history; it is converted back
+  /// to tokenizer source (locale separators, typographic signs) before being
+  /// tokenized. [mode] switches the calculator to the entry's mode. Returns
+  /// false when the text cannot be tokenized, so the caller can stay put.
+  bool loadExpression(String expression, {CalcMode? mode}) {
+    final List<Token> tokens;
+    try {
+      tokens = tokenize(
+        sourceFromDisplay(
+          expression,
+          options: numberFormatFor(ref.read(settingsProvider)),
+        ),
+      );
+    } on FormatException {
+      return false;
+    }
+    if (tokens.isEmpty) {
+      return false;
+    }
+
+    final InputBuffer buffer = InputBuffer(tokens);
+    final CalcMode target = mode ?? state.mode;
+    if (target != state.mode) {
+      _modeChanged = true;
+      _persistMode(target);
+    }
+    state = CalcState(
+      buffer: buffer,
+      preview: _previewFor(buffer),
+      ans: state.ans,
+      mode: target,
+      angleMode: state.angleMode,
+      second: state.second,
+    );
+    return true;
+  }
+
+  void _persistMode(CalcMode mode) {
     final store = ref.read(kvStoreProvider);
-    _lastPersist = _lastPersist.then((_) => store.setString(modeKey, mode.name));
+    _lastPersist = _lastPersist.then(
+      (_) => store.setString(modeKey, mode.name),
+    );
   }
 
   /// SPEC §3 "Clear all saved data": forget the persisted `Ans` and mode and
@@ -239,10 +290,18 @@ class CalculatorController extends Notifier<CalcState> {
       if (last == null) {
         return;
       }
+      final Decimal left = state.result ?? state.ans;
       _applyResult(
-        last.apply(state.result ?? state.ans, angleMode: state.angleMode),
+        last.apply(left, angleMode: state.angleMode),
         buffer: state.buffer,
         lastOperation: last,
+        // The history line of a repeated `=` is the operation that just ran,
+        // e.g. `8 + 3`, not the original `5 + 3`.
+        expressionTokens: <Token>[
+          ...valueTokens(left),
+          OperatorToken(last.operator),
+          ...last.rightTokens,
+        ],
       );
       return;
     }
@@ -262,6 +321,7 @@ class CalculatorController extends Notifier<CalcState> {
     CalcResult result, {
     required InputBuffer buffer,
     LastOperation? lastOperation,
+    List<Token>? expressionTokens,
   }) {
     switch (result) {
       case Success(:final Decimal value):
@@ -276,6 +336,7 @@ class CalculatorController extends Notifier<CalcState> {
           second: state.second,
         );
         _saveAns(value);
+        _saveHistory(expressionTokens ?? buffer.tokens, value);
       case Failure(:final CalcError error):
         // §5: show the message and keep the buffer so the user can fix it.
         state = CalcState(
@@ -288,6 +349,27 @@ class CalculatorController extends Notifier<CalcState> {
         );
     }
   }
+
+  /// BUSINESS_LOGIC §10: every successful `=` is saved with the same format
+  /// options the display used, so tapping it later shows the same text.
+  void _saveHistory(List<Token> tokens, Decimal value) {
+    final NumberFormatOptions options = numberFormatFor(
+      ref.read(settingsProvider),
+    );
+    ref
+        .read(historyProvider.notifier)
+        .add(
+          expression: formatExpression(tokens, options: options),
+          result: formatNumber(value, options: options),
+          mode: _historyMode(state.mode),
+        );
+  }
+
+  static HistoryMode _historyMode(CalcMode mode) => switch (mode) {
+    CalcMode.basic => HistoryMode.basic,
+    CalcMode.scientific => HistoryMode.scientific,
+    CalcMode.programmer => HistoryMode.programmer,
+  };
 
   void _saveAns(Decimal value) {
     _ansChanged = true;

@@ -3,6 +3,7 @@ import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calculator_page.dart';
 import 'package:calculator/features/calculator/widgets/display.dart';
 import 'package:calculator/features/calculator/widgets/keypad.dart';
+import 'package:calculator/features/history/history_page.dart';
 import 'package:calculator/features/shell/shell_page.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/shared/widgets/bottom_nav.dart';
@@ -34,6 +35,10 @@ void main() {
   Finder key(String label) =>
       find.descendant(of: find.byType(Keypad), matching: find.text(label));
 
+  /// The IndexedStack builds every tab, so page lookups stay inside one page.
+  Finder inCalculator(Finder matching) =>
+      find.descendant(of: find.byType(CalculatorPage), matching: matching);
+
   IndexedStack stack(WidgetTester tester) =>
       tester.widget<IndexedStack>(find.byType(IndexedStack));
 
@@ -46,11 +51,12 @@ void main() {
     expect(stack(tester).index, 0);
     expect(stack(tester).children.length, 4);
     expect(find.byType(CalculatorPage), findsOneWidget);
-    expect(find.byType(BlueHeader), findsOneWidget);
-    expect(find.byType(Segmented), findsOneWidget);
-    expect(find.byType(Display), findsOneWidget);
-    expect(find.byType(WhiteSheet), findsOneWidget);
-    expect(find.byType(Keypad), findsOneWidget);
+    expect(find.byType(HistoryPage, skipOffstage: false), findsOneWidget);
+    expect(inCalculator(find.byType(BlueHeader)), findsOneWidget);
+    expect(inCalculator(find.byType(Segmented)), findsOneWidget);
+    expect(inCalculator(find.byType(Display)), findsOneWidget);
+    expect(inCalculator(find.byType(WhiteSheet)), findsOneWidget);
+    expect(inCalculator(find.byType(Keypad)), findsOneWidget);
     expect(find.byType(BottomNav), findsOneWidget);
   });
 

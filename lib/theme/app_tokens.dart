@@ -44,6 +44,9 @@ abstract final class AppColors {
   // Navigation
   static const Color navDivider = Color(0xFFEDF0FA);
 
+  // History (screen 04)
+  static const Color historyDivider = Color(0xFF4A62CF);
+
   // States
   static const Color disabled = Color(0xFFA3ABC7);
   static const Color disabledBorder = Color(0xFFDCE1F2);
@@ -80,6 +83,9 @@ abstract final class AppRadii {
   static const double chip = 10;
 
   static const double navItem = 14;
+
+  static const double historyAction = 16;
+  static const double historySearch = 14;
 
   static const double card = 18;
   static const double cardLarge = 20;
@@ -168,6 +174,23 @@ abstract final class AppSizes {
   static const double navIcon = 22;
   static const double navPaddingTop = 10;
   static const double navPaddingBottom = 14;
+
+  // History (screen 04)
+  static const double historyListPaddingTop = 16;
+  static const double historyListPaddingSide = 24;
+  static const double historyListPaddingBottom = 16;
+  static const double historyGroupGap = 6;
+  static const double historyGroupTopGap = 10;
+  static const double historyEntryPaddingV = 8;
+  static const double historyEntryGap = 2;
+  static const double historyActionGap = 10;
+  static const double historyActionHeight = 48;
+  static const double historyMenuRowHeight = 48;
+  static const double historyMenuIcon = 20;
+  static const double searchIcon = 20;
+  static const double historySearchTopGap = 14;
+  static const double historySearchPaddingH = 14;
+  static const double historySearchRadius = 14;
 
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
@@ -321,6 +344,38 @@ abstract final class AppTypography {
   static const TextStyle navLabel = TextStyle(
     fontFamily: fontFamily,
     fontSize: 12,
+    fontWeight: medium,
+  );
+
+  // History (screen 04)
+  static const TextStyle historyDay = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: bold,
+  );
+  static const TextStyle historyExpression = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
+  );
+  static const TextStyle historyResult = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 24,
+    fontWeight: medium,
+  );
+  static const TextStyle historyAction = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: medium,
+  );
+  static const TextStyle historyEmpty = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: regular,
+  );
+  static const TextStyle historyMenu = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
     fontWeight: medium,
   );
 

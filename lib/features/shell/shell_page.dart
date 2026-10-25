@@ -4,12 +4,12 @@ import '../../shared/widgets/bottom_nav.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_page.dart';
+import '../history/history_page.dart';
 
 /// The app shell: four tabs kept alive in an [IndexedStack] with the shared
 /// bottom navigation (ARCHITECTURE "Navigation").
 ///
-/// The converter hub (T36), tools hub (T41) and history (T29) replace the
-/// placeholders below.
+/// The converter hub (T36) and tools hub (T41) replace the placeholders below.
 class ShellPage extends StatefulWidget {
   const ShellPage({super.key});
 
@@ -31,11 +31,13 @@ class _ShellPageState extends State<ShellPage> {
           Expanded(
             child: IndexedStack(
               index: _currentIndex,
-              children: const <Widget>[
-                CalculatorPage(),
-                _HubPlaceholder(title: 'Convert'),
-                _HubPlaceholder(title: 'Tools'),
-                _HubPlaceholder(title: 'History'),
+              children: <Widget>[
+                const CalculatorPage(),
+                const _HubPlaceholder(title: 'Convert'),
+                const _HubPlaceholder(title: 'Tools'),
+                HistoryPage(
+                  onOpenCalculator: () => setState(() => _currentIndex = 0),
+                ),
               ],
             ),
           ),

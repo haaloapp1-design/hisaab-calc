@@ -24,6 +24,7 @@ class BlueHeader extends StatelessWidget {
     this.actionIcon,
     this.onAction,
     this.actionTooltip,
+    this.actionIconSize = AppSizes.headerIcon,
     this.large = false,
     this.rounded = false,
     this.bottomPadding = 0,
@@ -60,6 +61,9 @@ class BlueHeader extends StatelessWidget {
 
   /// Accessibility label of the trailing action.
   final String? actionTooltip;
+
+  /// Size of the trailing action glyph (DESIGN uses 22 px, History 20 px).
+  final double actionIconSize;
 
   /// Hub variant: 26 px left-aligned title, optional subtitle, taller
   /// padding and no side slots.
@@ -147,9 +151,7 @@ class BlueHeader extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: AppTypography.screenTitle.copyWith(
-              color: palette.onPrimary,
-            ),
+            style: AppTypography.screenTitle.copyWith(color: palette.onPrimary),
           ),
         ),
         if (actionIcon == null)
@@ -160,6 +162,7 @@ class BlueHeader extends StatelessWidget {
             icon: actionIcon!,
             tooltip: actionTooltip,
             onTap: onAction!,
+            iconSize: actionIconSize,
           ),
       ],
     );
@@ -186,11 +189,13 @@ class _HeaderAction extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.iconSize = AppSizes.headerIcon,
   });
 
   final IconData icon;
   final String? tooltip;
   final VoidCallback onTap;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +208,7 @@ class _HeaderAction extends StatelessWidget {
         onPressed: onTap,
         tooltip: tooltip,
         padding: EdgeInsets.zero,
-        iconSize: AppSizes.headerIcon,
+        iconSize: iconSize,
         color: palette.onPrimary,
         icon: Icon(icon),
       ),

@@ -23,6 +23,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.onPrimaryMuted,
     required this.onPrimaryFaint,
     required this.dividerOnPrimary,
+    required this.historyDivider,
     required this.sheet,
     required this.background,
     required this.keyNumber,
@@ -53,6 +54,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color onPrimaryMuted;
   final Color onPrimaryFaint;
   final Color dividerOnPrimary;
+  final Color historyDivider;
   final Color sheet;
   final Color background;
   final Color keyNumber;
@@ -84,6 +86,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     onPrimaryMuted: AppColors.onPrimaryMuted,
     onPrimaryFaint: AppColors.onPrimaryFaint,
     dividerOnPrimary: AppColors.dividerOnPrimary,
+    historyDivider: AppColors.historyDivider,
     sheet: AppColors.sheet,
     background: AppColors.background,
     keyNumber: AppColors.keyNumber,
@@ -120,6 +123,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       onPrimaryMuted: _mixWhite(accent, 0.84),
       onPrimaryFaint: _mixWhite(accent, 0.73),
       dividerOnPrimary: _mixWhite(accent, 0.22),
+      historyDivider: _mixWhite(accent, 0.20),
       sheet: AppColors.sheet,
       background: AppColors.background,
       keyNumber: AppColors.keyNumber,
@@ -159,6 +163,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       onPrimaryMuted: _mixWhite(accent, 0.70),
       onPrimaryFaint: _mixWhite(accent, 0.58),
       dividerOnPrimary: _mixWhite(accent, 0.22),
+      historyDivider: _mixWhite(accent, 0.22),
       sheet: sheet,
       background: _darkBackground,
       keyNumber: _darkKeys,
@@ -223,6 +228,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? onPrimaryMuted,
     Color? onPrimaryFaint,
     Color? dividerOnPrimary,
+    Color? historyDivider,
     Color? sheet,
     Color? background,
     Color? keyNumber,
@@ -252,6 +258,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     onPrimaryMuted: onPrimaryMuted ?? this.onPrimaryMuted,
     onPrimaryFaint: onPrimaryFaint ?? this.onPrimaryFaint,
     dividerOnPrimary: dividerOnPrimary ?? this.dividerOnPrimary,
+    historyDivider: historyDivider ?? this.historyDivider,
     sheet: sheet ?? this.sheet,
     background: background ?? this.background,
     keyNumber: keyNumber ?? this.keyNumber,
@@ -289,6 +296,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       onPrimaryMuted: blend(onPrimaryMuted, other.onPrimaryMuted),
       onPrimaryFaint: blend(onPrimaryFaint, other.onPrimaryFaint),
       dividerOnPrimary: blend(dividerOnPrimary, other.dividerOnPrimary),
+      historyDivider: blend(historyDivider, other.historyDivider),
       sheet: blend(sheet, other.sheet),
       background: blend(background, other.background),
       keyNumber: blend(keyNumber, other.keyNumber),

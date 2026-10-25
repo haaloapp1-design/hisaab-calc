@@ -6,6 +6,8 @@ import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calc_state.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
+import 'package:calculator/features/history/history_controller.dart';
+import 'package:calculator/features/history/history_entry.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -95,11 +97,7 @@ void main() {
 
   group('live preview (§5)', () {
     test('shows the result of an operator expression', () async {
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.add,
-        CalcKey.digit3,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.add, CalcKey.digit3]);
 
       expect(calc().preview, Decimal.parse('5'));
     });
@@ -117,11 +115,7 @@ void main() {
     });
 
     test('never shows an error', () async {
-      await press(<CalcKey>[
-        CalcKey.digit5,
-        CalcKey.divide,
-        CalcKey.digit0,
-      ]);
+      await press(<CalcKey>[CalcKey.digit5, CalcKey.divide, CalcKey.digit0]);
 
       expect(calc().preview, isNull);
     });
@@ -141,21 +135,13 @@ void main() {
     });
 
     test('auto-closes missing brackets', () async {
-      await press(<CalcKey>[
-        CalcKey.sin,
-        CalcKey.digit3,
-        CalcKey.digit0,
-      ]);
+      await press(<CalcKey>[CalcKey.sin, CalcKey.digit3, CalcKey.digit0]);
 
       expect(calc().preview, Decimal.parse('0.5'));
     });
 
     test('shows implicit multiplication', () async {
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.leftParen,
-        CalcKey.digit3,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.leftParen, CalcKey.digit3]);
 
       expect(calc().preview, Decimal.parse('6'));
     });
@@ -178,20 +164,13 @@ void main() {
     });
 
     test('previews postfix keys', () async {
-      await press(<CalcKey>[
-        CalcKey.digit5,
-        CalcKey.factorial,
-      ]);
+      await press(<CalcKey>[CalcKey.digit5, CalcKey.factorial]);
 
       expect(calc().preview, Decimal.parse('120'));
     });
 
     test('previews the power key', () async {
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.power,
-        CalcKey.digit3,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.power, CalcKey.digit3]);
 
       expect(calc().preview, Decimal.parse('8'));
     });
@@ -209,10 +188,7 @@ void main() {
     });
 
     test('previews a constant after a value', () async {
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.pi,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.pi]);
 
       expect(calc().preview, isNotNull);
       expect(calc().preview!.toDouble(), closeTo(6.283185307, 1e-9));
@@ -240,10 +216,7 @@ void main() {
 
     test('starts an operator expression when the buffer is empty', () async {
       await store.setString(CalculatorController.ansKey, '8');
-      await press(<CalcKey>[
-        CalcKey.multiply,
-        CalcKey.digit2,
-      ]);
+      await press(<CalcKey>[CalcKey.multiply, CalcKey.digit2]);
 
       expect(tokens(), <Token>[
         const NumberToken('8'),
@@ -268,11 +241,7 @@ void main() {
 
     test('the Ans key inserts the loaded answer', () async {
       await store.setString(CalculatorController.ansKey, '8');
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.add,
-        CalcKey.ans,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.add, CalcKey.ans]);
 
       expect(tokens(), <Token>[
         const NumberToken('2'),
@@ -295,10 +264,7 @@ void main() {
 
     test('clear keeps Ans', () async {
       await store.setString(CalculatorController.ansKey, '8');
-      await press(<CalcKey>[
-        CalcKey.digit5,
-        CalcKey.clear,
-      ]);
+      await press(<CalcKey>[CalcKey.digit5, CalcKey.clear]);
 
       expect(calc().ans, Decimal.parse('8'));
     });
@@ -374,10 +340,7 @@ void main() {
       ]);
       await controller().persistDone;
 
-      expect(
-        await store.getString(CalculatorController.ansKey),
-        '8',
-      );
+      expect(await store.getString(CalculatorController.ansKey), '8');
     });
 
     test('a digit after = starts a new expression', () async {
@@ -499,11 +462,7 @@ void main() {
         const NumberToken('0'),
       ]);
 
-      await press(<CalcKey>[
-        CalcKey.backspace,
-        CalcKey.digit2,
-        CalcKey.equals,
-      ]);
+      await press(<CalcKey>[CalcKey.backspace, CalcKey.digit2, CalcKey.equals]);
 
       expect(calc().error, isNull);
       expect(calc().result, Decimal.parse('2.5'));
@@ -518,11 +477,7 @@ void main() {
     });
 
     test('= on a bare number keeps it on a repeated =', () async {
-      await press(<CalcKey>[
-        CalcKey.digit5,
-        CalcKey.equals,
-        CalcKey.equals,
-      ]);
+      await press(<CalcKey>[CalcKey.digit5, CalcKey.equals, CalcKey.equals]);
 
       expect(calc().result, Decimal.parse('5'));
       expect(calc().ans, Decimal.parse('5'));
@@ -530,11 +485,7 @@ void main() {
     });
 
     test('an incomplete expression reports a syntax error', () async {
-      await press(<CalcKey>[
-        CalcKey.digit2,
-        CalcKey.add,
-        CalcKey.equals,
-      ]);
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.add, CalcKey.equals]);
 
       expect(calc().error, CalcError.syntax);
       expect(tokens(), <Token>[
@@ -552,10 +503,7 @@ void main() {
 
       expect(calc().mode, CalcMode.scientific);
       await controller().persistDone;
-      expect(
-        await store.getString(CalculatorController.modeKey),
-        'scientific',
-      );
+      expect(await store.getString(CalculatorController.modeKey), 'scientific');
     });
 
     test('the mode is restored from the store', () async {
@@ -585,27 +533,17 @@ void main() {
     });
 
     test('the angle mode drives the preview and =', () async {
-      await press(<CalcKey>[
-        CalcKey.sin,
-        CalcKey.digit3,
-        CalcKey.digit0,
-      ]);
+      await press(<CalcKey>[CalcKey.sin, CalcKey.digit3, CalcKey.digit0]);
       expect(calc().preview, Decimal.parse('0.5'));
 
       controller().setAngleMode(AngleMode.rad);
 
       expect(calc().angleMode, AngleMode.rad);
-      expect(
-        calc().preview!.toDouble(),
-        closeTo(-0.988031624092862, 1e-12),
-      );
+      expect(calc().preview!.toDouble(), closeTo(-0.988031624092862, 1e-12));
 
       controller().onKey(CalcKey.equals);
 
-      expect(
-        calc().result!.toDouble(),
-        closeTo(-0.988031624092862, 1e-12),
-      );
+      expect(calc().result!.toDouble(), closeTo(-0.988031624092862, 1e-12));
     });
 
     test('the angle mode does not persist until Settings owns it', () async {
@@ -618,7 +556,11 @@ void main() {
     });
 
     test('2nd swaps a function and turns itself off', () async {
-      await press(<CalcKey>[CalcKey.digit0, CalcKey.decimalPoint, CalcKey.digit5]);
+      await press(<CalcKey>[
+        CalcKey.digit0,
+        CalcKey.decimalPoint,
+        CalcKey.digit5,
+      ]);
 
       controller().toggleSecond();
       expect(calc().second, isTrue);
@@ -680,6 +622,135 @@ void main() {
 
       await press(<CalcKey>[CalcKey.rightParen]);
       expect(calc().openBrackets, 0);
+    });
+  });
+
+  group('history (A10)', () {
+    List<HistoryEntry> history() => container.read(historyProvider);
+
+    Future<void> settleHistory() async {
+      final HistoryController history = container.read(
+        historyProvider.notifier,
+      );
+      await history.restoreDone;
+      await history.persistDone;
+    }
+
+    test('a successful = saves the display strings and mode', () async {
+      await press(<CalcKey>[
+        CalcKey.digit1,
+        CalcKey.digit8,
+        CalcKey.digit0,
+        CalcKey.digit0,
+        CalcKey.add,
+        CalcKey.digit2,
+        CalcKey.digit1,
+        CalcKey.equals,
+      ]);
+      await settleHistory();
+
+      expect(history(), hasLength(1));
+      final HistoryEntry entry = history().single;
+      expect(entry.expression, '1,800 + 21');
+      expect(entry.result, '1,821');
+      expect(entry.mode, HistoryMode.basic);
+    });
+
+    test('a repeated = saves the operation that just ran', () async {
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+        CalcKey.equals,
+      ]);
+      await settleHistory();
+
+      expect(history().map((HistoryEntry entry) => entry.expression), <String>[
+        '8 + 3',
+        '5 + 3',
+      ]);
+      expect(history().map((HistoryEntry entry) => entry.result), <String>[
+        '11',
+        '8',
+      ]);
+    });
+
+    test('the calculator mode becomes the entry mode', () async {
+      await controller().restoreDone;
+      controller().setMode(CalcMode.scientific);
+      await press(<CalcKey>[
+        CalcKey.digit2,
+        CalcKey.add,
+        CalcKey.digit3,
+        CalcKey.equals,
+      ]);
+      await settleHistory();
+
+      expect(history().single.mode, HistoryMode.scientific);
+    });
+
+    test('a failed or empty = saves nothing', () async {
+      await press(<CalcKey>[CalcKey.equals]);
+      await press(<CalcKey>[
+        CalcKey.digit5,
+        CalcKey.divide,
+        CalcKey.digit0,
+        CalcKey.equals,
+      ]);
+      await settleHistory();
+
+      expect(history(), isEmpty);
+    });
+  });
+
+  group('loadExpression (A10)', () {
+    test('re-tokenizes the display line and switches mode', () async {
+      await controller().restoreDone;
+
+      final bool loaded = controller().loadExpression(
+        '1,800 + 21',
+        mode: CalcMode.scientific,
+      );
+
+      expect(loaded, isTrue);
+      expect(calc().mode, CalcMode.scientific);
+      expect(tokens(), <Token>[
+        const NumberToken('1800'),
+        const OperatorToken(OperatorType.add),
+        const NumberToken('21'),
+      ]);
+      expect(calc().justEvaluated, isFalse);
+      expect(calc().preview, Decimal.parse('1821'));
+
+      await controller().persistDone;
+      expect(await store.getString(CalculatorController.modeKey), 'scientific');
+    });
+
+    test('reads the keypad glyphs of a saved expression', () async {
+      final bool loaded = controller().loadExpression('sin(30) + √(144) − 5²');
+
+      expect(loaded, isTrue);
+      expect(tokens(), <Token>[
+        const FunctionToken('sin'),
+        const NumberToken('30'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.add),
+        const FunctionToken('√'),
+        const NumberToken('144'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.subtract),
+        const NumberToken('5'),
+        const PostfixToken(PostfixType.square),
+      ]);
+      expect(calc().mode, CalcMode.basic);
+    });
+
+    test('a sentence that is not an expression is rejected', () async {
+      final bool loaded = controller().loadExpression('5 km → mi');
+
+      expect(loaded, isFalse);
+      expect(calc().buffer.isEmpty, isTrue);
     });
   });
 
