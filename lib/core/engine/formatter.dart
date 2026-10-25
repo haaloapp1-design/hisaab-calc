@@ -12,6 +12,33 @@ class NumberFormatOptions {
     this.groupSeparator = ',',
   });
 
+  /// The options for the device locale (SPEC §3: the decimal separator follows
+  /// it), with the user's fixed decimal count and thousands-separator switch.
+  ///
+  /// [locale] is only for tests; production uses [Intl.defaultLocale], set from
+  /// the platform in `main.dart`. An unsupported locale falls back to `.`/`,`.
+  factory NumberFormatOptions.localized({
+    int? decimalPlaces,
+    bool useGrouping = true,
+    String? locale,
+  }) {
+    String decimal = '.';
+    String group = ',';
+    try {
+      final symbols = NumberFormat.decimalPattern(locale).symbols;
+      decimal = symbols.DECIMAL_SEP;
+      group = symbols.GROUP_SEP;
+    } on Object {
+      // Keep the dot/comma defaults rather than failing to render a result.
+    }
+    return NumberFormatOptions(
+      decimalPlaces: decimalPlaces,
+      useGrouping: useGrouping,
+      decimalSeparator: decimal,
+      groupSeparator: group,
+    );
+  }
+
   /// Fixed decimal places (0–10) or null for Auto: 12 significant digits.
   final int? decimalPlaces;
 

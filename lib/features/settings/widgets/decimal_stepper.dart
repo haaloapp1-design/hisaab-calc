@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 import '../settings_model.dart';
 
@@ -35,6 +36,8 @@ class DecimalStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -51,7 +54,7 @@ class DecimalStepper extends StatelessWidget {
             value?.toString() ?? 'Auto',
             textAlign: TextAlign.center,
             maxLines: 1,
-            style: AppTypography.body.copyWith(color: AppColors.ink),
+            style: AppTypography.body.copyWith(color: palette.ink),
           ),
         ),
         const SizedBox(width: AppSizes.stepperGap),
@@ -81,6 +84,8 @@ class _StepButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Tooltip(
       message: tooltip,
       child: GestureDetector(
@@ -91,17 +96,17 @@ class _StepButton extends StatelessWidget {
           height: AppSizes.stepperButton,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: AppColors.keyNumber,
+            color: palette.keyNumber,
             borderRadius: BorderRadius.circular(AppRadii.chip),
             border: Border.all(
-              color: AppColors.keyNumberBorder,
+              color: palette.keyNumberBorder,
               width: AppSizes.borderWidth,
             ),
           ),
           child: Text(
             glyph,
             style: AppTypography.stepperGlyph.copyWith(
-              color: AppColors.primary,
+              color: palette.primary,
             ),
           ),
         ),

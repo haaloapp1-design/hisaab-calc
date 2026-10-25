@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// The 50×30 Settings switch from `05-settings.html`: a white 24 px knob on a
@@ -22,6 +23,8 @@ class ToggleSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       toggled: value,
       label: semanticLabel,
@@ -35,15 +38,15 @@ class ToggleSwitch extends StatelessWidget {
           padding: const EdgeInsets.all(AppSizes.switchPadding),
           alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           decoration: BoxDecoration(
-            color: value ? AppColors.primary : AppColors.switchOff,
+            color: value ? palette.primary : palette.switchOff,
             borderRadius: BorderRadius.circular(AppSizes.switchHeight / 2),
           ),
           child: Container(
             key: const Key('toggle-knob'),
             width: AppSizes.switchKnob,
             height: AppSizes.switchKnob,
-            decoration: const BoxDecoration(
-              color: AppColors.onPrimary,
+            decoration: BoxDecoration(
+              color: palette.onPrimary,
               shape: BoxShape.circle,
             ),
           ),

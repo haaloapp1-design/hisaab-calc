@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
+import '../accent_colors.dart';
 import '../settings_model.dart';
 
 /// The four 28 px accent dots from the Settings design (screen 05).
@@ -45,17 +47,8 @@ class AccentSelector extends StatelessWidget {
   }
 }
 
-/// Maps a stored swatch choice to its design colour. The colour values stay in
-/// the theme tokens, so [AccentSwatch] itself is pure Dart.
-extension AccentSwatchColor on AccentSwatch {
-  Color get color => switch (this) {
-    AccentSwatch.cobalt => AppColors.primary,
-    AccentSwatch.teal => AppColors.accentTeal,
-    AccentSwatch.violet => AppColors.accentViolet,
-    AccentSwatch.rust => AppColors.accentRust,
-  };
-}
-
+/// Maps a stored swatch choice to its design colour (see
+/// `settings/accent_colors.dart`).
 class _AccentDot extends StatelessWidget {
   const _AccentDot({
     super.key,
@@ -72,6 +65,8 @@ class _AccentDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       button: true,
       selected: selected,
@@ -88,7 +83,7 @@ class _AccentDot extends StatelessWidget {
             shape: BoxShape.circle,
             border: selected
                 ? Border.all(
-                    color: AppColors.onPrimary,
+                    color: palette.onPrimary,
                     width: AppSizes.accentSelectedBorder,
                   )
                 : null,

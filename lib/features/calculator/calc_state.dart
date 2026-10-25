@@ -55,7 +55,8 @@ final class CalcState {
   /// The mode the segmented switcher selected (persisted between launches).
   final CalcMode mode;
 
-  /// §6 the unit trig functions use; the DEG/RAD chip drives it.
+  /// §6 the unit trig functions use; it mirrors the Settings value and the
+  /// DEG/RAD chip writes Settings (T27).
   final AngleMode angleMode;
 
   /// SPEC §1.3 `2nd`: swaps the scientific alternate labels and functions.

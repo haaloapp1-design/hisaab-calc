@@ -350,4 +350,51 @@ void main() {
       );
     });
   });
+
+  group('localized options (SPEC §3)', () {
+    test('an en_US locale keeps the dot/comma pair', () {
+      final NumberFormatOptions options = NumberFormatOptions.localized(
+        locale: 'en_US',
+      );
+
+      expect(options.decimalSeparator, '.');
+      expect(options.groupSeparator, ',');
+      expect(options.useGrouping, isTrue);
+      expect(options.decimalPlaces, isNull);
+      expect(formatNumber(d('1234.5'), options: options), '1,234.5');
+    });
+
+    test('a de_DE locale swaps the separators', () {
+      final NumberFormatOptions options = NumberFormatOptions.localized(
+        locale: 'de_DE',
+      );
+
+      expect(options.decimalSeparator, ',');
+      expect(options.groupSeparator, '.');
+      expect(formatNumber(d('1234.5'), options: options), '1.234,5');
+    });
+
+    test('the Settings values become fixed decimals and grouping', () {
+      final NumberFormatOptions options = NumberFormatOptions.localized(
+        decimalPlaces: 2,
+        useGrouping: false,
+        locale: 'en_US',
+      );
+
+      expect(formatNumber(d('600'), options: options), '600.00');
+      expect(formatExpression(
+        <Token>[const NumberToken('1800')],
+        options: options,
+      ), '1800');
+    });
+
+    test('an unknown locale falls back to the dot/comma pair', () {
+      final NumberFormatOptions options = NumberFormatOptions.localized(
+        locale: 'zz_ZZ',
+      );
+
+      expect(options.decimalSeparator, '.');
+      expect(options.groupSeparator, ',');
+    });
+  });
 }

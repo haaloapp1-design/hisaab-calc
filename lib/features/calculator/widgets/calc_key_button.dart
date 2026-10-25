@@ -1,9 +1,9 @@
-import 'dart:ui' show PathMetric;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
+import 'dashed_border_painter.dart';
 
 /// The five key roles from DESIGN "Components".
 enum CalcKeyKind {
@@ -68,6 +68,7 @@ class CalcKeyButton extends StatefulWidget {
     this.semanticLabel,
     this.density = CalcKeyDensity.basic,
     this.haptics = true,
+    this.sounds = false,
   });
 
   final String label;
@@ -82,6 +83,9 @@ class CalcKeyButton extends StatefulWidget {
   /// SPEC §7 haptic tick; T25/T27 pass the user's setting.
   final bool haptics;
 
+  /// SPEC §3 "Key sounds": plays the platform click on every accepted key.
+  final bool sounds;
+
   @override
   State<CalcKeyButton> createState() => _CalcKeyButtonState();
 }
@@ -92,17 +96,22 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
   bool get _enabled =>
       widget.kind != CalcKeyKind.disabled && widget.onTap != null;
 
-  void _onTap() {
+  void _feedback() {
     if (widget.haptics) {
       HapticFeedback.selectionClick();
     }
+    if (widget.sounds) {
+      SystemSound.play(SystemSoundType.click);
+    }
+  }
+
+  void _onTap() {
+    _feedback();
     widget.onTap?.call();
   }
 
   void _onLongPress() {
-    if (widget.haptics) {
-      HapticFeedback.selectionClick();
-    }
+    _feedback();
     widget.onLongPress?.call();
   }
 
@@ -115,7 +124,8 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
 
   @override
   Widget build(BuildContext context) {
-    final _KeyStyle style = _styleFor(widget.kind, widget.density);
+    final AppPalette palette = AppPalette.of(context);
+    final _KeyStyle style = _styleFor(widget.kind, widget.density, palette);
     final bool pressed = _pressed && _enabled;
 
     Widget key = AnimatedScale(
@@ -144,8 +154,8 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
 
     if (style.dashed) {
       key = CustomPaint(
-        foregroundPainter: _DashedBorderPainter(
-          color: style.border ?? AppColors.disabledBorder,
+        foregroundPainter: DashedBorderPainter(
+          color: style.border ?? palette.disabledBorder,
           radius: widget.density.keyRadius,
         ),
         child: key,
@@ -178,6 +188,7 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
 final class _KeyStyle {
   const _KeyStyle({
     required this.background,
+    required this.pressedBackground,
     required this.foreground,
     required this.textStyle,
     this.border,
@@ -185,115 +196,85 @@ final class _KeyStyle {
   });
 
   final Color background;
+  final Color pressedBackground;
   final Color? border;
   final Color foreground;
   final TextStyle textStyle;
   final bool dashed;
-
-  Color get pressedBackground => background == AppColors.primary
-      ? AppColors.primaryDeep
-      : Color.lerp(background, Colors.black, AppMotion.keyPressDarken)!;
 }
 
-_KeyStyle _styleFor(CalcKeyKind kind, CalcKeyDensity density) {
+_KeyStyle _styleFor(
+  CalcKeyKind kind,
+  CalcKeyDensity density,
+  AppPalette palette,
+) {
   final bool basic = density == CalcKeyDensity.basic;
+  Color pressed(Color background, {bool accent = false}) => accent
+      ? palette.primaryDeep
+      : Color.lerp(background, Colors.black, AppMotion.keyPressDarken)!;
 
   return switch (kind) {
     CalcKeyKind.number => _KeyStyle(
-      background: basic ? AppColors.keyNumber : AppColors.keyNumberScientific,
-      border: AppColors.keyNumberBorder,
-      foreground: AppColors.ink,
+      background: basic ? palette.keyNumber : palette.keyNumberScientific,
+      pressedBackground: pressed(
+        basic ? palette.keyNumber : palette.keyNumberScientific,
+      ),
+      border: palette.keyNumberBorder,
+      foreground: palette.ink,
       textStyle: basic
           ? AppTypography.keyNumberBasic
           : AppTypography.keyNumberScientific,
     ),
     CalcKeyKind.function => _KeyStyle(
-      background: basic ? AppColors.keyNumber : AppColors.keyFunction,
-      border: AppColors.keyNumberBorder,
-      foreground: AppColors.primary,
+      background: basic ? palette.keyNumber : palette.keyFunction,
+      pressedBackground: pressed(
+        basic ? palette.keyNumber : palette.keyFunction,
+      ),
+      border: palette.keyNumberBorder,
+      foreground: palette.primary,
       textStyle: basic
           ? AppTypography.keyFunctionBasic
           : AppTypography.keyFunction,
     ),
     CalcKeyKind.functionStrong => _KeyStyle(
-      background: AppColors.keyNumberScientific,
-      border: AppColors.keyNumberBorder,
-      foreground: AppColors.primary,
+      background: palette.keyNumberScientific,
+      pressedBackground: pressed(palette.keyNumberScientific),
+      border: palette.keyNumberBorder,
+      foreground: palette.primary,
       textStyle: basic
           ? AppTypography.keyFunctionBasic
           : AppTypography.keyFunctionStrong,
     ),
     CalcKeyKind.active => _KeyStyle(
-      background: AppColors.primary,
-      foreground: AppColors.onPrimary,
+      background: palette.primary,
+      pressedBackground: palette.primaryDeep,
+      foreground: palette.onPrimary,
       textStyle: AppTypography.keyFunctionActive,
     ),
     CalcKeyKind.operator => _KeyStyle(
-      background: AppColors.keyOperator,
-      border: AppColors.keyOperatorBorder,
-      foreground: AppColors.primary,
+      background: palette.keyOperator,
+      pressedBackground: pressed(palette.keyOperator),
+      border: palette.keyOperatorBorder,
+      foreground: palette.primary,
       textStyle: basic
           ? AppTypography.keyOperatorBasic
           : AppTypography.keyOperatorScientific,
     ),
     CalcKeyKind.equals => _KeyStyle(
-      background: AppColors.primary,
-      foreground: AppColors.onPrimary,
+      background: palette.primary,
+      pressedBackground: palette.primaryDeep,
+      foreground: palette.onPrimary,
       textStyle: basic
           ? AppTypography.keyEqualsBasic
           : AppTypography.keyEqualsScientific,
     ),
-    CalcKeyKind.disabled => const _KeyStyle(
-      background: AppColors.sheet,
-      border: AppColors.disabledBorder,
-      foreground: AppColors.disabled,
+    CalcKeyKind.disabled => _KeyStyle(
+      background: palette.sheet,
+      pressedBackground: palette.sheet,
+      border: palette.disabledBorder,
+      foreground: palette.disabled,
       textStyle: AppTypography.keyDisabled,
       dashed: true,
     ),
   };
-}
-
-/// The dashed border of a disabled key (`03-programmer.html`).
-class _DashedBorderPainter extends CustomPainter {
-  const _DashedBorderPainter({required this.color, required this.radius});
-
-  final Color color;
-  final double radius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double half = AppSizes.borderWidth / 2;
-    final Paint paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = AppSizes.borderWidth;
-
-    final Path path = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            half,
-            half,
-            size.width - AppSizes.borderWidth,
-            size.height - AppSizes.borderWidth,
-          ),
-          Radius.circular(radius),
-        ),
-      );
-
-    for (final PathMetric metric in path.computeMetrics()) {
-      double start = 0;
-      while (start < metric.length) {
-        canvas.drawPath(
-          metric.extractPath(start, start + AppSizes.disabledDash),
-          paint,
-        );
-        start += AppSizes.disabledDash + AppSizes.disabledDashGap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedBorderPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.radius != radius;
 }

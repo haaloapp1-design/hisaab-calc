@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 
 /// The four destinations of the app's bottom navigation (DESIGN "BottomNav").
@@ -31,11 +32,16 @@ class BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Container(
       key: const Key('bottom-nav'),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
-          top: BorderSide(color: AppColors.navDivider, width: AppSizes.borderWidth),
+          top: BorderSide(
+            color: palette.navDivider,
+            width: AppSizes.borderWidth,
+          ),
         ),
       ),
       padding: const EdgeInsets.fromLTRB(
@@ -77,14 +83,15 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = selected ? AppColors.primary : AppColors.inkMuted;
+    final AppPalette palette = AppPalette.of(context);
+    final Color color = selected ? palette.primary : palette.inkMuted;
 
     return Semantics(
       selected: selected,
       button: true,
       label: destination.label,
       child: Material(
-        color: selected ? AppColors.keyOperator : Colors.transparent,
+        color: selected ? palette.keyOperator : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadii.navItem),
         clipBehavior: Clip.antiAlias,
         child: InkWell(

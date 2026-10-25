@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 
 /// The blue top area of every screen (DESIGN "Components").
@@ -72,11 +73,13 @@ class BlueHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Container(
       key: const Key('blue-header'),
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: palette.primary,
         borderRadius: rounded
             ? const BorderRadius.vertical(
                 bottom: Radius.circular(AppRadii.header),
@@ -96,11 +99,11 @@ class BlueHeader extends StatelessWidget {
               AppSizes.screenPadding,
               bottomPadding,
             ),
-      child: large ? _buildLarge() : _buildStandard(),
+      child: large ? _buildLarge(palette) : _buildStandard(palette),
     );
   }
 
-  Widget _buildLarge() {
+  Widget _buildLarge(AppPalette palette) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -109,7 +112,7 @@ class BlueHeader extends StatelessWidget {
           title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: AppTypography.hubTitle.copyWith(color: AppColors.onPrimary),
+          style: AppTypography.hubTitle.copyWith(color: palette.onPrimary),
         ),
         if (subtitle != null) ...<Widget>[
           const SizedBox(height: AppSizes.headerSubtitleGap),
@@ -118,7 +121,7 @@ class BlueHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.hubSubtitle.copyWith(
-              color: AppColors.onPrimaryMuted,
+              color: palette.onPrimaryMuted,
             ),
           ),
         ],
@@ -126,7 +129,7 @@ class BlueHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildStandard() {
+  Widget _buildStandard(AppPalette palette) {
     return Row(
       children: <Widget>[
         if (onBack == null)
@@ -145,7 +148,7 @@ class BlueHeader extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.screenTitle.copyWith(
-              color: AppColors.onPrimary,
+              color: palette.onPrimary,
             ),
           ),
         ),
@@ -191,6 +194,8 @@ class _HeaderAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return SizedBox(
       width: AppSizes.minTapTarget,
       height: AppSizes.minTapTarget,
@@ -199,7 +204,7 @@ class _HeaderAction extends StatelessWidget {
         tooltip: tooltip,
         padding: EdgeInsets.zero,
         iconSize: AppSizes.headerIcon,
-        color: AppColors.onPrimary,
+        color: palette.onPrimary,
         icon: Icon(icon),
       ),
     );

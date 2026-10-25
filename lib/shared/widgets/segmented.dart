@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 
 /// The pill row that switches Basic / Scientific / Programmer (DESIGN
@@ -22,6 +23,7 @@ class Segmented extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
     final double pillHeight =
         AppSizes.segmentedHeight - AppSizes.segmentTrackPadding * 2;
 
@@ -30,7 +32,7 @@ class Segmented extends StatelessWidget {
       height: AppSizes.segmentedHeight,
       padding: const EdgeInsets.all(AppSizes.segmentTrackPadding),
       decoration: BoxDecoration(
-        color: AppColors.primaryTrack,
+        color: palette.primaryTrack,
         borderRadius: BorderRadius.circular(AppRadii.segmentedTrack),
       ),
       child: Row(
@@ -70,6 +72,8 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       key: Key('segment-$index'),
       container: true,
@@ -87,7 +91,7 @@ class _Segment extends StatelessWidget {
           height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.sheet : Colors.transparent,
+            color: selected ? palette.sheet : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadii.segmentedPill),
           ),
           child: Text(
@@ -95,9 +99,7 @@ class _Segment extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.segmentedLabel.copyWith(
-              color: selected
-                  ? AppColors.primary
-                  : AppColors.segmentedInactive,
+              color: selected ? palette.primary : palette.segmentedInactive,
               fontWeight: selected
                   ? AppTypography.medium
                   : AppTypography.regular,

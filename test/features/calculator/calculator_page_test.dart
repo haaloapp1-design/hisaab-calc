@@ -1,3 +1,4 @@
+import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/engine/calc_result.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
@@ -5,6 +6,8 @@ import 'package:calculator/features/calculator/calculator_page.dart';
 import 'package:calculator/features/calculator/widgets/display.dart';
 import 'package:calculator/features/calculator/widgets/calc_key_button.dart';
 import 'package:calculator/features/calculator/widgets/keypad.dart';
+import 'package:calculator/features/settings/settings_controller.dart';
+import 'package:calculator/features/settings/settings_model.dart';
 import 'package:calculator/features/settings/settings_page.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/shared/widgets/segmented.dart';
@@ -16,8 +19,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget app() => ProviderScope(
-    overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+  Widget app([MemoryKvStore? store]) => ProviderScope(
+    overrides: [kvStoreProvider.overrideWithValue(store ?? MemoryKvStore())],
     child: MaterialApp(theme: AppTheme.light(), home: const CalculatorPage()),
   );
 
@@ -396,5 +399,82 @@ void main() {
 
     expect(find.byType(SettingsPage), findsNothing);
     expect(find.byType(CalcKeyButton), findsNWidgets(20));
+  });
+
+  testWidgets('stored formatter and feedback settings reach the page', (
+    tester,
+  ) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      SettingsController.key: const Settings(
+        decimalPlaces: 2,
+        thousandsSeparator: true,
+        haptics: false,
+        keySounds: true,
+      ).encode(),
+    });
+    await tester.pumpWidget(app(store));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Keypad>(find.byType(Keypad)).haptics,
+      isFalse,
+    );
+    expect(tester.widget<Keypad>(find.byType(Keypad)).sounds, isTrue);
+
+    await tapKeys(tester, <String>['1', '8', '0', '0']);
+    expect(expressionText(tester), '1,800');
+
+    await tapKeys(tester, <String>['÷', '3']);
+    expect(expressionText(tester), '1,800 ÷ 3');
+    expect(resultText(tester), '600.00');
+
+    await tester.tap(key('='));
+    await tester.pump();
+    expect(expressionText(tester), '');
+    expect(resultText(tester), '600.00');
+  });
+
+  testWidgets('the stored angle unit is used until the chip changes it', (
+    tester,
+  ) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      SettingsController.key: const Settings(angleMode: AngleMode.rad).encode(),
+    });
+    await tester.pumpWidget(app(store));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pumpAndSettle();
+    await tapKeys(tester, <String>['sin', '3', '0']);
+    expect(resultText(tester), '−0.988031624093');
+
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(CalculatorPage)),
+    );
+    await tester.tap(find.byKey(const Key('angle-deg')));
+    await tester.pumpAndSettle();
+
+    expect(container.read(settingsProvider).angleMode, AngleMode.deg);
+    expect(resultText(tester), '0.5');
+  });
+
+  testWidgets('changing Settings updates the display live', (tester) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+
+    await tapKeys(tester, <String>['1', '8', '0', '0', '+', '2', '0', '0']);
+    expect(expressionText(tester), '1,800 + 200');
+
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(CalculatorPage)),
+    );
+    container.read(settingsProvider.notifier).setThousandsSeparator(false);
+    await tester.pumpAndSettle();
+
+    expect(expressionText(tester), '1800 + 200');
+    expect(resultText(tester), '2000');
   });
 }

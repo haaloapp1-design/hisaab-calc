@@ -38,7 +38,7 @@ class SettingsController extends Notifier<Settings> {
   /// SPEC §3 accent swatches.
   void setAccent(AccentSwatch value) => _save(state.copyWith(accent: value));
 
-  /// SPEC §3 angle unit; T27 feeds this to the calculator.
+  /// SPEC §3 angle unit; the calculator mirrors this value (T27).
   void setAngleMode(AngleMode value) =>
       _save(state.copyWith(angleMode: value));
 

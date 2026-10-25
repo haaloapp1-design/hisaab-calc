@@ -39,6 +39,7 @@ class Keypad extends StatelessWidget {
     required this.columns,
     this.density = CalcKeyDensity.basic,
     this.haptics = true,
+    this.sounds = false,
   }) : assert(columns > 0, 'a keypad needs at least one column');
 
   final List<KeypadEntry> spec;
@@ -47,6 +48,9 @@ class Keypad extends StatelessWidget {
 
   /// SPEC §7 haptic tick; T25/T27 pass the user's setting.
   final bool haptics;
+
+  /// SPEC §3 key sounds; T27 passes the user's setting.
+  final bool sounds;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +88,7 @@ class Keypad extends StatelessWidget {
             semanticLabel: entry.semanticLabel,
             density: density,
             haptics: haptics,
+            sounds: sounds,
           ),
         ),
       );

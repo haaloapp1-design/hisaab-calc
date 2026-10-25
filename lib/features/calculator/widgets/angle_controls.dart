@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/engine/angle_mode.dart';
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// The DEG/RAD chip row above the scientific display, with the open-bracket
@@ -65,6 +66,8 @@ class _AngleChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       button: true,
       selected: selected,
@@ -80,12 +83,12 @@ class _AngleChip extends StatelessWidget {
             horizontal: AppSizes.angleChipPaddingH,
           ),
           decoration: BoxDecoration(
-            color: selected ? AppColors.onPrimary : Colors.transparent,
+            color: selected ? palette.onPrimary : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadii.chip),
             border: selected
                 ? null
                 : Border.all(
-                    color: AppColors.dividerOnPrimary,
+                    color: palette.dividerOnPrimary,
                     width: AppSizes.borderWidth,
                   ),
           ),
@@ -93,7 +96,7 @@ class _AngleChip extends StatelessWidget {
             label,
             maxLines: 1,
             style: AppTypography.small.copyWith(
-              color: selected ? AppColors.primary : AppColors.onPrimaryMuted,
+              color: selected ? palette.primary : palette.onPrimaryMuted,
               fontWeight: selected
                   ? AppTypography.bold
                   : AppTypography.regular,
@@ -114,6 +117,8 @@ class _BracketBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       label: '$count open brackets',
       excludeSemantics: true,
@@ -126,7 +131,7 @@ class _BracketBadge extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadii.chip),
           border: Border.all(
-            color: AppColors.dividerOnPrimary,
+            color: palette.dividerOnPrimary,
             width: AppSizes.borderWidth,
           ),
         ),
@@ -134,7 +139,7 @@ class _BracketBadge extends StatelessWidget {
           '($count',
           maxLines: 1,
           style: AppTypography.small.copyWith(
-            color: AppColors.onPrimaryMuted,
+            color: palette.onPrimaryMuted,
           ),
         ),
       ),

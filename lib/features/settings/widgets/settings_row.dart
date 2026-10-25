@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// One line of a Settings card: a 15 px label on the left and an optional
@@ -21,6 +22,8 @@ class SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       button: onTap != null,
       child: GestureDetector(
@@ -37,7 +40,7 @@ class SettingsRow extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: AppTypography.body.copyWith(color: AppColors.ink),
+                  style: AppTypography.body.copyWith(color: palette.ink),
                 ),
               ),
               ?trailing,
@@ -60,7 +63,9 @@ class SettingsValue extends StatelessWidget {
     return Text(
       text,
       maxLines: 1,
-      style: AppTypography.settingsValue.copyWith(color: AppColors.primary),
+      style: AppTypography.settingsValue.copyWith(
+        color: AppPalette.of(context).primary,
+      ),
     );
   }
 }

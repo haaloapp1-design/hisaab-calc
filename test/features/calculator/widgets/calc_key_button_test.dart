@@ -361,4 +361,62 @@ void main() {
 
     semantics.dispose();
   });
+
+  testWidgets('key sounds play the platform click only when enabled', (
+    tester,
+  ) async {
+    final List<MethodCall> calls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (MethodCall call) async {
+        calls.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    await tester.pumpWidget(
+      wrap(
+        CalcKeyButton(
+          label: '5',
+          kind: CalcKeyKind.number,
+          sounds: true,
+          haptics: false,
+          onTap: () {},
+        ),
+      ),
+    );
+    await tester.tap(find.byType(CalcKeyButton));
+    await tester.pump();
+
+    expect(
+      calls.where(
+        (MethodCall call) =>
+            call.method == 'SystemSound.play' &&
+            call.arguments == 'SystemSoundType.click',
+      ),
+      hasLength(1),
+    );
+
+    calls.clear();
+    await tester.pumpWidget(
+      wrap(
+        CalcKeyButton(
+          label: '5',
+          kind: CalcKeyKind.number,
+          haptics: false,
+          onTap: () {},
+        ),
+      ),
+    );
+    await tester.tap(find.byType(CalcKeyButton));
+    await tester.pump();
+
+    expect(calls.where((MethodCall call) => call.method == 'SystemSound.play'), isEmpty);
+  });
 }

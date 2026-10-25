@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 
 /// The white card that holds the lower half of a screen (DESIGN "Components").
@@ -30,12 +31,14 @@ class WhiteSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Container(
       key: const Key('white-sheet'),
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: AppColors.sheet,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: palette.sheet,
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppRadii.sheet),
         ),
       ),
@@ -58,7 +61,7 @@ class WhiteSheet extends StatelessWidget {
                 width: AppSizes.handleWidth,
                 height: AppSizes.handleHeight,
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: palette.primary,
                   borderRadius: BorderRadius.circular(AppRadii.handle),
                 ),
               ),

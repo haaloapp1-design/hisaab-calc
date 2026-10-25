@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../settings_model.dart';
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
+import '../settings_model.dart';
 
 /// The Light / Dark / System pills from the Theme row (screen 05).
 ///
@@ -25,10 +26,12 @@ class ThemeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Container(
       padding: const EdgeInsets.all(AppSizes.settingsTrackPadding),
       decoration: BoxDecoration(
-        color: AppColors.selectorTrack,
+        color: palette.selectorTrack,
         borderRadius: BorderRadius.circular(AppRadii.settingsTrack),
       ),
       child: Row(
@@ -64,6 +67,8 @@ class _ThemePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       button: true,
       selected: selected,
@@ -78,14 +83,14 @@ class _ThemePill extends StatelessWidget {
             horizontal: AppSizes.settingsPillPaddingH,
           ),
           decoration: BoxDecoration(
-            color: selected ? AppColors.onPrimary : Colors.transparent,
+            color: selected ? palette.onPrimary : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadii.settingsPill),
           ),
           child: Text(
             label,
             maxLines: 1,
             style: AppTypography.settingsPill.copyWith(
-              color: selected ? AppColors.primary : AppColors.inkMuted,
+              color: selected ? palette.primary : palette.inkMuted,
               fontWeight: selected ? AppTypography.bold : AppTypography.regular,
             ),
           ),

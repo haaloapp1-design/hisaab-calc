@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// The 36 px "Clear" button from the Data card (screen 05): white `danger`
@@ -11,6 +12,8 @@ class ClearDataButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Semantics(
       button: true,
       child: GestureDetector(
@@ -24,16 +27,16 @@ class ClearDataButton extends StatelessWidget {
           ),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: AppColors.dangerSurface,
+            color: palette.dangerSurface,
             borderRadius: BorderRadius.circular(AppRadii.chip),
             border: Border.all(
-              color: AppColors.dangerBorder,
+              color: palette.dangerBorder,
               width: AppSizes.borderWidth,
             ),
           ),
           child: Text(
             'Clear',
-            style: AppTypography.clearButton.copyWith(color: AppColors.danger),
+            style: AppTypography.clearButton.copyWith(color: palette.danger),
           ),
         ),
       ),

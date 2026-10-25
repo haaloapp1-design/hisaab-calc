@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/engine/calc_result.dart';
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// Display density: Basic uses 60 px results and 20 px expressions,
@@ -51,10 +52,11 @@ class Display extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
     final _DisplayMetrics metrics = _metricsFor(density);
     final Color resultColour = error != null
-        ? AppColors.warning
-        : (preview ? AppColors.onPrimaryMuted : AppColors.onPrimary);
+        ? palette.warning
+        : (preview ? palette.onPrimaryMuted : palette.onPrimary);
 
     return Padding(
       key: const Key('display'),
@@ -78,7 +80,7 @@ class Display extends StatelessWidget {
                 child: _ExpressionLine(
                   expression: expression,
                   style: metrics.expressionStyle.copyWith(
-                    color: AppColors.onPrimaryMuted,
+                    color: palette.onPrimaryMuted,
                   ),
                 ),
               ),
@@ -88,7 +90,7 @@ class Display extends StatelessWidget {
           Container(
             key: const Key('display-divider'),
             height: AppSizes.borderWidth,
-            color: AppColors.dividerOnPrimary,
+            color: palette.dividerOnPrimary,
           ),
           SizedBox(height: metrics.gap),
           _ResultLine(
@@ -139,6 +141,8 @@ class _MemoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Container(
       key: const Key('display-memory'),
       padding: const EdgeInsets.symmetric(
@@ -148,14 +152,14 @@ class _MemoryChip extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppRadii.chip),
         border: Border.all(
-          color: AppColors.dividerOnPrimary,
+          color: palette.dividerOnPrimary,
           width: AppSizes.borderWidth,
         ),
       ),
       child: Text(
         'M = $memory',
         maxLines: 1,
-        style: AppTypography.small.copyWith(color: AppColors.onPrimaryFaint),
+        style: AppTypography.small.copyWith(color: palette.onPrimaryFaint),
       ),
     );
   }

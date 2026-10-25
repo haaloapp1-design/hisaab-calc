@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/engine/angle_mode.dart';
 import '../../core/engine/formatter.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../shared/widgets/segmented.dart';
 import '../../shared/widgets/white_sheet.dart';
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import '../settings/settings_controller.dart';
+import '../settings/settings_model.dart';
 import '../settings/settings_page.dart';
 import 'calc_state.dart';
 import 'calculator_controller.dart';
@@ -33,14 +37,28 @@ class CalculatorPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppPalette palette = AppPalette.of(context);
     final CalcState calc = ref.watch(calculatorProvider);
+    final Settings settings = ref.watch(settingsProvider);
     final CalculatorController controller = ref.read(
       calculatorProvider.notifier,
     );
+
+    // The angle lives in Settings (T27); the calculator keeps a mirror so its
+    // previews and `=` use the same value.
+    ref.listen<AngleMode>(
+      settingsProvider.select((Settings value) => value.angleMode),
+      (AngleMode? previous, AngleMode next) => controller.setAngleMode(next),
+    );
+
     final bool scientific = calc.mode == CalcMode.scientific;
+    final NumberFormatOptions format = NumberFormatOptions.localized(
+      decimalPlaces: settings.decimalPlaces,
+      useGrouping: settings.thousandsSeparator,
+    );
 
     return ColoredBox(
-      color: AppColors.primary,
+      color: palette.primary,
       child: SafeArea(
         bottom: false,
         child: Column(
@@ -79,16 +97,21 @@ class CalculatorPage extends ConsumerWidget {
                         AppSizes.angleRowBottomGap,
                       ),
                       child: AngleControls(
-                        angleMode: calc.angleMode,
-                        onChanged: controller.setAngleMode,
+                        angleMode: settings.angleMode,
+                        onChanged: ref
+                            .read(settingsProvider.notifier)
+                            .setAngleMode,
                         openBrackets: calc.openBrackets,
                       ),
                     ),
                   Display(
                     expression: calc.justEvaluated
                         ? ''
-                        : formatExpression(calc.buffer.tokens),
-                    result: formatNumber(calc.displayValue),
+                        : formatExpression(
+                            calc.buffer.tokens,
+                            options: format,
+                          ),
+                    result: formatNumber(calc.displayValue, options: format),
                     preview: calc.result == null && calc.preview != null,
                     error: calc.error,
                     density: scientific
@@ -119,10 +142,14 @@ class CalculatorPage extends ConsumerWidget {
                       ),
                       columns: 5,
                       density: CalcKeyDensity.scientific,
+                      haptics: settings.haptics,
+                      sounds: settings.keySounds,
                     )
                   : Keypad(
                       spec: basicKeys(controller.onKey),
                       columns: 4,
+                      haptics: settings.haptics,
+                      sounds: settings.keySounds,
                     ),
             ),
           ],

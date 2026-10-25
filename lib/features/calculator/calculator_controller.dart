@@ -330,7 +330,7 @@ class CalculatorController extends Notifier<CalcState> {
 }
 
 /// ARCHITECTURE "State": mode, buffer tokens, preview, result, error, 2nd and
-/// Ans. T27 connects the angle mode to Settings.
+/// Ans. The angle mirrors Settings (see `CalculatorPage`).
 final NotifierProvider<CalculatorController, CalcState> calculatorProvider =
     NotifierProvider<CalculatorController, CalcState>(
       CalculatorController.new,

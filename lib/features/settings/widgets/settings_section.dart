@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 
 /// A titled white card from the Settings design (screen 05).
@@ -18,6 +19,8 @@ class SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -28,7 +31,7 @@ class SettingsSection extends StatelessWidget {
           child: Text(
             title,
             style: AppTypography.sectionLabel.copyWith(
-              color: AppColors.inkMuted,
+              color: palette.inkMuted,
             ),
           ),
         ),
@@ -40,7 +43,7 @@ class SettingsSection extends StatelessWidget {
             vertical: AppSizes.settingsCardPaddingV,
           ),
           decoration: BoxDecoration(
-            color: AppColors.sheet,
+            color: palette.sheet,
             borderRadius: BorderRadius.circular(AppRadii.cardLarge),
           ),
           child: Column(
@@ -51,7 +54,7 @@ class SettingsSection extends StatelessWidget {
                 if (index < children.length - 1)
                   Container(
                     height: AppSizes.borderWidth,
-                    color: AppColors.divider,
+                    color: palette.divider,
                   ),
               ],
             ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/widgets/bottom_nav.dart';
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_page.dart';
 
@@ -21,8 +22,10 @@ class _ShellPageState extends State<ShellPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       body: Column(
         children: <Widget>[
           Expanded(
@@ -37,7 +40,7 @@ class _ShellPageState extends State<ShellPage> {
             ),
           ),
           ColoredBox(
-            color: AppColors.sheet,
+            color: palette.sheet,
             child: SafeArea(
               top: false,
               child: BottomNav(
@@ -61,14 +64,16 @@ class _HubPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppPalette palette = AppPalette.of(context);
+
     return ColoredBox(
-      color: AppColors.background,
+      color: palette.background,
       child: SafeArea(
         bottom: false,
         child: Center(
           child: Text(
             title,
-            style: AppTypography.hubTitle.copyWith(color: AppColors.ink),
+            style: AppTypography.hubTitle.copyWith(color: palette.ink),
           ),
         ),
       ),

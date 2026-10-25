@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/engine/angle_mode.dart';
 import '../../shared/widgets/blue_header.dart';
+import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_controller.dart';
 import 'settings_controller.dart';
@@ -29,11 +30,12 @@ class SettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AppPalette palette = AppPalette.of(context);
     final Settings settings = ref.watch(settingsProvider);
     final SettingsController controller = ref.read(settingsProvider.notifier);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: palette.background,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -157,7 +159,7 @@ class SettingsPage extends ConsumerWidget {
                       'Version $version',
                       textAlign: TextAlign.center,
                       style: AppTypography.small.copyWith(
-                        color: AppColors.inkMuted,
+                        color: palette.inkMuted,
                       ),
                     ),
                   ],
@@ -221,7 +223,7 @@ class SettingsPage extends ConsumerWidget {
                 child: Text(
                   'Clear',
                   style: AppTypography.body.copyWith(
-                    color: AppColors.danger,
+                    color: AppPalette.of(context).danger,
                     fontWeight: AppTypography.medium,
                   ),
                 ),
