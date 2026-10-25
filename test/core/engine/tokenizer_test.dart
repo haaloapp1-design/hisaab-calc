@@ -145,8 +145,185 @@ void main() {
     });
   });
 
+  group('functions and constants', () {
+    test('a function owns its opening bracket', () {
+      expect(tokenize('sin(30)'), <Token>[
+        const FunctionToken('sin'),
+        const NumberToken('30'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('cos(0)'), <Token>[
+        const FunctionToken('cos'),
+        const NumberToken('0'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('tan(45)'), <Token>[
+        const FunctionToken('tan'),
+        const NumberToken('45'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('understands logarithms, roots and inverse trig', () {
+      expect(tokenize('ln(e)'), <Token>[
+        const FunctionToken('ln'),
+        const ConstantToken(MathConstant.e),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('log(100)'), <Token>[
+        const FunctionToken('log'),
+        const NumberToken('100'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('√(144)'), <Token>[
+        const FunctionToken('√'),
+        const NumberToken('144'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('∛(8)'), <Token>[
+        const FunctionToken('∛'),
+        const NumberToken('8'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('sin⁻¹(0.5)'), <Token>[
+        const FunctionToken('sin⁻¹'),
+        const NumberToken('0.5'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('understands eˣ and 10ˣ', () {
+      expect(tokenize('eˣ(2)'), <Token>[
+        const FunctionToken('eˣ'),
+        const NumberToken('2'),
+        const RightParenToken(),
+      ]);
+      expect(tokenize('10ˣ(3)'), <Token>[
+        const FunctionToken('10ˣ'),
+        const NumberToken('3'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('tokenizes constants and Ans', () {
+      expect(tokenize('π'), <Token>[const ConstantToken(MathConstant.pi)]);
+      expect(tokenize('pi'), <Token>[const ConstantToken(MathConstant.pi)]);
+      expect(tokenize('e'), <Token>[const ConstantToken(MathConstant.e)]);
+      expect(tokenize('Ans'), <Token>[const AnsToken()]);
+      expect(tokenize('ans+1'), <Token>[
+        const AnsToken(),
+        const OperatorToken(OperatorType.add),
+        const NumberToken('1'),
+      ]);
+    });
+
+    test('a sign inside a function bracket is unary', () {
+      expect(tokenize('sin(−30)'), <Token>[
+        const FunctionToken('sin'),
+        const UnaryToken(negative: true),
+        const NumberToken('30'),
+        const RightParenToken(),
+      ]);
+    });
+  });
+
+  group('implicit multiplication', () {
+    test('number × constant', () {
+      expect(tokenize('2π'), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const ConstantToken(MathConstant.pi),
+      ]);
+    });
+
+    test('number × bracket', () {
+      expect(tokenize('3(4)'), <Token>[
+        const NumberToken('3'),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const LeftParenToken(),
+        const NumberToken('4'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('bracket × bracket', () {
+      expect(tokenize('(1)(2)'), <Token>[
+        const LeftParenToken(),
+        const NumberToken('1'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const LeftParenToken(),
+        const NumberToken('2'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('number × function', () {
+      expect(tokenize('2sin(30)'), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const FunctionToken('sin'),
+        const NumberToken('30'),
+        const RightParenToken(),
+      ]);
+    });
+
+    test('postfix × number', () {
+      expect(tokenize('5!2'), <Token>[
+        const NumberToken('5'),
+        const PostfixToken(PostfixType.factorial),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const NumberToken('2'),
+      ]);
+    });
+
+    test('constant × constant, number × Ans and bracket × number', () {
+      expect(tokenize('πe'), <Token>[
+        const ConstantToken(MathConstant.pi),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const ConstantToken(MathConstant.e),
+      ]);
+      expect(tokenize('2Ans'), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const AnsToken(),
+      ]);
+      expect(tokenize('(2)3'), <Token>[
+        const LeftParenToken(),
+        const NumberToken('2'),
+        const RightParenToken(),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const NumberToken('3'),
+      ]);
+    });
+
+    test('does not insert × where it does not belong', () {
+      expect(tokenize('2×3'), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.multiply),
+        const NumberToken('3'),
+      ]);
+      expect(
+        tokenize('sin(30)'),
+        isNot(
+          contains(const OperatorToken(OperatorType.multiply, implicit: true)),
+        ),
+      );
+      expect(tokenize('2^3(4)'), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.power),
+        const NumberToken('3'),
+        const OperatorToken(OperatorType.multiply, implicit: true),
+        const LeftParenToken(),
+        const NumberToken('4'),
+        const RightParenToken(),
+      ]);
+    });
+  });
+
   test('rejects characters it cannot tokenize', () {
     expect(() => tokenize('2#3'), throwsFormatException);
     expect(() => tokenize('2.5.1'), throwsFormatException);
+    expect(() => tokenize('sinx'), throwsFormatException);
   });
 }

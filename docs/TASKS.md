@@ -24,7 +24,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `CalcResult` sealed class + `CalcError` enum with display texts; tests.
 - [x] **T05 Tokenizer: numbers, operators, brackets** — Read: §3.
   Done when: `"12.5+3×(4−1)"` → correct tokens; `−` after operator/`(` becomes unary; tests.
-- [ ] **T06 Tokenizer: functions, constants, implicit ×** — Read: §3.
+- [x] **T06 Tokenizer: functions, constants, implicit ×** — Read: §3.
   Done when: `2π`, `3(4)`, `(1)(2)`, `2sin(30)`, `5!2` tokenize with hidden ×; tests.
 - [ ] **T07 Parser core** — Read: §3 (precedence table). Files: `ast.dart`, `parser.dart`.
   Done when: `2+3×4`→14 tree, `2^3^2` right-assoc, `−2^2` = −(2^2), brackets; tests on AST shape.

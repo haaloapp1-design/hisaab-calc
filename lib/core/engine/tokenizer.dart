@@ -1,9 +1,25 @@
 import 'token.dart';
 
+/// Function names the tokenizer understands, matching the labels on the
+/// scientific keypad (BUSINESS_LOGIC §3, SPEC §1.3).
+const Set<String> _functionNames = <String>{
+  'sin',
+  'cos',
+  'tan',
+  'sin⁻¹',
+  'cos⁻¹',
+  'tan⁻¹',
+  'ln',
+  'log',
+};
+
+const String _inverseSuffix = '⁻¹';
+
 /// Turns source text into tokens (BUSINESS_LOGIC §1, §3).
 ///
-/// Numbers, operators, brackets and postfix operators are handled here.
-/// Functions, constants and implicit `×` arrive in T06.
+/// Handles numbers, operators, brackets, postfix operators, functions,
+/// constants (`π`, `e`), `Ans`, and inserts the hidden `×` for implicit
+/// multiplication.
 ///
 /// Throws [FormatException] for text it cannot tokenize; the engine facade
 /// turns that into `CalcError.syntax`, so nothing reaches the UI as an
@@ -20,11 +36,36 @@ List<Token> tokenize(String source) {
     expectsValue = valueAfter;
   }
 
+  // A function token owns its opening bracket, so `sin(` is one token.
+  void addFunction(String name) {
+    if (index < source.length && source[index] == '(') {
+      index++;
+    }
+    add(FunctionToken(name), valueAfter: true);
+  }
+
   while (index < source.length) {
     final String char = source[index];
 
     if (_isWhitespace(char)) {
       index++;
+      continue;
+    }
+
+    // Multi-character function symbols (checked before numbers/letters).
+    if (_matchesAt(source, index, '10ˣ')) {
+      index += 3;
+      addFunction('10ˣ');
+      continue;
+    }
+    if (_matchesAt(source, index, 'eˣ')) {
+      index += 2;
+      addFunction('eˣ');
+      continue;
+    }
+    if (char == '√' || char == '∛') {
+      index++;
+      addFunction(char);
       continue;
     }
 
@@ -48,9 +89,32 @@ List<Token> tokenize(String source) {
       while (index < source.length && _isLetter(source[index])) {
         index++;
       }
-      final String word = source.substring(start, index);
+      String word = source.substring(start, index);
+
+      if ((word == 'sin' || word == 'cos' || word == 'tan') &&
+          _matchesAt(source, index, _inverseSuffix)) {
+        index += _inverseSuffix.length;
+        word += _inverseSuffix;
+      }
+
       if (word == 'mod') {
         add(const OperatorToken(OperatorType.mod), valueAfter: true);
+        continue;
+      }
+      if (word == 'Ans' || word == 'ans') {
+        add(const AnsToken(), valueAfter: false);
+        continue;
+      }
+      if (word == 'pi') {
+        add(const ConstantToken(MathConstant.pi), valueAfter: false);
+        continue;
+      }
+      if (word == 'e') {
+        add(const ConstantToken(MathConstant.e), valueAfter: false);
+        continue;
+      }
+      if (_functionNames.contains(word)) {
+        addFunction(word);
         continue;
       }
       throw FormatException('Unknown name "$word"', source, start);
@@ -81,6 +145,8 @@ List<Token> tokenize(String source) {
         add(const LeftParenToken(), valueAfter: true);
       case ')':
         add(const RightParenToken(), valueAfter: false);
+      case 'π':
+        add(const ConstantToken(MathConstant.pi), valueAfter: false);
       case '!':
         add(const PostfixToken(PostfixType.factorial), valueAfter: false);
       case '%':
@@ -95,8 +161,45 @@ List<Token> tokenize(String source) {
     index++;
   }
 
-  return tokens;
+  return _insertImplicitMultiplication(tokens);
 }
+
+/// Inserts the hidden `×` between A and B per BUSINESS_LOGIC §3.
+List<Token> _insertImplicitMultiplication(List<Token> tokens) {
+  if (tokens.length < 2) {
+    return tokens;
+  }
+
+  final List<Token> result = <Token>[];
+  Token? previous;
+  for (final Token token in tokens) {
+    if (previous != null && _endsValue(previous) && _startsValue(token)) {
+      result.add(const OperatorToken(OperatorType.multiply, implicit: true));
+    }
+    result.add(token);
+    previous = token;
+  }
+  return result;
+}
+
+/// A is a number, constant, `)`, `!`, `%`, `Ans` or a postfix power.
+bool _endsValue(Token token) =>
+    token is NumberToken ||
+    token is ConstantToken ||
+    token is RightParenToken ||
+    token is PostfixToken ||
+    token is AnsToken;
+
+/// B is a number, constant, `(`, a function or `Ans`.
+bool _startsValue(Token token) =>
+    token is NumberToken ||
+    token is ConstantToken ||
+    token is LeftParenToken ||
+    token is FunctionToken ||
+    token is AnsToken;
+
+bool _matchesAt(String source, int index, String text) =>
+    source.startsWith(text, index);
 
 bool _isDigit(String char) {
   final int code = char.codeUnitAt(0);

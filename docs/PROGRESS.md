@@ -13,6 +13,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — `MemoryKvStore` lives in `lib/core/storage/` and `kvStoreProvider` in its own file `kv_store_provider.dart` — shared by every future test/provider override instead of test-only code.
 - 2026-10-25 — Token model: `FunctionToken` owns its `(`, hidden `×` is `OperatorToken(multiply, implicit: true)`, and `CalcError.domain` displays "Undefined" — matches §1 ("sin( is ONE token") and §7; T05/T06 tokenize into this.
 - 2026-10-25 — Leading `+`/`−` becomes a `UnaryToken` in the tokenizer, not a parser-only decision — T05 requires it and the parser can use precedence level 4 directly.
+- 2026-10-25 — Function tokens use display names (`sin⁻¹`, `eˣ`, `10ˣ`, `√`, `∛`) and consume their `(`; hidden `×` is added in a post-pass over the token list — keeps `sin(` one token (§1) and makes implicit-multiplication rules one place.
 
 ## Log entry template
 
@@ -68,3 +69,10 @@ Changed: `lib/core/engine/tokenizer.dart` (top-level `tokenize`, whitespace/alia
 Tests: §3 sample `12.5+3×(4−1)`, empty input, decimals/leading zeros, `* / ^` aliases, `mod`, postfix `! % ² ³`, whitespace, unary at start / after operator / after `(` / after `−`, binary after value or `)`, unknown chars throw; `flutter test` 40/40 pass; `flutter analyze` clean.
 Notes for next session: T06 must extend the word branch in `tokenize` (today only `mod` is known, everything else throws) with functions/constants, and insert hidden `×` before `(`/function/constant/`Ans`. `expectsValue` already tracks unary context. Numbers keep trailing dots (`12.`) — parser must normalise before `Decimal.parse`.
 Next: T06 Tokenizer: functions, constants, implicit ×
+
+### T06 — Tokenizer: functions, constants, implicit × — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/tokenizer.dart` (function set `sin cos tan sin⁻¹ cos⁻¹ tan⁻¹ ln log √ ∛ eˣ 10ˣ`, constants `π`/`pi`/`e`, `Ans`/`ans`, hidden-× post-pass), `test/core/engine/tokenizer_test.dart`.
+Tests: `2π`, `3(4)`, `(1)(2)`, `2sin(30)`, `5!2`, `πe`, `2Ans`, `(2)3` all get `OperatorToken(multiply, implicit: true)`; functions keep their bracket; roots/inverse/`eˣ`/`10ˣ`; no × inside `sin(30)`; `flutter test` 52/52 pass; `flutter analyze` clean.
+Notes for next session: T07 parser receives `FunctionToken` where a `(` would be (it already consumed the bracket) — treat it as opening a bracket and auto-close it in T08. `π`/`e` arrive as `ConstantToken`, `Ans` as `AnsToken`; unary is `UnaryToken`. No whitespace is allowed between a function name and its `(`.
+Next: T07 Parser core
