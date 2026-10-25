@@ -73,7 +73,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 4 — Settings
 
-- [ ] **T25 Settings model and persistence** — Read: SPEC §3.
+- [x] **T25 Settings model and persistence** — Read: SPEC §3.
   Done when: `Settings` (immutable, copyWith, toJson/fromJson) saved via KvStore; tests.
 - [ ] **T26 Settings page** — Read: SPEC §3, DESIGN. Screen 05 (`docs/screens/05-settings.html`).
   Done when: every row works and persists; opened from Calculator header icon.
