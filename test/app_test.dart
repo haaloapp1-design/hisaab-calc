@@ -1,4 +1,6 @@
 import 'package:calculator/app.dart';
+import 'package:calculator/core/storage/kv_store_provider.dart';
+import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/shell/shell_page.dart';
 import 'package:calculator/shared/widgets/bottom_nav.dart';
 import 'package:calculator/theme/app_tokens.dart';
@@ -7,8 +9,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  Widget app() => ProviderScope(
+    overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+    child: const CalculatorApp(),
+  );
+
+  /// The calculator page needs the 390×844 design height.
+  void designSurface(WidgetTester tester) {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
   testWidgets('app boots inside a ProviderScope', (tester) async {
-    await tester.pumpWidget(const ProviderScope(child: CalculatorApp()));
+    designSurface(tester);
+    await tester.pumpWidget(app());
 
     expect(find.byType(MaterialApp), findsOneWidget);
     expect(find.byType(Scaffold), findsOneWidget);
@@ -18,10 +34,13 @@ void main() {
   testWidgets('app shows the shell, its theme and the four nav items', (
     tester,
   ) async {
-    await tester.pumpWidget(const ProviderScope(child: CalculatorApp()));
+    designSurface(tester);
+    await tester.pumpWidget(app());
 
-    final MaterialApp app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    expect(app.theme?.colorScheme.primary, AppColors.primary);
+    final MaterialApp materialApp = tester.widget<MaterialApp>(
+      find.byType(MaterialApp),
+    );
+    expect(materialApp.theme?.colorScheme.primary, AppColors.primary);
 
     final Scaffold scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, AppColors.background);
@@ -34,10 +53,7 @@ void main() {
       'History',
     ]) {
       expect(
-        find.descendant(
-          of: find.byType(BottomNav),
-          matching: find.text(label),
-        ),
+        find.descendant(of: find.byType(BottomNav), matching: find.text(label)),
         findsOneWidget,
       );
     }

@@ -1,6 +1,8 @@
 import 'package:decimal/decimal.dart';
 import 'package:intl/intl.dart';
 
+import 'token.dart';
+
 /// Formatting options for the result display (BUSINESS_LOGIC §8).
 class NumberFormatOptions {
   const NumberFormatOptions({
@@ -52,6 +54,90 @@ String formatTypedNumber(
       : integerPart;
   return dot == -1 ? integer : '$integer${options.decimalSeparator}$fraction';
 }
+
+/// §1.1 line 1: renders the typed tokens as the expression line.
+///
+/// Typed numbers keep exactly what the user entered (only grouping, §8.6).
+/// Binary operators get a space on each side (`5 + 3`), the hidden `×` is
+/// invisible (`2π`, `3(4 + 1)`), a unary sign hugs its number (`−5`), a
+/// function carries its opening bracket (`sin(`) and postfix keys hug the value
+/// they apply to (`5!`, `50%`, `5²`). `Ans` shows as `Ans`.
+String formatExpression(
+  List<Token> tokens, {
+  NumberFormatOptions options = const NumberFormatOptions(),
+}) {
+  final StringBuffer buffer = StringBuffer();
+  Token? previous;
+
+  for (final Token token in tokens) {
+    // The tokenizer's implicit `×` is not shown to the user.
+    if (token is OperatorToken && token.implicit) {
+      previous = token;
+      continue;
+    }
+
+    if (_needsExpressionSpace(previous, token)) {
+      buffer.write(' ');
+    }
+    buffer.write(_expressionToken(token, options));
+    previous = token;
+  }
+
+  return buffer.toString();
+}
+
+bool _needsExpressionSpace(Token? previous, Token token) {
+  if (previous == null) {
+    return false;
+  }
+  if (previous is OperatorToken && previous.implicit) {
+    return false;
+  }
+  // Brackets and postfixes belong to the value on their left.
+  if (token is RightParenToken || token is PostfixToken) {
+    return false;
+  }
+  // A sign belongs to the number on its right.
+  if (previous is LeftParenToken ||
+      previous is FunctionToken ||
+      previous is UnaryToken) {
+    return false;
+  }
+  return true;
+}
+
+String _expressionToken(Token token, NumberFormatOptions options) =>
+    switch (token) {
+      NumberToken(:final String value) => formatTypedNumber(
+        value,
+        options: options,
+      ),
+      OperatorToken(operator: final OperatorType type) => _operatorSymbol(type),
+      UnaryToken(:final bool negative) => negative ? '−' : '+',
+      LeftParenToken() => '(',
+      RightParenToken() => ')',
+      FunctionToken(:final String name) => '$name(',
+      ConstantToken(:final MathConstant constant) => switch (constant) {
+        MathConstant.pi => 'π',
+        MathConstant.e => 'e',
+      },
+      PostfixToken(:final PostfixType postfix) => switch (postfix) {
+        PostfixType.factorial => '!',
+        PostfixType.percent => '%',
+        PostfixType.square => '²',
+        PostfixType.cube => '³',
+      },
+      AnsToken() => 'Ans',
+    };
+
+String _operatorSymbol(OperatorType type) => switch (type) {
+  OperatorType.add => '+',
+  OperatorType.subtract => '−',
+  OperatorType.multiply => '×',
+  OperatorType.divide => '÷',
+  OperatorType.power => '^',
+  OperatorType.mod => 'mod',
+};
 
 /// Builds options from the locale's [NumberFormat] symbols (§8.4).
 NumberFormatOptions numberFormatOptionsFor(

@@ -14,7 +14,9 @@ void main() {
   );
 
   BoxDecoration decorationOf(WidgetTester tester) =>
-      tester.widget<AnimatedContainer>(find.byType(AnimatedContainer)).decoration!
+      tester
+              .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+              .decoration!
           as BoxDecoration;
 
   TextStyle styleOf(WidgetTester tester, String label) =>
@@ -24,29 +26,14 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(
-        CalcKeyButton(
-          label: '7',
-          kind: CalcKeyKind.number,
-          onTap: () {},
-        ),
-      ),
+      wrap(CalcKeyButton(label: '7', kind: CalcKeyKind.number, onTap: () {})),
     );
 
     final BoxDecoration decoration = decorationOf(tester);
     expect(decoration.color, AppColors.keyNumber);
-    expect(
-      (decoration.border! as Border).top.color,
-      AppColors.keyNumberBorder,
-    );
-    expect(
-      (decoration.border! as Border).top.width,
-      AppSizes.borderWidth,
-    );
-    expect(
-      decoration.borderRadius,
-      BorderRadius.circular(AppRadii.keyBasic),
-    );
+    expect((decoration.border! as Border).top.color, AppColors.keyNumberBorder);
+    expect((decoration.border! as Border).top.width, AppSizes.borderWidth);
+    expect(decoration.borderRadius, BorderRadius.circular(AppRadii.keyBasic));
 
     expect(tester.getSize(find.byType(AnimatedContainer)).height, 60);
 
@@ -60,13 +47,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(
-        CalcKeyButton(
-          label: '%',
-          kind: CalcKeyKind.function,
-          onTap: () {},
-        ),
-      ),
+      wrap(CalcKeyButton(label: '%', kind: CalcKeyKind.function, onTap: () {})),
     );
 
     BoxDecoration decoration = decorationOf(tester);
@@ -76,13 +57,7 @@ void main() {
     expect(styleOf(tester, '%').color, AppColors.primary);
 
     await tester.pumpWidget(
-      wrap(
-        CalcKeyButton(
-          label: '÷',
-          kind: CalcKeyKind.operator,
-          onTap: () {},
-        ),
-      ),
+      wrap(CalcKeyButton(label: '÷', kind: CalcKeyKind.operator, onTap: () {})),
     );
 
     decoration = decorationOf(tester);
@@ -227,6 +202,28 @@ void main() {
     semantics.dispose();
   });
 
+  testWidgets('a long press fires the secondary action only', (tester) async {
+    int taps = 0;
+    int holds = 0;
+    await tester.pumpWidget(
+      wrap(
+        CalcKeyButton(
+          label: '⌫',
+          kind: CalcKeyKind.function,
+          semanticLabel: 'Backspace',
+          onTap: () => taps++,
+          onLongPress: () => holds++,
+        ),
+      ),
+    );
+
+    await tester.longPress(find.byType(CalcKeyButton));
+    await tester.pump();
+
+    expect(holds, 1);
+    expect(taps, 0);
+  });
+
   testWidgets('haptics can be turned off, for example from Settings', (
     tester,
   ) async {
@@ -291,11 +288,7 @@ void main() {
     );
     expect(
       decorationOf(tester).color,
-      Color.lerp(
-        AppColors.keyNumber,
-        Colors.black,
-        AppMotion.keyPressDarken,
-      ),
+      Color.lerp(AppColors.keyNumber, Colors.black, AppMotion.keyPressDarken),
     );
 
     await gesture.up();

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../shared/widgets/blue_header.dart';
 import '../../shared/widgets/bottom_nav.dart';
-import '../../shared/widgets/segmented.dart';
-import '../../shared/widgets/white_sheet.dart';
 import '../../theme/app_tokens.dart';
+import '../calculator/calculator_page.dart';
 
 /// The app shell: four tabs kept alive in an [IndexedStack] with the shared
 /// bottom navigation (ARCHITECTURE "Navigation").
 ///
-/// The calculator (T23), converter hub (T36), tools hub (T41) and history
-/// (T29) replace the placeholders below.
+/// The converter hub (T36), tools hub (T41) and history (T29) replace the
+/// placeholders below.
 class ShellPage extends StatefulWidget {
   const ShellPage({super.key});
 
@@ -31,7 +29,7 @@ class _ShellPageState extends State<ShellPage> {
             child: IndexedStack(
               index: _currentIndex,
               children: const <Widget>[
-                _CalculatorPlaceholder(),
+                CalculatorPage(),
                 _HubPlaceholder(title: 'Convert'),
                 _HubPlaceholder(title: 'Tools'),
                 _HubPlaceholder(title: 'History'),
@@ -50,74 +48,6 @@ class _ShellPageState extends State<ShellPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Temporary calculator tab until T23 builds the real page.
-///
-/// It is the first user of the shared [BlueHeader], [Segmented] and
-/// [WhiteSheet], so T20's widgets are exercised on a real screen.
-class _CalculatorPlaceholder extends StatefulWidget {
-  const _CalculatorPlaceholder();
-
-  @override
-  State<_CalculatorPlaceholder> createState() => _CalculatorPlaceholderState();
-}
-
-class _CalculatorPlaceholderState extends State<_CalculatorPlaceholder> {
-  static const List<String> _modes = <String>[
-    'Basic',
-    'Scientific',
-    'Programmer',
-  ];
-
-  int _mode = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.primary,
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: <Widget>[
-            BlueHeader(
-              title: 'Calculator',
-              actionIcon: Icons.tune_rounded,
-              actionTooltip: 'Settings',
-              onAction: () {},
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSizes.screenPadding,
-                AppSizes.segmentedTopGap,
-                AppSizes.screenPadding,
-                0,
-              ),
-              child: Segmented(
-                labels: _modes,
-                selectedIndex: _mode,
-                onSelected: (int index) => setState(() => _mode = index),
-              ),
-            ),
-            const Spacer(),
-            WhiteSheet(
-              child: SizedBox(
-                height: AppSizes.keyHeightBasic * 2,
-                child: Center(
-                  child: Text(
-                    '${_modes[_mode]} mode',
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.inkMuted,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

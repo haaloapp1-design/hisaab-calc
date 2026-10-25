@@ -70,7 +70,11 @@ void main() {
       semanticLabel: 'Decimal point',
       onTap: () => taps.add('.'),
     ),
-    KeypadEntry(label: '=', kind: CalcKeyKind.equals, onTap: () => taps.add('=')),
+    KeypadEntry(
+      label: '=',
+      kind: CalcKeyKind.equals,
+      onTap: () => taps.add('='),
+    ),
   ];
 
   Widget wrap(Widget child) => MaterialApp(
@@ -83,14 +87,7 @@ void main() {
   testWidgets('renders a 4×5 Basic keypad on the design grid', (tester) async {
     final List<String> taps = <String>[];
 
-    await tester.pumpWidget(
-      wrap(
-        Keypad(
-          spec: basicSpec(taps),
-          columns: 4,
-        ),
-      ),
-    );
+    await tester.pumpWidget(wrap(Keypad(spec: basicSpec(taps), columns: 4)));
 
     expect(find.byType(CalcKeyButton), findsNWidgets(20));
 
@@ -103,7 +100,10 @@ void main() {
     expect(keys.first.width, closeTo((350 - 36) / 4, 0.01));
     expect(keys.first.height, AppSizes.keyHeightBasic);
     expect(keys[1].left - keys[0].right, AppSizes.keyGapBasic);
-    expect(keys[4].top - keys[0].top, AppSizes.keyHeightBasic + AppSizes.keyGapBasic);
+    expect(
+      keys[4].top - keys[0].top,
+      AppSizes.keyHeightBasic + AppSizes.keyGapBasic,
+    );
 
     for (int row = 0; row < 5; row++) {
       for (int column = 1; column < 4; column++) {
@@ -148,7 +148,10 @@ void main() {
     final Rect sixth = tester.getRect(find.byType(CalcKeyButton).at(5));
     expect(first.height, AppSizes.keyHeightScientific);
     expect(first.width, closeTo((350 - 32) / 5, 0.01));
-    expect(sixth.top - first.top, AppSizes.keyHeightScientific + AppSizes.keyGapScientific);
+    expect(
+      sixth.top - first.top,
+      AppSizes.keyHeightScientific + AppSizes.keyGapScientific,
+    );
   });
 
   testWidgets('a short last row keeps the shared column widths', (
@@ -157,12 +160,7 @@ void main() {
     final List<String> taps = <String>[];
 
     await tester.pumpWidget(
-      wrap(
-        Keypad(
-          spec: basicSpec(taps).take(6).toList(),
-          columns: 4,
-        ),
-      ),
+      wrap(Keypad(spec: basicSpec(taps).take(6).toList(), columns: 4)),
     );
 
     expect(find.byType(CalcKeyButton), findsNWidgets(6));
@@ -180,12 +178,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      wrap(
-        Keypad(
-          spec: basicSpec(<String>[]),
-          columns: 4,
-        ),
-      ),
+      wrap(Keypad(spec: basicSpec(<String>[]), columns: 4)),
     );
 
     final CalcKeyButton divide = tester.widget<CalcKeyButton>(
@@ -201,5 +194,30 @@ void main() {
     expect(equals.kind, CalcKeyKind.equals);
     expect(equals.density, CalcKeyDensity.basic);
     expect(equals.haptics, isTrue);
+  });
+
+  testWidgets('passes a secondary action to its key', (tester) async {
+    int holds = 0;
+
+    await tester.pumpWidget(
+      wrap(
+        Keypad(
+          spec: <KeypadEntry>[
+            KeypadEntry(
+              label: '⌫',
+              kind: CalcKeyKind.function,
+              onTap: () {},
+              onLongPress: () => holds++,
+            ),
+          ],
+          columns: 4,
+        ),
+      ),
+    );
+
+    await tester.longPress(find.byType(CalcKeyButton));
+    await tester.pump();
+
+    expect(holds, 1);
   });
 }

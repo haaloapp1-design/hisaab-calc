@@ -58,6 +58,7 @@ class CalcKeyButton extends StatefulWidget {
     required this.label,
     required this.kind,
     this.onTap,
+    this.onLongPress,
     this.semanticLabel,
     this.density = CalcKeyDensity.basic,
     this.haptics = true,
@@ -66,6 +67,9 @@ class CalcKeyButton extends StatefulWidget {
   final String label;
   final CalcKeyKind kind;
   final VoidCallback? onTap;
+
+  /// Secondary action, e.g. long-pressing `⌫` to clear (SPEC §1.2).
+  final VoidCallback? onLongPress;
   final String? semanticLabel;
   final CalcKeyDensity density;
 
@@ -87,6 +91,13 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
       HapticFeedback.selectionClick();
     }
     widget.onTap?.call();
+  }
+
+  void _onLongPress() {
+    if (widget.haptics) {
+      HapticFeedback.selectionClick();
+    }
+    widget.onLongPress?.call();
   }
 
   void _setPressed(bool pressed) {
@@ -114,10 +125,7 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
           borderRadius: BorderRadius.circular(widget.density.keyRadius),
           border: style.border == null || style.dashed
               ? null
-              : Border.all(
-                  color: style.border!,
-                  width: AppSizes.borderWidth,
-                ),
+              : Border.all(color: style.border!, width: AppSizes.borderWidth),
         ),
         child: Text(
           widget.label,
@@ -143,10 +151,14 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
       enabled: _enabled,
       label: widget.semanticLabel ?? widget.label,
       onTap: _enabled ? _onTap : null,
+      onLongPress: _enabled && widget.onLongPress != null ? _onLongPress : null,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _enabled ? _onTap : null,
+        onLongPress: _enabled && widget.onLongPress != null
+            ? _onLongPress
+            : null,
         onTapDown: _enabled ? (_) => _setPressed(true) : null,
         onTapUp: _enabled ? (_) => _setPressed(false) : null,
         onTapCancel: _enabled ? () => _setPressed(false) : null,
@@ -174,11 +186,7 @@ final class _KeyStyle {
 
   Color get pressedBackground => background == AppColors.primary
       ? AppColors.primaryDeep
-      : Color.lerp(
-          background,
-          Colors.black,
-          AppMotion.keyPressDarken,
-        )!;
+      : Color.lerp(background, Colors.black, AppMotion.keyPressDarken)!;
 }
 
 _KeyStyle _styleFor(CalcKeyKind kind, CalcKeyDensity density) {

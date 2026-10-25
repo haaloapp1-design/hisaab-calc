@@ -1,6 +1,8 @@
 import 'package:decimal/decimal.dart';
 
+import '../../core/engine/calc_engine.dart';
 import '../../core/engine/calc_result.dart';
+import '../../core/engine/token.dart';
 import '../../core/input/input_buffer.dart';
 import '../../core/input/last_operation.dart';
 
@@ -44,6 +46,29 @@ final class CalcState {
   final LastOperation? lastOperation;
 
   bool get isEmpty => buffer.isEmpty;
+
+  /// The number the big display line shows (SPEC §1.1).
+  ///
+  /// The committed result wins, then the live preview. With neither (a plain
+  /// number, `(−5)` or `π` before any operator) the value of what is typed so
+  /// far is shown. An unfinished tail is trimmed until the rest evaluates, so
+  /// `5 + 3 +` keeps showing `8` instead of dropping back to `3`.
+  Decimal get displayValue {
+    final Decimal? shown = result ?? preview;
+    if (shown != null) {
+      return shown;
+    }
+
+    final List<Token> tokens = List<Token>.of(buffer.tokens);
+    while (tokens.isNotEmpty) {
+      final CalcResult current = CalcEngine.evaluate(tokens);
+      if (current is Success) {
+        return current.value;
+      }
+      tokens.removeLast();
+    }
+    return Decimal.zero;
+  }
 
   @override
   String toString() =>

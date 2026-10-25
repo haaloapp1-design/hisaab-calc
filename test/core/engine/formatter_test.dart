@@ -1,4 +1,5 @@
 import 'package:calculator/core/engine/formatter.dart';
+import 'package:calculator/core/engine/token.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -150,6 +151,184 @@ void main() {
           ),
         ),
         '1.234.567,891',
+      );
+    });
+  });
+
+  group('expression line', () {
+    test('joins typed tokens with a space around operators', () {
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('1800'),
+          const OperatorToken(OperatorType.add),
+          const NumberToken('21'),
+          const OperatorToken(OperatorType.add),
+          const NumberToken('88'),
+        ]),
+        '1,800 + 21 + 88',
+      );
+
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('1234'),
+          const OperatorToken(OperatorType.multiply),
+          const NumberToken('56.5'),
+        ]),
+        '1,234 × 56.5',
+      );
+    });
+
+    test('uses the typographic signs of the keypad', () {
+      const Map<OperatorType, String> signs = <OperatorType, String>{
+        OperatorType.subtract: '−',
+        OperatorType.divide: '÷',
+        OperatorType.power: '^',
+        OperatorType.mod: 'mod',
+      };
+
+      for (final MapEntry<OperatorType, String> entry in signs.entries) {
+        expect(
+          formatExpression(<Token>[
+            const NumberToken('6'),
+            OperatorToken(entry.key),
+            const NumberToken('2'),
+          ]),
+          '6 ${entry.value} 2',
+        );
+      }
+    });
+
+    test('hides the implicit multiply', () {
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('2'),
+          const OperatorToken(OperatorType.multiply, implicit: true),
+          const ConstantToken(MathConstant.pi),
+        ]),
+        '2π',
+      );
+
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('3'),
+          const OperatorToken(OperatorType.multiply, implicit: true),
+          const LeftParenToken(),
+          const NumberToken('4'),
+          const OperatorToken(OperatorType.add),
+          const NumberToken('1'),
+          const RightParenToken(),
+        ]),
+        '3(4 + 1)',
+      );
+    });
+
+    test('attaches unary signs to their number', () {
+      expect(
+        formatExpression(<Token>[
+          const LeftParenToken(),
+          const UnaryToken(negative: true),
+          const NumberToken('5'),
+          const RightParenToken(),
+        ]),
+        '(−5)',
+      );
+
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('5'),
+          const OperatorToken(OperatorType.multiply),
+          const UnaryToken(negative: true),
+          const NumberToken('5'),
+        ]),
+        '5 × −5',
+      );
+
+      expect(
+        formatExpression(<Token>[
+          const FunctionToken('sin'),
+          const UnaryToken(negative: true),
+          const NumberToken('30'),
+          const RightParenToken(),
+        ]),
+        'sin(−30)',
+      );
+    });
+
+    test('functions carry their bracket and constants use their glyph', () {
+      expect(
+        formatExpression(<Token>[
+          const FunctionToken('sin'),
+          const NumberToken('30'),
+          const RightParenToken(),
+        ]),
+        'sin(30)',
+      );
+      expect(
+        formatExpression(<Token>[const ConstantToken(MathConstant.e)]),
+        'e',
+      );
+    });
+
+    test('postfix keys hug the value they apply to', () {
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('5'),
+          const PostfixToken(PostfixType.factorial),
+        ]),
+        '5!',
+      );
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('50'),
+          const PostfixToken(PostfixType.percent),
+        ]),
+        '50%',
+      );
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('5'),
+          const PostfixToken(PostfixType.square),
+        ]),
+        '5²',
+      );
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('5'),
+          const PostfixToken(PostfixType.cube),
+        ]),
+        '5³',
+      );
+    });
+
+    test('renders Ans and an empty buffer', () {
+      expect(
+        formatExpression(<Token>[
+          const AnsToken(),
+          const OperatorToken(OperatorType.add),
+          const NumberToken('2'),
+        ]),
+        'Ans + 2',
+      );
+      expect(formatExpression(<Token>[]), '');
+    });
+
+    test('honours number options, including a trailing dot', () {
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('1234.50'),
+        ], options: const NumberFormatOptions(useGrouping: false)),
+        '1234.50',
+      );
+      expect(formatExpression(<Token>[const NumberToken('12.')]), '12.');
+      expect(
+        formatExpression(
+          <Token>[const NumberToken('1234.5')],
+          options: const NumberFormatOptions(
+            decimalSeparator: ',',
+            groupSeparator: '.',
+          ),
+        ),
+        '1.234,5',
       );
     });
   });

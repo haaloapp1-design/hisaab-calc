@@ -12,12 +12,16 @@ final class KeypadEntry {
     required this.label,
     this.kind = CalcKeyKind.number,
     this.onTap,
+    this.onLongPress,
     this.semanticLabel,
   });
 
   final String label;
   final CalcKeyKind kind;
   final VoidCallback? onTap;
+
+  /// Secondary action such as long-pressing `⌫` to clear (SPEC §1.2).
+  final VoidCallback? onLongPress;
 
   /// Screen-reader label when the visible glyph is not a word ("÷" → "Divide").
   final String? semanticLabel;
@@ -76,6 +80,7 @@ class Keypad extends StatelessWidget {
             label: entry.label,
             kind: entry.kind,
             onTap: entry.onTap,
+            onLongPress: entry.onLongPress,
             semanticLabel: entry.semanticLabel,
             density: density,
             haptics: haptics,
