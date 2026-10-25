@@ -18,7 +18,8 @@ You have NO memory between sessions. These files ARE your memory. Follow this lo
    - In `docs/TASKS.md` change that task's `- [ ]` to `- [x]`.
    - Append ONE entry to the end of `docs/PROGRESS.md` using the template there.
    - If you made a design choice the docs do not cover, add it to "Decisions" in `docs/PROGRESS.md`.
-7. Commit: `git add -A && git commit -m "T<id>: <short title>"`.
+7. Commit and push: `git add -A && git commit -m "T<id>: <short title>" && git push`
+   (`origin` is https://github.com/haaloapp1-design/hisaab-calc — keep it in sync every task).
 8. Stop and tell the user: task done, what changed, what the next task is.
 
 If a task is too big to finish in one go: split it into T<id>a, T<id>b in `docs/TASKS.md`,
