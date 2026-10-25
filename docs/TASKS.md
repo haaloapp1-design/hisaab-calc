@@ -14,7 +14,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T02 Theme tokens** — Read: DESIGN.md.
   Create `app_tokens.dart` (all colours, radii, sizes) and `app_theme.dart` (light theme, Ubuntu font).
   Done when: app shows a test screen using primary + sheet colours; no hard-coded colours outside theme/.
-- [ ] **T03 Storage layer** — Read: ARCHITECTURE (State, `kvStoreProvider`).
+- [x] **T03 Storage layer** — Read: ARCHITECTURE (State, `kvStoreProvider`).
   `KvStore` interface (getString/setString/remove), `PrefsStore`, `MemoryKvStore` for tests, `kvStoreProvider`.
   Done when: tests for MemoryKvStore pass.
 
