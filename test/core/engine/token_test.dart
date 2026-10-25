@@ -46,5 +46,20 @@ void main() {
       expect(const AnsToken(), const AnsToken());
       expect(const AnsToken(), isNot(const NumberToken('0')));
     });
+
+    test('unary signs compare by polarity', () {
+      expect(
+        const UnaryToken(negative: true),
+        const UnaryToken(negative: true),
+      );
+      expect(
+        const UnaryToken(negative: true),
+        isNot(const UnaryToken(negative: false)),
+      );
+      expect(
+        const UnaryToken(negative: false),
+        isNot(const OperatorToken(OperatorType.add)),
+      );
+    });
   });
 }

@@ -50,6 +50,24 @@ final class OperatorToken extends Token {
       'OperatorToken(${operator.name}${implicit ? ', implicit' : ''})';
 }
 
+/// A leading `+`/`−` (precedence level 4). The tokenizer emits it at the start
+/// of an expression or after an operator / `(` / a function.
+final class UnaryToken extends Token {
+  const UnaryToken({required this.negative});
+
+  final bool negative;
+
+  @override
+  bool operator ==(Object other) =>
+      other is UnaryToken && other.negative == negative;
+
+  @override
+  int get hashCode => Object.hash(UnaryToken, negative);
+
+  @override
+  String toString() => 'UnaryToken(${negative ? '−' : '+'})';
+}
+
 final class LeftParenToken extends Token {
   const LeftParenToken();
 

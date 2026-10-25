@@ -22,7 +22,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 - [x] **T04 Results and errors** — Read: BUSINESS_LOGIC §1, §7. Files: `calc_result.dart`, `token.dart`.
   Done when: `CalcResult` sealed class + `CalcError` enum with display texts; tests.
-- [ ] **T05 Tokenizer: numbers, operators, brackets** — Read: §3.
+- [x] **T05 Tokenizer: numbers, operators, brackets** — Read: §3.
   Done when: `"12.5+3×(4−1)"` → correct tokens; `−` after operator/`(` becomes unary; tests.
 - [ ] **T06 Tokenizer: functions, constants, implicit ×** — Read: §3.
   Done when: `2π`, `3(4)`, `(1)(2)`, `2sin(30)`, `5!2` tokenize with hidden ×; tests.
