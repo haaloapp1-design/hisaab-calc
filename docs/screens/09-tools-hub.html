@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator — Tools</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D46B9}a:hover{color:#1F3391}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F6FD; font-family: Ubuntu, 'Segoe UI', Roboto, sans-serif; color: #18224F; overflow: hidden">
+
+  <div style="background: #2D46B9; padding: 24px 20px 22px; border-radius: 0 0 28px 28px; display: flex; flex-direction: column; gap: 6px; color: #FFFFFF">
+    <div style="font-size: 26px; font-weight: 500">Tools</div>
+    <div style="font-size: 14px; color: #DDE3FF">Ready-made calculators for everyday sums</div>
+  </div>
+
+  <div style="flex: 1; overflow: hidden; padding: 16px 20px 0">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{tools}}" as="t" hint-placeholder-count="10">
+        <a href="LoanTool.dc.html" style="height: 92px; box-sizing: border-box; padding: 12px 14px; border-radius: 18px; background: #FFFFFF; border: 1px solid #E4E8F7; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; color: #18224F">
+          <span style="align-self: flex-start; min-width: 36px; height: 30px; padding: 0 8px; box-sizing: border-box; border-radius: 10px; background: #E6EBFC; color: #2D46B9; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">{{t.sym}}</span>
+          <span style="display: flex; flex-direction: column; gap: 1px">
+            <span style="font-size: 15px; font-weight: 500">{{t.name}}</span>
+            <span style="font-size: 12px; color: #5A6487">{{t.sub}}</span>
+          </span>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <nav aria-label="Main" style="display: flex; gap: 6px; background: #FFFFFF; border-top: 1px solid #EDF0FA; padding: 10px 20px 14px">
+    <a href="Main.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"></rect><path d="M8.5 7h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"></path></svg>Calculator</a>
+    <a href="Convert.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15l-4-4M20 16H5l4 4"></path></svg>Convert</a>
+    <a href="Tools.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; background: #E6EBFC; color: #2D46B9; text-decoration: none; font-size: 12px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>Tools</a>
+    <a href="History.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>History</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tools = [
+      ['EMI', 'Loan / EMI', 'Monthly instalment'],
+      ['%', 'Percentage', 'Of, change, ratio'],
+      ['−%', 'Discount and tax', 'Sale price, GST'],
+      ['÷n', 'Tip and split', 'Share a bill'],
+      ['yrs', 'Age', 'Exact age in days'],
+      ['Δd', 'Date difference', 'Days between dates'],
+      ['BMI', 'BMI', 'Body mass index'],
+      ['GPA', 'GPA / grades', 'Weighted average'],
+      ['ax²', 'Equation solver', 'Linear, quadratic'],
+      ['Σ', 'Statistics', 'Mean, median, SD']
+    ].map(([sym, name, sub]) => ({ sym, name, sub }));
+    return { tools };
+  }
+}
+</script>
+</body>
+</html>

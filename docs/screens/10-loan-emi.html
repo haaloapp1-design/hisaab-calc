@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator — Loan EMI tool</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D46B9}a:hover{color:#1F3391}
+button,input{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #2D46B9; font-family: Ubuntu, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0">
+    <a href="Tools.dc.html" aria-label="Back to tools" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="font-size: 17px; font-weight: 500">Loan / EMI</div>
+    <button aria-label="Share result" style="width: 44px; height: 44px; border: none; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg>
+    </button>
+  </div>
+
+  <div style="padding: 14px 24px 24px; display: flex; flex-direction: column; gap: 4px; align-items: flex-end">
+    <span style="font-size: 14px; color: #DDE3FF">Monthly instalment</span>
+    <span style="font-size: 48px; font-weight: 500">{{emi}}</span>
+    <span style="font-size: 14px; color: #DDE3FF">PKR for 60 months</span>
+  </div>
+
+  <div style="flex: 1; background: #FFFFFF; border-radius: 32px 32px 0 0; padding: 12px 20px 18px; display: flex; flex-direction: column; gap: 14px; color: #18224F">
+    <div style="width: 44px; height: 4px; border-radius: 2px; background: #2D46B9; align-self: center"></div>
+
+    <label style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 13px; font-weight: 500; color: #5A6487">Loan amount (PKR)</span>
+      <input value="1,000,000" inputmode="decimal" style="height: 50px; padding: 0 14px; border-radius: 14px; border: 1px solid #D6DDF8; background: #F6F7FD; font-size: 18px; color: #18224F">
+    </label>
+
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 13px; font-weight: 500; color: #5A6487">Interest rate per year</span>
+      <div style="display: flex; gap: 8px">
+        <sc-for list="{{rates}}" as="r" hint-placeholder-count="3">
+          <button onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="{{r.style}}">{{r.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px">
+      <label style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; font-weight: 500; color: #5A6487">Tenure</span>
+        <input value="5" inputmode="numeric" style="height: 50px; padding: 0 14px; border-radius: 14px; border: 1px solid #D6DDF8; background: #F6F7FD; font-size: 18px; color: #18224F; width: 100%; box-sizing: border-box">
+      </label>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 13px; font-weight: 500; color: #5A6487">In</span>
+        <div style="display: flex; height: 50px; padding: 3px; box-sizing: border-box; border-radius: 14px; background: #EEF1FB">
+          <button style="flex: 1; border: none; border-radius: 11px; background: #FFFFFF; color: #2D46B9; font-size: 14px; font-weight: 700">Years</button>
+          <button style="flex: 1; border: none; border-radius: 11px; background: transparent; color: #5A6487; font-size: 14px">Months</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 18px; border: 1px solid #E4E8F7">
+      <div style="display: flex; height: 12px; border-radius: 6px; overflow: hidden; background: #F5B971">
+        <div style="{{barStyle}}"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 14px">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #2D46B9"></span>Principal</span>
+        <span>1,000,000</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 14px">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F5B971"></span>Total interest</span>
+        <span>{{interest}}</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; border-top: 1px solid #EDF0FA; padding-top: 8px">
+        <span>Total payable</span><span>{{total}}</span>
+      </div>
+    </div>
+
+    <button style="height: 52px; border-radius: 16px; border: none; background: #2D46B9; color: #FFFFFF; font-size: 16px; font-weight: 500">Show monthly schedule</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { rate: 12 }; }
+  renderVals() {
+    const data = {
+      10: { emi: '21,247.04', interest: '274,822.68', total: '1,274,822.68', share: 78.4 },
+      12: { emi: '22,244.45', interest: '334,666.86', total: '1,334,666.86', share: 74.9 },
+      14: { emi: '23,268.25', interest: '396,095.05', total: '1,396,095.05', share: 71.6 }
+    };
+    const d = data[this.state.rate];
+    const on = 'flex: 1; height: 44px; border-radius: 12px; border: none; background: #2D46B9; color: #FFFFFF; font-size: 15px; font-weight: 700';
+    const off = 'flex: 1; height: 44px; border-radius: 12px; border: 1px solid #D6DDF8; background: #F6F7FD; color: #2D46B9; font-size: 15px';
+    const rates = [10, 12, 14].map((r) => ({ label: r + '%', on: String(r === this.state.rate), style: r === this.state.rate ? on : off, pick: () => this.setState({ rate: r }) }));
+    return { rates, emi: d.emi, interest: d.interest, total: d.total, barStyle: 'width: ' + d.share + '%; background: #2D46B9' };
+  }
+}
+</script>
+</body>
+</html>

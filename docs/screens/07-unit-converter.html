@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator — Length converter</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D46B9}a:hover{color:#1F3391}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #2D46B9; font-family: Ubuntu, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0">
+    <a href="Convert.dc.html" aria-label="Back to converter categories" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="font-size: 17px; font-weight: 500">Length</div>
+    <button aria-label="Add to favourites" style="width: 44px; height: 44px; border: none; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"></path></svg>
+    </button>
+  </div>
+
+  <div style="padding: 16px 20px 0; display: flex; flex-direction: column; gap: 0; position: relative">
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 14px 16px; color: #18224F; display: flex; flex-direction: column; gap: 6px; border: 2px solid #9FB0F2">
+      <button style="align-self: flex-start; display: flex; align-items: center; gap: 6px; border: none; background: #EEF1FB; color: #2D46B9; padding: 6px 10px; border-radius: 10px; font-size: 14px; font-weight: 500">{{fromName}}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </button>
+      <div style="text-align: right; font-size: 38px; font-weight: 500">{{fromVal}}</div>
+    </div>
+    <div style="display: flex; justify-content: center; height: 12px; position: relative; z-index: 1">
+      <button onClick="{{swap}}" aria-label="Swap units" style="width: 48px; height: 48px; margin-top: -18px; border-radius: 24px; border: 4px solid #2D46B9; background: #FFFFFF; color: #2D46B9; display: flex; align-items: center; justify-content: center">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"></path></svg>
+      </button>
+    </div>
+    <div style="background: #3E58C8; border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+      <button style="align-self: flex-start; display: flex; align-items: center; gap: 6px; border: none; background: #FFFFFF; color: #2D46B9; padding: 6px 10px; border-radius: 10px; font-size: 14px; font-weight: 500">{{toName}}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </button>
+      <div style="text-align: right; font-size: 38px; font-weight: 500">{{toVal}}</div>
+    </div>
+    <div style="text-align: right; font-size: 13px; color: #DDE3FF; padding: 8px 4px 0">{{rule}}</div>
+  </div>
+
+  <div style="flex: 1; padding: 10px 24px 14px; display: flex; flex-direction: column; gap: 4px; overflow: hidden">
+    <div style="font-size: 13px; font-weight: 700; color: #DDE3FF; padding-bottom: 4px">{{also}}</div>
+    <sc-for list="{{others}}" as="o" hint-placeholder-count="4">
+      <div style="display: flex; justify-content: space-between; font-size: 15px; padding: 5px 0; border-bottom: 1px solid #4A62CF">
+        <span style="color: #DDE3FF">{{o.u}}</span><span>{{o.v}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="background: #FFFFFF; border-radius: 32px 32px 0 0; padding: 12px 20px 18px; display: flex; flex-direction: column; gap: 12px">
+    <div style="width: 44px; height: 4px; border-radius: 2px; background: #2D46B9; align-self: center"></div>
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{keys}}" as="k" hint-placeholder-count="16">
+        <sc-if value="{{k.num}}" hint-placeholder-val="{{true}}">
+          <button aria-label="{{k.label}}" style="height: 52px; border-radius: 16px; border: 1px solid #E4E8F7; background: #F6F7FD; color: #18224F; font-size: 24px">{{k.t}}</button>
+        </sc-if>
+        <sc-if value="{{k.fn}}">
+          <button aria-label="{{k.label}}" style="height: 52px; border-radius: 16px; border: 1px solid #D6DDF8; background: #E6EBFC; color: #2D46B9; font-size: 18px; font-weight: 700">{{k.t}}</button>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { swapped: false }; }
+  renderVals() {
+    const sw = this.state.swapped;
+    const spec = [
+      ['7','num'],['8','num'],['9','num'],['⌫','fn','Backspace'],
+      ['4','num'],['5','num'],['6','num'],['C','fn','Clear'],
+      ['1','num'],['2','num'],['3','num'],['±','fn','Toggle sign'],
+      ['00','num','Double zero'],['0','num'],['.','num','Decimal point'],['Copy','fn','Copy result']
+    ];
+    const keys = spec.map(([t, kind, label]) => ({ t, label: label || t, num: kind === 'num', fn: kind === 'fn' }));
+    return {
+      keys,
+      fromName: sw ? 'Mile (mi)' : 'Kilometre (km)',
+      toName: sw ? 'Kilometre (km)' : 'Mile (mi)',
+      fromVal: '5',
+      toVal: sw ? '8.04672' : '3.10686',
+      rule: sw ? '1 mi = 1.609344 km' : '1 km = 0.621371 mi',
+      swap: () => this.setState({ swapped: !sw }),
+      also: sw ? '5 mi is also' : '5 km is also',
+      others: sw ? [
+        { u: 'Metre (m)', v: '8,046.72' },
+        { u: 'Foot (ft)', v: '26,400' },
+        { u: 'Yard (yd)', v: '8,800' },
+        { u: 'Nautical mile (nmi)', v: '4.34488' }
+      ] : [
+        { u: 'Metre (m)', v: '5,000' },
+        { u: 'Foot (ft)', v: '16,404.2' },
+        { u: 'Yard (yd)', v: '5,468.07' },
+        { u: 'Nautical mile (nmi)', v: '2.69978' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

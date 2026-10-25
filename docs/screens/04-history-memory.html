@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator — History and memory</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D46B9}a:hover{color:#1F3391}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #2D46B9; font-family: Ubuntu, 'Segoe UI', Roboto, sans-serif; color: #FFFFFF; overflow: hidden">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 0">
+    <a href="Main.dc.html" aria-label="Back to calculator" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="font-size: 17px; font-weight: 500">History</div>
+    <button aria-label="Search history" style="width: 44px; height: 44px; border: none; background: transparent; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+    </button>
+  </div>
+
+  <div style="display: flex; gap: 4px; margin: 14px 20px 0; padding: 4px; background: #3E58C8; border-radius: 14px">
+    <button onClick="{{showHist}}" style="{{histTab}}">History</button>
+    <button onClick="{{showMem}}" style="{{memTab}}">Memory</button>
+  </div>
+
+  <div style="flex: 1; overflow: hidden; padding: 16px 24px 0; display: flex; flex-direction: column; gap: 6px">
+    <sc-if value="{{isHist}}" hint-placeholder-val="{{true}}">
+      <div style="font-size: 13px; font-weight: 700; color: #DDE3FF">Today</div>
+      <sc-for list="{{today}}" as="h" hint-placeholder-count="4">
+        <button style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; width: 100%; padding: 8px 0; border: none; border-bottom: 1px solid #4A62CF; background: transparent; color: #FFFFFF">
+          <span style="font-size: 14px; color: #DDE3FF">{{h.expr}}</span>
+          <span style="font-size: 24px; font-weight: 500">{{h.res}}</span>
+        </button>
+      </sc-for>
+      <div style="font-size: 13px; font-weight: 700; color: #DDE3FF; margin-top: 10px">Yesterday</div>
+      <sc-for list="{{yesterday}}" as="h" hint-placeholder-count="2">
+        <button style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; width: 100%; padding: 8px 0; border: none; border-bottom: 1px solid #4A62CF; background: transparent; color: #FFFFFF">
+          <span style="font-size: 14px; color: #DDE3FF">{{h.expr}}</span>
+          <span style="font-size: 24px; font-weight: 500">{{h.res}}</span>
+        </button>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{isMem}}">
+      <sc-for list="{{mem}}" as="m" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 16px; background: #3E58C8">
+          <div style="display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 13px; color: #DDE3FF">{{m.slot}}</span>
+            <span style="font-size: 26px; font-weight: 500">{{m.val}}</span>
+          </div>
+          <div style="display: flex; gap: 6px">
+            <button aria-label="Recall {{m.slot}}" style="height: 44px; padding: 0 12px; border-radius: 12px; border: none; background: #FFFFFF; color: #2D46B9; font-size: 14px; font-weight: 700">MR</button>
+            <button aria-label="Add to {{m.slot}}" style="height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #7F93E3; background: transparent; color: #FFFFFF; font-size: 14px">M+</button>
+            <button aria-label="Subtract from {{m.slot}}" style="height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid #7F93E3; background: transparent; color: #FFFFFF; font-size: 14px">M−</button>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+  </div>
+
+  <div style="background: #FFFFFF; border-radius: 32px 32px 0 0; padding: 12px 20px 14px; display: flex; flex-direction: column; gap: 14px; color: #18224F">
+    <div style="width: 44px; height: 4px; border-radius: 2px; background: #2D46B9; align-self: center"></div>
+    <div style="display: flex; gap: 10px">
+      <button style="flex: 1; height: 48px; border-radius: 16px; border: 1px solid #E4E8F7; background: #F6F7FD; color: #2D46B9; font-size: 15px; font-weight: 500">Copy all</button>
+      <button style="flex: 1; height: 48px; border-radius: 16px; border: 1px solid #F3C9B5; background: #FFF4EE; color: #B4410E; font-size: 15px; font-weight: 500">Clear history</button>
+    </div>
+    <nav aria-label="Main" style="display: flex; gap: 6px; border-top: 1px solid #EDF0FA; padding-top: 10px">
+      <a href="Main.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="3"></rect><path d="M8.5 7h7M9 12h.01M12 12h.01M15 12h.01M9 16h.01M12 16h.01M15 16h.01"></path></svg>Calculator</a>
+      <a href="Convert.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h15l-4-4M20 16H5l4 4"></path></svg>Convert</a>
+      <a href="Tools.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; color: #5A6487; text-decoration: none; font-size: 12px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></svg>Tools</a>
+      <a href="History.dc.html" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 7px 0; border-radius: 14px; background: #E6EBFC; color: #2D46B9; text-decoration: none; font-size: 12px; font-weight: 500"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>History</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tab: 'hist' }; }
+  renderVals() {
+    const on = 'flex: 1; padding: 10px 0; border-radius: 10px; border: none; background: #FFFFFF; color: #2D46B9; font-size: 14px; font-weight: 500';
+    const off = 'flex: 1; padding: 10px 0; border-radius: 10px; border: none; background: transparent; color: #E4E9FF; font-size: 14px';
+    const hist = this.state.tab === 'hist';
+    return {
+      isHist: hist, isMem: !hist,
+      histTab: hist ? on : off, memTab: hist ? off : on,
+      showHist: () => this.setState({ tab: 'hist' }),
+      showMem: () => this.setState({ tab: 'mem' }),
+      today: [
+        { expr: '1800 + 21 + 88 + 12 + 99 + 1', res: '2,021' },
+        { expr: '15% of 4,800', res: '720' },
+        { expr: '2598 − 2574 + 985', res: '1,009' },
+        { expr: '188 + 12 + 99 + 1', res: '300' }
+      ],
+      yesterday: [
+        { expr: 'sin(30°) + √144 × 2²', res: '48.5' },
+        { expr: '5 km → mi', res: '3.10686' }
+      ],
+      mem: [
+        { slot: 'M1', val: '128' },
+        { slot: 'M2', val: '3.14159' },
+        { slot: 'M3', val: '2,021' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Calculator — Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D46B9}a:hover{color:#1F3391}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F4F6FD; font-family: Ubuntu, 'Segoe UI', Roboto, sans-serif; color: #18224F; overflow: hidden">
+
+  <div style="background: #2D46B9; padding: 20px 20px 22px; border-radius: 0 0 28px 28px; display: flex; align-items: center; justify-content: space-between; color: #FFFFFF">
+    <a href="Main.dc.html" aria-label="Back to calculator" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <div style="font-size: 17px; font-weight: 500">Settings</div>
+    <span style="width: 44px"></span>
+  </div>
+
+  <div style="flex: 1; overflow: hidden; padding: 18px 20px; display: flex; flex-direction: column; gap: 18px">
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0 4px; font-size: 14px; font-weight: 700; color: #5A6487">Appearance</h2>
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 6px 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EDF0FA">
+          <span style="font-size: 15px">Theme</span>
+          <div style="display: flex; gap: 2px; padding: 3px; background: #EEF1FB; border-radius: 10px">
+            <sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+              <button onClick="{{t.pick}}" style="{{t.style}}">{{t.name}}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0">
+          <span style="font-size: 15px">Accent colour</span>
+          <div style="display: flex; gap: 10px">
+            <button aria-label="Cobalt (selected)" style="width: 28px; height: 28px; border-radius: 14px; border: 3px solid #FFFFFF; outline: 2px solid #2D46B9; background: #2D46B9"></button>
+            <button aria-label="Teal" style="width: 28px; height: 28px; border-radius: 14px; border: none; background: #0F766E"></button>
+            <button aria-label="Violet" style="width: 28px; height: 28px; border-radius: 14px; border: none; background: #7C3AED"></button>
+            <button aria-label="Rust" style="width: 28px; height: 28px; border-radius: 14px; border: none; background: #C2410C"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0 4px; font-size: 14px; font-weight: 700; color: #5A6487">Calculation</h2>
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 6px 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EDF0FA">
+          <span style="font-size: 15px">Angle unit</span>
+          <span style="font-size: 15px; color: #2D46B9; font-weight: 500">Degrees</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EDF0FA">
+          <span style="font-size: 15px">Decimal places</span>
+          <div style="display: flex; align-items: center; gap: 8px">
+            <button aria-label="Fewer decimal places" style="width: 32px; height: 32px; border-radius: 10px; border: 1px solid #E4E8F7; background: #F6F7FD; color: #2D46B9; font-size: 18px">−</button>
+            <span style="font-size: 15px; width: 40px; text-align: center">Auto</span>
+            <button aria-label="More decimal places" style="width: 32px; height: 32px; border-radius: 10px; border: 1px solid #E4E8F7; background: #F6F7FD; color: #2D46B9; font-size: 18px">+</button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0">
+          <span style="font-size: 15px">Thousands separator</span>
+          <button role="switch" aria-checked="{{sepOn}}" aria-label="Thousands separator" onClick="{{toggleSep}}" style="{{sepTrack}}"><span style="{{sepKnob}}"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0 4px; font-size: 14px; font-weight: 700; color: #5A6487">Feel</h2>
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 6px 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EDF0FA">
+          <span style="font-size: 15px">Vibrate on key press</span>
+          <button role="switch" aria-checked="{{hapOn}}" aria-label="Vibrate on key press" onClick="{{toggleHap}}" style="{{hapTrack}}"><span style="{{hapKnob}}"></span></button>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0">
+          <span style="font-size: 15px">Key sounds</span>
+          <button role="switch" aria-checked="{{sndOn}}" aria-label="Key sounds" onClick="{{toggleSnd}}" style="{{sndTrack}}"><span style="{{sndKnob}}"></span></button>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <h2 style="margin: 0 4px; font-size: 14px; font-weight: 700; color: #5A6487">Data</h2>
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 6px 16px">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EDF0FA">
+          <span style="font-size: 15px">Keep history for</span>
+          <span style="font-size: 15px; color: #2D46B9; font-weight: 500">30 days</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0">
+          <span style="font-size: 15px">Clear all saved data</span>
+          <button style="height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid #F3C9B5; background: #FFF4EE; color: #B4410E; font-size: 14px; font-weight: 500">Clear</button>
+        </div>
+      </div>
+    </section>
+
+    <p style="margin: 0; text-align: center; font-size: 13px; color: #5A6487">Version 1.0.0</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { theme: 'System', sep: true, hap: true, snd: false }; }
+  sw(on) {
+    return {
+      track: 'width: 50px; height: 30px; border-radius: 15px; border: none; padding: 3px; display: flex; justify-content: ' + (on ? 'flex-end' : 'flex-start') + '; background: ' + (on ? '#2D46B9' : '#C9CFE3'),
+      knob: 'width: 24px; height: 24px; border-radius: 12px; background: #FFFFFF; display: block'
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const on = 'padding: 6px 10px; border-radius: 8px; border: none; background: #FFFFFF; color: #2D46B9; font-size: 13px; font-weight: 700';
+    const off = 'padding: 6px 10px; border-radius: 8px; border: none; background: transparent; color: #5A6487; font-size: 13px';
+    const themes = ['Light', 'Dark', 'System'].map((n) => ({ name: n, style: n === s.theme ? on : off, pick: () => this.setState({ theme: n }) }));
+    const a = this.sw(s.sep), b = this.sw(s.hap), c = this.sw(s.snd);
+    return {
+      themes,
+      sepOn: String(s.sep), sepTrack: a.track, sepKnob: a.knob, toggleSep: () => this.setState({ sep: !s.sep }),
+      hapOn: String(s.hap), hapTrack: b.track, hapKnob: b.knob, toggleHap: () => this.setState({ hap: !s.hap }),
+      sndOn: String(s.snd), sndTrack: c.track, sndKnob: c.knob, toggleSnd: () => this.setState({ snd: !s.snd })
+    };
+  }
+}
+</script>
+</body>
+</html>
