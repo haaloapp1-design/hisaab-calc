@@ -19,6 +19,8 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — Parser auto-closes missing `)` at the end of the token list (not only on `=`) — live preview and `=` share one code path; a missing `)` anywhere else stays a syntax error.
 - 2026-10-25 — `x²`/`x³` are parsed in the postfix loop (tightest) instead of at power level 5 — `2²^3` then means `(2²)^3`, the usual calculator reading.
 - 2026-10-25 — §4 percent-of-left is implemented in the evaluator (`_binary` sees `right is PostfixNode(percent)`), not in the parser as the doc suggests — the rule needs the *evaluated* left operand; the parser still emits plain `PostfixNode(percent, …)`.
+- 2026-10-25 — `AngleMode` lives in `lib/core/engine/angle_mode.dart` as a pure-Dart enum, and `evaluate` takes it as `{AngleMode angleMode = AngleMode.deg}` — SPEC says DEG is the default; T14 can pass the settings value straight through without the engine importing settings.
+- 2026-10-25 — Trig results use `double.toStringAsPrecision(15)` then `Decimal.parse` — the string route applies the §2 15-significant-digit rule directly and parses exactly; a raw double-to-Decimal conversion would keep binary noise.
 
 ## Log entry template
 
@@ -109,3 +111,10 @@ Changed: `lib/core/engine/evaluator.dart` (`PostfixType.percent` → `value × 0
 Tests: all 5 §4 rows (`50%`→0.5, `200+10%`→220, `200−10%`→180, `200×10%`→20, `200÷10%`→2000), left operand as expression (`(100+100)+10%`→220), percent amount as expression (`200+(10+5)%`→230), rule only on the right of `+`/`−` (`10%+200`→200.1, `10%×200`→20), left-assoc chains (`200+10%+5`→225, `200−10%−5`→175), `50%%`→0.005, failure propagation; 9 percent tests; `flutter test` 101/101 pass; `flutter analyze` clean.
 Notes for next session: §4 lives in the evaluator, not the parser — the special case needs the *evaluated* left value, so `_binary` inspects `right is PostfixNode(percent)` before evaluating the right side. Percent binds as a postfix, so `200+10%` parses as `add(200, PostfixNode(percent, 10))`. Factorial/square/cube still return `Failure(CalcError.syntax)` (T12).
 Next: T11 Trig functions
+
+### T11 — Trig functions — 2026-10-25
+Status: DONE
+Changed: new `lib/core/engine/angle_mode.dart` (`enum AngleMode { deg, rad }`), `lib/core/engine/evaluator.dart` (`evaluate(..., {angleMode = AngleMode.deg})`, sin/cos/tan + inverses, DEG/RAD conversion, tan domain rules, §2 15-digit rounding + 1e-12 snap), `test/core/engine/evaluator_test.dart`.
+Tests: DEG `sin(30)`=0.5, `sin(180)`/`sin(360)`/`cos(90)` snap to 0, `cos(60)`=0.5, `cos(180)`=−1, `tan(45)`=1, `tan(180)`=0, `tan(90/270/−90)`→domain, `sin⁻¹(0.5)`=30, `cos⁻¹(0.5)`=60, `tan⁻¹(1)`=45, `sin⁻¹(1)`=90, `cos⁻¹(−1)`=180, `sin⁻¹(2)`/`sin⁻¹(−2)`/`cos⁻¹(1.5)`→domain, trig inside expressions; RAD `cos(π)`=−1, `sin(π÷2)`=1, `tan(π÷2)`→domain, `sin⁻¹(1)`=π/2, `sin(30)` and `2×sin(30)` prove the mode threads through the tree; 12 trig tests; `flutter test` 113/113 pass; `flutter analyze` clean.
+Notes for next session: `evaluate` takes `AngleMode` as an optional named parameter and every recursive call forwards it; T14's facade can pass `settings.angle` straight through. Transcendental results go through `_fromDouble` (NaN→domain, infinite→overflow, `toStringAsPrecision(15)`, snap `<1e-12` to 0). `tan` DEG checks `x % 180 == 90` on the Decimal (covers ±90, 270…); RAD checks `|cos(x)| < 1e-12`. `ln log eˣ 10ˣ √ ∛`, `^`, `mod`, `!`, `x²`/`x³` still return `Failure(CalcError.syntax)` (T12).
+Next: T12 Other functions

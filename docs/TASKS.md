@@ -34,7 +34,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `0.1+0.2`=`0.3`, `1÷3×3`=`1`, `5÷0`→divideByZero; tests.
 - [x] **T10 Percent rules** — Read: §4.
   Done when: all 5 rows of the §4 table pass as tests.
-- [ ] **T11 Trig functions** — Read: §2 (snap), §6.
+- [x] **T11 Trig functions** — Read: §2 (snap), §6.
   Done when: DEG `sin(30)`=0.5, `sin(180)`=0, `tan(90)`→Undefined, `sin⁻¹(2)`→domain; RAD `cos(π)`=−1; tests.
 - [ ] **T12 Other functions** — Read: §6.
   Done when: `ln`, `log`, `eˣ`, `10ˣ`, `√144`=12 exact, `∛−8`=−2, `xʸ` rules, `5!`=120, `171!`→overflow, `1/0`→error; tests.

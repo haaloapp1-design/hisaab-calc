@@ -1,3 +1,4 @@
+import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/engine/ast.dart';
 import 'package:calculator/core/engine/calc_result.dart';
 import 'package:calculator/core/engine/evaluator.dart';
@@ -6,7 +7,8 @@ import 'package:calculator/core/engine/tokenizer.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-CalcResult eval(String source) => evaluate(Parser(tokenize(source)).parse());
+CalcResult eval(String source, {AngleMode angleMode = AngleMode.deg}) =>
+    evaluate(Parser(tokenize(source)).parse(), angleMode: angleMode);
 
 Decimal valueOf(CalcResult result) => (result as Success).value;
 
@@ -108,6 +110,88 @@ void main() {
 
     test('a failing left operand still propagates', () {
       expect(eval('1÷0+10%'), const Failure(CalcError.divideByZero));
+    });
+  });
+
+  group('trigonometry — degrees', () {
+    test('sin(30) is 0.5', () {
+      expect(valueOf(eval('sin(30)')), Decimal.parse('0.5'));
+    });
+
+    test('sin(180) snaps to 0 instead of 1.2E−16', () {
+      expect(valueOf(eval('sin(180)')), Decimal.zero);
+      expect(valueOf(eval('sin(360)')), Decimal.zero);
+      expect(valueOf(eval('cos(90)')), Decimal.zero);
+    });
+
+    test('cos and tan', () {
+      expect(valueOf(eval('cos(60)')), Decimal.parse('0.5'));
+      expect(valueOf(eval('cos(180)')), Decimal.fromInt(-1));
+      expect(valueOf(eval('tan(45)')), Decimal.one);
+      expect(valueOf(eval('tan(180)')), Decimal.zero);
+    });
+
+    test('tan is undefined at 90 + k×180', () {
+      expect(eval('tan(90)'), const Failure(CalcError.domain));
+      expect(eval('tan(270)'), const Failure(CalcError.domain));
+      expect(eval('tan(−90)'), const Failure(CalcError.domain));
+    });
+
+    test('inverse functions return degrees', () {
+      expect(valueOf(eval('sin⁻¹(0.5)')), Decimal.fromInt(30));
+      expect(valueOf(eval('cos⁻¹(0.5)')), Decimal.fromInt(60));
+      expect(valueOf(eval('tan⁻¹(1)')), Decimal.fromInt(45));
+      expect(valueOf(eval('sin⁻¹(1)')), Decimal.fromInt(90));
+      expect(valueOf(eval('cos⁻¹(−1)')), Decimal.fromInt(180));
+    });
+
+    test('inverse sin/cos are limited to [−1, 1]', () {
+      expect(eval('sin⁻¹(2)'), const Failure(CalcError.domain));
+      expect(eval('sin⁻¹(−2)'), const Failure(CalcError.domain));
+      expect(eval('cos⁻¹(1.5)'), const Failure(CalcError.domain));
+    });
+
+    test('trig takes part in expressions', () {
+      expect(valueOf(eval('2×sin(30)')), Decimal.one);
+      expect(valueOf(eval('sin(30)+cos(60)')), Decimal.one);
+    });
+  });
+
+  group('trigonometry — radians', () {
+    test('cos(π) is −1', () {
+      expect(
+        valueOf(eval('cos(π)', angleMode: AngleMode.rad)),
+        Decimal.fromInt(-1),
+      );
+    });
+
+    test('sin(π÷2) is 1', () {
+      expect(valueOf(eval('sin(π÷2)', angleMode: AngleMode.rad)), Decimal.one);
+    });
+
+    test('tan is undefined where cos is 0', () {
+      expect(
+        eval('tan(π÷2)', angleMode: AngleMode.rad),
+        const Failure(CalcError.domain),
+      );
+    });
+
+    test('inverse functions stay in radians', () {
+      expect(
+        valueOf(eval('sin⁻¹(1)', angleMode: AngleMode.rad)),
+        Decimal.parse('1.57079632679490'),
+      );
+    });
+
+    test('the angle mode is threaded through the whole tree', () {
+      expect(
+        valueOf(eval('sin(30)', angleMode: AngleMode.rad)),
+        Decimal.parse('-0.988031624092862'),
+      );
+      expect(
+        valueOf(eval('2×sin(30)', angleMode: AngleMode.rad)),
+        Decimal.parse('-1.976063248185724'),
+      );
     });
   });
 
