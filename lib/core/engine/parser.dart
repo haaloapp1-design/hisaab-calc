@@ -66,7 +66,18 @@ class Parser {
       final Node operand = _parseExpression(_unaryPrecedence);
       return UnaryNode(negative: token.negative, operand: operand);
     }
-    return _parsePrimary();
+    return _parsePostfix();
+  }
+
+  /// Postfix operators bind tightest (level 6); repeated postfix is left-assoc.
+  Node _parsePostfix() {
+    Node node = _parsePrimary();
+    while (!_isAtEnd && _tokens[_index] is PostfixToken) {
+      final PostfixToken token = _tokens[_index] as PostfixToken;
+      _index++;
+      node = PostfixNode(token.postfix, node);
+    }
+    return node;
   }
 
   Node _parsePrimary() {
@@ -81,14 +92,29 @@ class Parser {
       case LeftParenToken():
         _index++;
         final Node inner = _parseExpression(_addPrecedence);
-        if (_current is! RightParenToken) {
-          throw FormatException('Expected ")"', null, _index);
-        }
-        _index++;
+        _closeBracket();
         return inner;
+      case FunctionToken(:final String name):
+        _index++;
+        final Node argument = _parseExpression(_addPrecedence);
+        _closeBracket();
+        return FuncNode(name, argument);
       default:
         throw FormatException('Unexpected token $token', null, _index);
     }
+  }
+
+  /// Consumes `)` when present. At the end of the input the bracket is
+  /// auto-closed, which is what `=` does (BUSINESS_LOGIC §3).
+  void _closeBracket() {
+    if (_isAtEnd) {
+      return;
+    }
+    if (_tokens[_index] is RightParenToken) {
+      _index++;
+      return;
+    }
+    throw FormatException('Expected ")"', null, _index);
   }
 
   int _precedenceOf(OperatorToken token) => switch (token.operator) {

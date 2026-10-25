@@ -129,11 +129,111 @@ void main() {
     });
   });
 
+  group('postfix operators', () {
+    test('factorial and percent', () {
+      expect(parse('5!'), PostfixNode(PostfixType.factorial, num(5)));
+      expect(parse('50%'), PostfixNode(PostfixType.percent, num(50)));
+    });
+
+    test('square and cube', () {
+      expect(parse('5²'), PostfixNode(PostfixType.square, num(5)));
+      expect(parse('5³'), PostfixNode(PostfixType.cube, num(5)));
+    });
+
+    test('postfix binds tighter than power and unary', () {
+      expect(
+        parse('2^3!'),
+        pow(num(2), PostfixNode(PostfixType.factorial, num(3))),
+      );
+      expect(
+        parse('2!^3'),
+        pow(PostfixNode(PostfixType.factorial, num(2)), num(3)),
+      );
+      expect(
+        parse('−5!'),
+        UnaryNode(
+          negative: true,
+          operand: PostfixNode(PostfixType.factorial, num(5)),
+        ),
+      );
+    });
+
+    test('repeated postfix is left-associative', () {
+      expect(
+        parse('5!!'),
+        PostfixNode(
+          PostfixType.factorial,
+          PostfixNode(PostfixType.factorial, num(5)),
+        ),
+      );
+      expect(
+        parse('5!²'),
+        PostfixNode(
+          PostfixType.square,
+          PostfixNode(PostfixType.factorial, num(5)),
+        ),
+      );
+    });
+
+    test('postfix applies to brackets and results', () {
+      expect(
+        parse('(2+3)!'),
+        PostfixNode(PostfixType.factorial, add(num(2), num(3))),
+      );
+      expect(
+        parse('5!2'),
+        mul(PostfixNode(PostfixType.factorial, num(5)), num(2)),
+      );
+    });
+  });
+
+  group('functions', () {
+    test('a function owns its argument', () {
+      expect(parse('sin(30)'), FuncNode('sin', num(30)));
+    });
+
+    test('arguments can be full expressions', () {
+      expect(
+        parse('sin(2π)'),
+        FuncNode('sin', mul(num(2), const ConstNode(MathConstant.pi))),
+      );
+      expect(parse('sin(30)+1'), add(FuncNode('sin', num(30)), num(1)));
+    });
+
+    test('functions nest and take part in implicit ×', () {
+      expect(parse('sin(cos(0))'), FuncNode('sin', FuncNode('cos', num(0))));
+      expect(parse('2sin(30)'), mul(num(2), FuncNode('sin', num(30))));
+      expect(
+        parse('sin(30)!'),
+        PostfixNode(PostfixType.factorial, FuncNode('sin', num(30))),
+      );
+    });
+
+    test('roots are functions too', () {
+      expect(parse('√(144)'), FuncNode('√', num(144)));
+    });
+  });
+
+  group('auto-closing brackets', () {
+    test('a missing ")" at the end is auto-closed', () {
+      expect(parse('(2+3'), add(num(2), num(3)));
+      expect(parse('((2+3'), add(num(2), num(3)));
+      expect(parse('2(3'), mul(num(2), num(3)));
+      expect(parse('sin(30'), FuncNode('sin', num(30)));
+      expect(parse('sin(30^2'), FuncNode('sin', pow(num(30), num(2))));
+      expect(parse('sin((2+3'), FuncNode('sin', add(num(2), num(3))));
+    });
+
+    test('a missing ")" is not invented before another token', () {
+      expect(() => parse('sin(30))'), throwsFormatException);
+    });
+  });
+
   group('syntax errors', () {
     test('throws on incomplete or unbalanced input', () {
       expect(() => parse(''), throwsFormatException);
       expect(() => parse('2+'), throwsFormatException);
-      expect(() => parse('(2+3'), throwsFormatException);
+      expect(() => parse('(2+'), throwsFormatException);
       expect(() => parse('2+3)'), throwsFormatException);
       expect(() => parse('×3'), throwsFormatException);
       expect(() => parse('2+×3'), throwsFormatException);

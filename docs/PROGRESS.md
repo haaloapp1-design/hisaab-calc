@@ -16,6 +16,8 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — Function tokens use display names (`sin⁻¹`, `eˣ`, `10ˣ`, `√`, `∛`) and consume their `(`; hidden `×` is added in a post-pass over the token list — keeps `sin(` one token (§1) and makes implicit-multiplication rules one place.
 - 2026-10-25 — AST `NumberNode` stores a `Decimal` (trailing `.` trimmed), not the raw string — the evaluator needs exact arithmetic while expression display keeps using tokens.
 - 2026-10-25 — `origin` = https://github.com/haaloapp1-design/hisaab-calc and every task ends with `git push` — user asked for the repo to be kept in sync.
+- 2026-10-25 — Parser auto-closes missing `)` at the end of the token list (not only on `=`) — live preview and `=` share one code path; a missing `)` anywhere else stays a syntax error.
+- 2026-10-25 — `x²`/`x³` are parsed in the postfix loop (tightest) instead of at power level 5 — `2²^3` then means `(2²)^3`, the usual calculator reading.
 
 ## Log entry template
 
@@ -85,3 +87,10 @@ Changed: `lib/core/engine/ast.dart` (NumberNode, ConstNode, UnaryNode, BinaryNod
 Tests: `2+3×4` tree, `2^3^2` right-assoc, `−2^2` = −(2^2), signed exponent, unary vs ×, brackets, left-assoc − ÷ ×, implicit × precedence (incl. `1÷2π`), exact decimals, trailing dot, constants, syntax errors; 18 parser tests; `flutter test` 70/70 pass; `flutter analyze` clean.
 Notes for next session: parser still rejects `FunctionToken`, `PostfixToken` and `AnsToken` — T08 adds postfix (precedence 6) + functions + auto-close. Precedence constants live in `Parser`; implicit × is `OperatorToken.implicit` at level 3. `FuncNode`/`PostfixNode` already exist. `_parsePrimary` currently throws when `)` is missing, which T08 must relax for auto-closing.
 Next: T08 Parser: postfix, functions, auto-close
+
+### T08 — Parser: postfix, functions, auto-close — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/parser.dart` (postfix loop, `FunctionToken` → `FuncNode`, `_closeBracket` auto-close), `test/core/engine/parser_test.dart`.
+Tests: `5!`, `50%`, `5²`, `5³`, postfix vs `^`/unary, repeated postfix, postfix on brackets, `sin(30)`, nested functions, `2sin(30)`, `√(144)`, `(2+3`, `((2+3`, `2(3`, `sin(30`, `sin(30^2`, `sin((2+3`; 29 parser tests; `flutter test` 81/81 pass; `flutter analyze` clean.
+Notes for next session: §4 percent is an *evaluation* rule — parser produces `add(200, PostfixNode(percent, 10))`, so T10 must special-case `+`/`−` with a percent right operand. `AnsToken` still unsupported (T18). Auto-close only at end of input; `sin(30))` is a syntax error.
+Next: T09 Evaluator: arithmetic with Decimal
