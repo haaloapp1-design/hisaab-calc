@@ -1,4 +1,5 @@
 import 'package:calculator/core/engine/calc_result.dart';
+import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/engine/token.dart';
 import 'package:calculator/core/input/calc_key.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
@@ -540,6 +541,145 @@ void main() {
         const NumberToken('2'),
         const OperatorToken(OperatorType.add),
       ]);
+    });
+  });
+
+  group('mode, angle and 2nd', () {
+    test('the mode switcher updates and persists the mode', () async {
+      await controller().restoreDone;
+
+      controller().setMode(CalcMode.scientific);
+
+      expect(calc().mode, CalcMode.scientific);
+      await controller().persistDone;
+      expect(
+        await store.getString(CalculatorController.modeKey),
+        'scientific',
+      );
+    });
+
+    test('the mode is restored from the store', () async {
+      await store.setString(CalculatorController.modeKey, 'programmer');
+
+      await controller().restoreDone;
+
+      expect(calc().mode, CalcMode.programmer);
+    });
+
+    test('an unknown stored mode falls back to Basic', () async {
+      await store.setString(CalculatorController.modeKey, 'hex');
+
+      await controller().restoreDone;
+
+      expect(calc().mode, CalcMode.basic);
+    });
+
+    test('a mode chosen while loading is not overwritten', () async {
+      await store.setString(CalculatorController.modeKey, 'scientific');
+      final CalculatorController c = controller();
+
+      c.setMode(CalcMode.programmer);
+      await c.restoreDone;
+
+      expect(calc().mode, CalcMode.programmer);
+    });
+
+    test('the angle mode drives the preview and =', () async {
+      await press(<CalcKey>[
+        CalcKey.sin,
+        CalcKey.digit3,
+        CalcKey.digit0,
+      ]);
+      expect(calc().preview, Decimal.parse('0.5'));
+
+      controller().setAngleMode(AngleMode.rad);
+
+      expect(calc().angleMode, AngleMode.rad);
+      expect(
+        calc().preview!.toDouble(),
+        closeTo(-0.988031624092862, 1e-12),
+      );
+
+      controller().onKey(CalcKey.equals);
+
+      expect(
+        calc().result!.toDouble(),
+        closeTo(-0.988031624092862, 1e-12),
+      );
+    });
+
+    test('the angle mode does not persist until Settings owns it', () async {
+      await controller().restoreDone;
+      controller().setAngleMode(AngleMode.rad);
+      await controller().persistDone;
+
+      expect(calc().angleMode, AngleMode.rad);
+      expect(await store.getString(CalculatorController.modeKey), isNull);
+    });
+
+    test('2nd swaps a function and turns itself off', () async {
+      await press(<CalcKey>[CalcKey.digit0, CalcKey.decimalPoint, CalcKey.digit5]);
+
+      controller().toggleSecond();
+      expect(calc().second, isTrue);
+
+      controller().onKey(CalcKey.sin);
+
+      expect(tokens().last, const FunctionToken('sin⁻¹'));
+      expect(calc().second, isFalse);
+    });
+
+    test('2nd stays on until a function is used', () async {
+      await press(<CalcKey>[CalcKey.digit2]);
+      controller().toggleSecond();
+
+      controller().onKey(CalcKey.digit5);
+
+      expect(calc().second, isTrue);
+      expect(tokens(), <Token>[const NumberToken('25')]);
+    });
+
+    test('2nd reaches the other alternates, including ʸ√x', () async {
+      await press(<CalcKey>[CalcKey.digit8]);
+      controller().toggleSecond();
+      controller().onKey(CalcKey.power);
+      controller().onKey(CalcKey.digit3);
+
+      expect(tokens(), <Token>[
+        const NumberToken('8'),
+        const OperatorToken(OperatorType.root),
+        const NumberToken('3'),
+      ]);
+      expect(calc().preview, Decimal.fromInt(2));
+
+      controller().onKey(CalcKey.equals);
+      expect(calc().result, Decimal.fromInt(2));
+    });
+
+    test('the reciprocal key previews 1/x', () async {
+      await press(<CalcKey>[CalcKey.digit4, CalcKey.reciprocal]);
+
+      expect(tokens(), <Token>[
+        const NumberToken('4'),
+        const PostfixToken(PostfixType.reciprocal),
+      ]);
+      expect(calc().preview, Decimal.parse('0.25'));
+    });
+
+    test('openBrackets follows the buffer', () async {
+      await press(<CalcKey>[
+        CalcKey.leftParen,
+        CalcKey.sin,
+        CalcKey.digit3,
+        CalcKey.digit0,
+      ]);
+      expect(calc().openBrackets, 2);
+
+      await press(<CalcKey>[CalcKey.rightParen]);
+      expect(calc().openBrackets, 1);
+
+      await press(<CalcKey>[CalcKey.rightParen]);
+      expect(calc().openBrackets, 0);
     });
   });
 }

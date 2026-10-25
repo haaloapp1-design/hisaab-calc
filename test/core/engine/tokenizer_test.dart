@@ -70,6 +70,23 @@ void main() {
         const NumberToken('2'),
         const PostfixToken(PostfixType.cube),
       ]);
+      expect(tokenize('4⁻¹'), <Token>[
+        const NumberToken('4'),
+        const PostfixToken(PostfixType.reciprocal),
+      ]);
+    });
+
+    test('tokenizes the y-th root operator', () {
+      expect(tokenize('8ʸ√3'), <Token>[
+        const NumberToken('8'),
+        const OperatorToken(OperatorType.root),
+        const NumberToken('3'),
+      ]);
+      expect(tokenize('8 ʸ√ 3'), <Token>[
+        const NumberToken('8'),
+        const OperatorToken(OperatorType.root),
+        const NumberToken('3'),
+      ]);
     });
 
     test('ignores whitespace between tokens', () {

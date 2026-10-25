@@ -13,6 +13,12 @@ enum CalcKeyKind {
   /// Function keys such as `sin`, `C`, `%` and `±`.
   function,
 
+  /// The heavier `C`, `⌫` and `±` keys in Scientific mode (SPEC §1.3).
+  functionStrong,
+
+  /// A function key whose alternate set is on, such as `2nd`.
+  active,
+
   /// `+ − × ÷` and the other operators.
   operator,
 
@@ -208,6 +214,19 @@ _KeyStyle _styleFor(CalcKeyKind kind, CalcKeyDensity density) {
       textStyle: basic
           ? AppTypography.keyFunctionBasic
           : AppTypography.keyFunction,
+    ),
+    CalcKeyKind.functionStrong => _KeyStyle(
+      background: AppColors.keyNumberScientific,
+      border: AppColors.keyNumberBorder,
+      foreground: AppColors.primary,
+      textStyle: basic
+          ? AppTypography.keyFunctionBasic
+          : AppTypography.keyFunctionStrong,
+    ),
+    CalcKeyKind.active => _KeyStyle(
+      background: AppColors.primary,
+      foreground: AppColors.onPrimary,
+      textStyle: AppTypography.keyFunctionActive,
     ),
     CalcKeyKind.operator => _KeyStyle(
       background: AppColors.keyOperator,

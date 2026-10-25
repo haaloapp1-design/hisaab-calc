@@ -122,7 +122,7 @@ class Parser {
     OperatorType.multiply =>
       token.implicit ? _implicitPrecedence : _multiplyPrecedence,
     OperatorType.divide || OperatorType.mod => _multiplyPrecedence,
-    OperatorType.power => _powerPrecedence,
+    OperatorType.power || OperatorType.root => _powerPrecedence,
   };
 
   /// `12.` is accepted by the tokenizer; trim the dot before `Decimal.parse`.

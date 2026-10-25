@@ -126,6 +126,7 @@ String _expressionToken(Token token, NumberFormatOptions options) =>
         PostfixType.percent => '%',
         PostfixType.square => '²',
         PostfixType.cube => '³',
+        PostfixType.reciprocal => '⁻¹',
       },
       AnsToken() => 'Ans',
     };
@@ -136,6 +137,7 @@ String _operatorSymbol(OperatorType type) => switch (type) {
   OperatorType.multiply => '×',
   OperatorType.divide => '÷',
   OperatorType.power => '^',
+  OperatorType.root => 'ʸ√',
   OperatorType.mod => 'mod',
 };
 

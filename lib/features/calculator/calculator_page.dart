@@ -9,38 +9,34 @@ import '../../theme/app_tokens.dart';
 import 'calc_state.dart';
 import 'calculator_controller.dart';
 import 'keypads/basic_keys.dart';
+import 'keypads/scientific_keys.dart';
+import 'widgets/angle_controls.dart';
+import 'widgets/calc_key_button.dart';
 import 'widgets/display.dart';
 import 'widgets/keypad.dart';
 
 /// The Calculator tab (SPEC §1, screens 01–03).
 ///
 /// Blue top area (header, mode switcher, display) and the white keypad sheet.
-/// The page formats state values and forwards keys; it owns no maths. Basic is
-/// wired end to end in T23 — the Scientific (T24) and Programmer (T33) keypads
-/// arrive later, so every mode currently shows the Basic keys.
-class CalculatorPage extends ConsumerStatefulWidget {
+/// The page formats state values and forwards keys; it owns no maths. Basic
+/// (T23) and Scientific (T24) are wired end to end; Programmer still shows the
+/// Basic keys until T33.
+class CalculatorPage extends ConsumerWidget {
   const CalculatorPage({super.key});
 
-  @override
-  ConsumerState<CalculatorPage> createState() => _CalculatorPageState();
-}
-
-class _CalculatorPageState extends ConsumerState<CalculatorPage> {
   static const List<String> _modes = <String>[
     'Basic',
     'Scientific',
     'Programmer',
   ];
 
-  /// T24/T33 swap the keypad per mode and persist the choice.
-  int _mode = 0;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final CalcState calc = ref.watch(calculatorProvider);
     final CalculatorController controller = ref.read(
       calculatorProvider.notifier,
     );
+    final bool scientific = calc.mode == CalcMode.scientific;
 
     return ColoredBox(
       color: AppColors.primary,
@@ -63,8 +59,9 @@ class _CalculatorPageState extends ConsumerState<CalculatorPage> {
               ),
               child: Segmented(
                 labels: _modes,
-                selectedIndex: _mode,
-                onSelected: (int index) => setState(() => _mode = index),
+                selectedIndex: calc.mode.index,
+                onSelected: (int index) =>
+                    controller.setMode(CalcMode.values[index]),
               ),
             ),
             Expanded(
@@ -72,6 +69,20 @@ class _CalculatorPageState extends ConsumerState<CalculatorPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  if (scientific)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSizes.displayPaddingSide,
+                        0,
+                        AppSizes.displayPaddingSide,
+                        AppSizes.angleRowBottomGap,
+                      ),
+                      child: AngleControls(
+                        angleMode: calc.angleMode,
+                        onChanged: controller.setAngleMode,
+                        openBrackets: calc.openBrackets,
+                      ),
+                    ),
                   Display(
                     expression: calc.justEvaluated
                         ? ''
@@ -79,12 +90,39 @@ class _CalculatorPageState extends ConsumerState<CalculatorPage> {
                     result: formatNumber(calc.displayValue),
                     preview: calc.result == null && calc.preview != null,
                     error: calc.error,
+                    density: scientific
+                        ? DisplayDensity.scientific
+                        : DisplayDensity.basic,
                   ),
                 ],
               ),
             ),
             WhiteSheet(
-              child: Keypad(spec: basicKeys(controller.onKey), columns: 4),
+              padding: scientific
+                  ? const EdgeInsets.fromLTRB(
+                      AppSizes.sheetScientificPaddingSide,
+                      AppSizes.sheetPaddingTop,
+                      AppSizes.sheetScientificPaddingSide,
+                      AppSizes.sheetPaddingBottom,
+                    )
+                  : null,
+              contentGap: scientific
+                  ? AppSizes.sheetScientificContentGap
+                  : null,
+              child: scientific
+                  ? Keypad(
+                      spec: scientificKeys(
+                        onKey: controller.onKey,
+                        second: calc.second,
+                        onSecond: controller.toggleSecond,
+                      ),
+                      columns: 5,
+                      density: CalcKeyDensity.scientific,
+                    )
+                  : Keypad(
+                      spec: basicKeys(controller.onKey),
+                      columns: 4,
+                    ),
             ),
           ],
         ),

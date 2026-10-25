@@ -1,3 +1,4 @@
+import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/engine/token.dart';
 import 'package:calculator/core/input/input_buffer.dart';
 import 'package:calculator/features/calculator/calc_state.dart';
@@ -85,6 +86,52 @@ void main() {
           const OperatorToken(OperatorType.add),
         ]).displayValue,
         Decimal.parse('8'),
+      );
+    });
+
+    test('evaluates trig with the state angle mode', () {
+      final CalcState degrees = CalcState(
+        buffer: const InputBuffer(<Token>[
+          FunctionToken('sin'),
+          NumberToken('30'),
+        ]),
+      );
+      final CalcState radians = CalcState(
+        buffer: const InputBuffer(<Token>[
+          FunctionToken('sin'),
+          NumberToken('30'),
+        ]),
+        angleMode: AngleMode.rad,
+      );
+
+      expect(degrees.displayValue, Decimal.parse('0.5'));
+      expect(
+        radians.displayValue.toDouble(),
+        closeTo(-0.988031624092862, 1e-12),
+      );
+    });
+  });
+
+  group('openBrackets', () {
+    test('counts typed and function brackets', () {
+      expect(state(const <Token>[]).openBrackets, 0);
+      expect(
+        state(<Token>[
+          const LeftParenToken(),
+          const FunctionToken('sin'),
+          const NumberToken('30'),
+        ]).openBrackets,
+        2,
+      );
+      expect(
+        state(<Token>[
+          const LeftParenToken(),
+          const FunctionToken('sin'),
+          const NumberToken('30'),
+          const RightParenToken(),
+          const RightParenToken(),
+        ]).openBrackets,
+        0,
       );
     });
   });

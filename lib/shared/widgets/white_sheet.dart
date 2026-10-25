@@ -14,6 +14,7 @@ class WhiteSheet extends StatelessWidget {
     required this.child,
     this.showHandle = true,
     this.padding,
+    this.contentGap,
   });
 
   final Widget child;
@@ -23,6 +24,9 @@ class WhiteSheet extends StatelessWidget {
 
   /// Overrides the default 12/20/14 sheet padding.
   final EdgeInsetsGeometry? padding;
+
+  /// Overrides the default 14 px gap between the handle and the child.
+  final double? contentGap;
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +63,7 @@ class WhiteSheet extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: AppSizes.sheetContentGap),
+            SizedBox(height: contentGap ?? AppSizes.sheetContentGap),
           ],
           child,
         ],

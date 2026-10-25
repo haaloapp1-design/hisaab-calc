@@ -244,6 +244,47 @@ void main() {
     });
   });
 
+  group('y-th root (ʸ√x)', () {
+    test('perfect roots come back exact', () {
+      expect(valueOf(eval('8ʸ√3')), Decimal.fromInt(2));
+      expect(valueOf(eval('16ʸ√2')), Decimal.fromInt(4));
+      expect(valueOf(eval('32ʸ√5')), Decimal.fromInt(2));
+      expect(valueOf(eval('0ʸ√3')), Decimal.zero);
+    });
+
+    test('the degree may itself be an expression', () {
+      expect(valueOf(eval('64ʸ√(1+2)')), Decimal.fromInt(4));
+    });
+
+    test('negative radicands need an odd integer degree', () {
+      expect(valueOf(eval('(−8)ʸ√3')), Decimal.fromInt(-2));
+      expect(valueOf(eval('(−8)ʸ√−3')), Decimal.parse('-0.5'));
+      expect(eval('(−16)ʸ√2'), const Failure(CalcError.domain));
+      expect(eval('(−16)ʸ√2.5'), const Failure(CalcError.domain));
+    });
+
+    test('a zero degree is a division by zero', () {
+      expect(eval('8ʸ√0'), const Failure(CalcError.divideByZero));
+    });
+  });
+
+  group('reciprocal (1/x)', () {
+    test('inverts the value', () {
+      expect(valueOf(eval('4⁻¹')), Decimal.parse('0.25'));
+      expect(valueOf(eval('0.5⁻¹')), Decimal.fromInt(2));
+      expect(valueOf(eval('(−4)⁻¹')), Decimal.parse('-0.25'));
+    });
+
+    test('zero has no reciprocal', () {
+      expect(eval('0⁻¹'), const Failure(CalcError.divideByZero));
+    });
+
+    test('takes part in expressions and repeated postfixes', () {
+      expect(valueOf(eval('2+4⁻¹')), Decimal.parse('2.25'));
+      expect(valueOf(eval('4⁻¹⁻¹')), Decimal.fromInt(4));
+    });
+  });
+
   group('powers', () {
     test('integer exponents are exact', () {
       expect(valueOf(eval('2^10')), Decimal.fromInt(1024));

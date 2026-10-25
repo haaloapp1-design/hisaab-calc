@@ -21,6 +21,7 @@ void main() {
       expect(CalcKey.multiply.operatorType, OperatorType.multiply);
       expect(CalcKey.divide.operatorType, OperatorType.divide);
       expect(CalcKey.power.operatorType, OperatorType.power);
+      expect(CalcKey.root.operatorType, OperatorType.root);
     });
 
     test('other keys are not operators', () {
@@ -58,6 +59,7 @@ void main() {
       expect(CalcKey.factorial.postfixType, PostfixType.factorial);
       expect(CalcKey.square.postfixType, PostfixType.square);
       expect(CalcKey.cube.postfixType, PostfixType.cube);
+      expect(CalcKey.reciprocal.postfixType, PostfixType.reciprocal);
       expect(CalcKey.digit2.postfixType, isNull);
     });
 

@@ -53,6 +53,16 @@ List<Token> tokenize(String source) {
     }
 
     // Multi-character function symbols (checked before numbers/letters).
+    if (_matchesAt(source, index, 'ʸ√')) {
+      index += 2;
+      add(const OperatorToken(OperatorType.root), valueAfter: true);
+      continue;
+    }
+    if (_matchesAt(source, index, '⁻¹')) {
+      index += 2;
+      add(const PostfixToken(PostfixType.reciprocal), valueAfter: false);
+      continue;
+    }
     if (_matchesAt(source, index, '10ˣ')) {
       index += 3;
       addFunction('10ˣ');

@@ -94,6 +94,7 @@ CalcResult _binary(
           ? const Failure(CalcError.divideByZero)
           : _check((a / b).toDecimal(scaleOnInfinitePrecision: 32)),
     OperatorType.power => _power(a, b),
+    OperatorType.root => _nthRoot(a, b),
     // `mod` belongs to programmer mode (integer Word), not the Decimal engine.
     OperatorType.mod => const Failure(CalcError.syntax),
   };
@@ -104,6 +105,12 @@ CalcResult _postfix(PostfixType postfix, Decimal value) => switch (postfix) {
   PostfixType.factorial => _factorial(value),
   PostfixType.square => _check(value * value),
   PostfixType.cube => _check(value * value * value),
+  PostfixType.reciprocal =>
+    value == Decimal.zero
+        ? const Failure(CalcError.divideByZero)
+        : _check(
+            (Decimal.one / value).toDecimal(scaleOnInfinitePrecision: 32),
+          ),
 };
 
 CalcResult _function(String name, Node argument, AngleMode angleMode) {
@@ -167,6 +174,26 @@ CalcResult _power(Decimal base, Decimal exponent) {
     return const Failure(CalcError.domain);
   }
   return _fromDouble(math.pow(base.toDouble(), exponent.toDouble()).toDouble());
+}
+
+/// §6: `ʸ√x` — the [degree]-th root of [radicand], i.e. `radicand^(1/degree)`.
+///
+/// A negative radicand is only real for an odd integer degree (`∛(−8) = −2`).
+CalcResult _nthRoot(Decimal radicand, Decimal degree) {
+  if (degree == Decimal.zero) {
+    return const Failure(CalcError.divideByZero);
+  }
+  final Decimal exponent = (Decimal.one / degree).toDecimal(
+    scaleOnInfinitePrecision: 32,
+  );
+  if (radicand < Decimal.zero) {
+    if (!degree.isInteger || degree.toBigInt().isEven) {
+      return const Failure(CalcError.domain);
+    }
+    final CalcResult positive = _power(-radicand, exponent);
+    return positive is Failure ? positive : _check(-(positive as Success).value);
+  }
+  return _power(radicand, exponent);
 }
 
 /// §2: perfect squares/cubes of small Decimals come back exact because the

@@ -198,4 +198,176 @@ void main() {
     expect(expressionText(tester), '5 ÷');
     expect(resultStyle(tester).color, AppColors.onPrimary);
   });
+
+  testWidgets('Scientific mode shows the 5×7 keypad, chips and compact metrics', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CalcKeyButton), findsNWidgets(35));
+    final Keypad keypad = tester.widget<Keypad>(find.byType(Keypad));
+    expect(keypad.columns, 5);
+    expect(keypad.density, CalcKeyDensity.scientific);
+
+    expect(find.byKey(const Key('angle-controls')), findsOneWidget);
+    expect(find.text('DEG'), findsOneWidget);
+    expect(find.text('RAD'), findsOneWidget);
+    expect(find.byKey(const Key('bracket-badge')), findsNothing);
+
+    expect(resultStyle(tester).fontSize, 52);
+    final Finder seven = find
+        .ancestor(of: key('7'), matching: find.byType(CalcKeyButton))
+        .first;
+    expect(tester.getSize(seven).height, 46);
+    expect(tester.getRect(seven).left, AppSizes.sheetScientificPaddingSide);
+
+    final WhiteSheet sheet = tester.widget<WhiteSheet>(find.byType(WhiteSheet));
+    expect(
+      (sheet.padding! as EdgeInsets).left,
+      AppSizes.sheetScientificPaddingSide,
+    );
+    expect(sheet.contentGap, AppSizes.sheetScientificContentGap);
+  });
+
+  testWidgets('the DEG/RAD chip changes how trig evaluates', (tester) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pump();
+    await tapKeys(tester, <String>['sin', '3', '0']);
+    expect(resultText(tester), '0.5');
+
+    await tester.tap(find.byKey(const Key('angle-rad')));
+    await tester.pump();
+    expect(resultText(tester), '−0.988031624093');
+
+    await tester.tap(find.byKey(const Key('angle-deg')));
+    await tester.pump();
+    expect(resultText(tester), '0.5');
+  });
+
+  testWidgets('2nd swaps the labels, highlights itself and resets after use', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pump();
+    await tester.tap(key('2nd'));
+    await tester.pump();
+
+    for (final String label in <String>[
+      'sin⁻¹',
+      'cos⁻¹',
+      'tan⁻¹',
+      'x³',
+      'ʸ√x',
+      '∛x',
+      'eˣ',
+      '10ˣ',
+    ]) {
+      expect(key(label), findsOneWidget, reason: label);
+    }
+    expect(
+      tester.widget<CalcKeyButton>(
+        find.widgetWithText(CalcKeyButton, '2nd'),
+      ).kind,
+      CalcKeyKind.active,
+    );
+
+    await tapKeys(tester, <String>['sin⁻¹', '0', '.', '5', '=']);
+
+    expect(resultText(tester), '30');
+    expect(key('sin'), findsOneWidget);
+    expect(
+      tester.widget<CalcKeyButton>(
+        find.widgetWithText(CalcKeyButton, '2nd'),
+      ).kind,
+      CalcKeyKind.function,
+    );
+  });
+
+  testWidgets('the bracket badge counts open brackets and disappears at zero', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pump();
+
+    await tapKeys(tester, <String>['(', '(']);
+    expect(find.byKey(const Key('bracket-badge')), findsOneWidget);
+    expect(find.text('(2'), findsOneWidget);
+
+    await tapKeys(tester, <String>['1', ')']);
+    expect(find.text('(1'), findsOneWidget);
+
+    await tapKeys(tester, <String>[')']);
+    expect(find.byKey(const Key('bracket-badge')), findsNothing);
+  });
+
+  testWidgets('the scientific keypad evaluates roots and reciprocals', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pump();
+
+    await tapKeys(tester, <String>['8', 'xʸ', '3', '=']);
+    expect(resultText(tester), '512');
+
+    await tapKeys(tester, <String>['C', '4', '1/x', '=']);
+    expect(resultText(tester), '0.25');
+  });
+
+  testWidgets('the chosen mode is remembered on the next launch', (tester) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore();
+    Widget page() => ProviderScope(
+      overrides: [kvStoreProvider.overrideWithValue(store)],
+      child: MaterialApp(theme: AppTheme.light(), home: const CalculatorPage()),
+    );
+
+    await tester.pumpWidget(page());
+    await tester.pump();
+    await tester.tap(find.text('Scientific'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<Segmented>(find.byType(Segmented)).selectedIndex,
+      1,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await tester.pumpWidget(page());
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<Segmented>(find.byType(Segmented)).selectedIndex,
+      1,
+    );
+    expect(find.byType(CalcKeyButton), findsNWidgets(35));
+  });
+
+  testWidgets('Programmer still shows the Basic keypad until T33', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+
+    await tester.tap(find.text('Programmer'));
+    await tester.pump();
+
+    expect(find.byType(CalcKeyButton), findsNWidgets(20));
+    expect(find.byKey(const Key('angle-controls')), findsNothing);
+  });
 }

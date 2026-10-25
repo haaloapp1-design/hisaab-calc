@@ -68,7 +68,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: expression line scrolls, result auto-shrinks, preview colour, error text, memory chip.
 - [x] **T23 Basic mode wired** — Read: SPEC §1.2.
   Done when: tapping keys on device calculates correctly end to end (`docs/screens/01-basic.html`).
-- [ ] **T24 Scientific mode** — Read: SPEC §1.3, §6.
+- [x] **T24 Scientific mode** — Read: SPEC §1.3, §6.
   Done when: 5×7 keypad, DEG/RAD chip, 2nd toggles labels, bracket badge, mode switcher remembers mode (`docs/screens/02-scientific.html`).
 
 ## Phase 4 — Settings

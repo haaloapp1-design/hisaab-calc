@@ -86,7 +86,9 @@ abstract final class AppSizes {
   static const double sheetPaddingTop = 12;
   static const double sheetPaddingSide = 20;
   static const double sheetPaddingBottom = 14;
+  static const double sheetScientificPaddingSide = 16;
   static const double sheetContentGap = 14;
+  static const double sheetScientificContentGap = 12;
 
   static const double headerPaddingTop = 20;
   static const double hubHeaderPaddingTop = 24;
@@ -106,6 +108,11 @@ abstract final class AppSizes {
   static const double displayScientificGap = 8;
   static const double chipPaddingV = 4;
   static const double chipPaddingH = 10;
+
+  static const double angleChipPaddingV = 6;
+  static const double angleChipPaddingH = 12;
+  static const double angleChipGap = 6;
+  static const double angleRowBottomGap = 8;
 
   static const double keyHeightBasic = 60;
   static const double keyHeightScientific = 46;
@@ -201,6 +208,16 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: medium,
+  );
+  static const TextStyle keyFunctionStrong = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 19,
+    fontWeight: bold,
+  );
+  static const TextStyle keyFunctionActive = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: bold,
   );
   static const TextStyle keyFunctionBasic = TextStyle(
     fontFamily: fontFamily,

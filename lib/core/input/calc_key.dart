@@ -28,6 +28,9 @@ enum CalcKey {
   /// `xʸ`
   power,
 
+  /// `ʸ√x` (2nd function of `xʸ`)
+  root,
+
   leftParen,
   rightParen,
 
@@ -45,6 +48,9 @@ enum CalcKey {
 
   /// `x³`
   cube,
+
+  /// `1/x` (renders as `⁻¹`)
+  reciprocal,
 
   /// `√`
   sqrt,
@@ -108,6 +114,7 @@ enum CalcKey {
     CalcKey.multiply => OperatorType.multiply,
     CalcKey.divide => OperatorType.divide,
     CalcKey.power => OperatorType.power,
+    CalcKey.root => OperatorType.root,
     _ => null,
   };
 
@@ -134,6 +141,7 @@ enum CalcKey {
     CalcKey.factorial => PostfixType.factorial,
     CalcKey.square => PostfixType.square,
     CalcKey.cube => PostfixType.cube,
+    CalcKey.reciprocal => PostfixType.reciprocal,
     _ => null,
   };
 

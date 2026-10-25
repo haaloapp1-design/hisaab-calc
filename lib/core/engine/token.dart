@@ -26,7 +26,9 @@ final class NumberToken extends Token {
 }
 
 /// Binary operators, including `mod` (BUSINESS_LOGIC §3).
-enum OperatorType { add, subtract, multiply, divide, power, mod }
+///
+/// `root` is the scientific `ʸ√x` key: `8 ʸ√ 3` is the cube root of 8.
+enum OperatorType { add, subtract, multiply, divide, power, root, mod }
 
 final class OperatorToken extends Token {
   const OperatorToken(this.operator, {this.implicit = false});
@@ -134,7 +136,9 @@ final class ConstantToken extends Token {
 }
 
 /// Postfix operators at precedence level 6 / 5 (BUSINESS_LOGIC §3).
-enum PostfixType { factorial, percent, square, cube }
+///
+/// `reciprocal` is the scientific `1/x` key and renders as `⁻¹`.
+enum PostfixType { factorial, percent, square, cube, reciprocal }
 
 final class PostfixToken extends Token {
   const PostfixToken(this.postfix);

@@ -298,6 +298,24 @@ void main() {
         ]),
         '5³',
       );
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('4'),
+          const PostfixToken(PostfixType.reciprocal),
+        ]),
+        '4⁻¹',
+      );
+    });
+
+    test('spaces the y-th root operator', () {
+      expect(
+        formatExpression(<Token>[
+          const NumberToken('8'),
+          const OperatorToken(OperatorType.root),
+          const NumberToken('3'),
+        ]),
+        '8 ʸ√ 3',
+      );
     });
 
     test('renders Ans and an empty buffer', () {
