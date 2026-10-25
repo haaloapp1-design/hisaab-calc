@@ -14,6 +14,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — Token model: `FunctionToken` owns its `(`, hidden `×` is `OperatorToken(multiply, implicit: true)`, and `CalcError.domain` displays "Undefined" — matches §1 ("sin( is ONE token") and §7; T05/T06 tokenize into this.
 - 2026-10-25 — Leading `+`/`−` becomes a `UnaryToken` in the tokenizer, not a parser-only decision — T05 requires it and the parser can use precedence level 4 directly.
 - 2026-10-25 — Function tokens use display names (`sin⁻¹`, `eˣ`, `10ˣ`, `√`, `∛`) and consume their `(`; hidden `×` is added in a post-pass over the token list — keeps `sin(` one token (§1) and makes implicit-multiplication rules one place.
+- 2026-10-25 — AST `NumberNode` stores a `Decimal` (trailing `.` trimmed), not the raw string — the evaluator needs exact arithmetic while expression display keeps using tokens.
 
 ## Log entry template
 
@@ -76,3 +77,10 @@ Changed: `lib/core/engine/tokenizer.dart` (function set `sin cos tan sin⁻¹ co
 Tests: `2π`, `3(4)`, `(1)(2)`, `2sin(30)`, `5!2`, `πe`, `2Ans`, `(2)3` all get `OperatorToken(multiply, implicit: true)`; functions keep their bracket; roots/inverse/`eˣ`/`10ˣ`; no × inside `sin(30)`; `flutter test` 52/52 pass; `flutter analyze` clean.
 Notes for next session: T07 parser receives `FunctionToken` where a `(` would be (it already consumed the bracket) — treat it as opening a bracket and auto-close it in T08. `π`/`e` arrive as `ConstantToken`, `Ans` as `AnsToken`; unary is `UnaryToken`. No whitespace is allowed between a function name and its `(`.
 Next: T07 Parser core
+
+### T07 — Parser core — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/ast.dart` (NumberNode, ConstNode, UnaryNode, BinaryNode, FuncNode, PostfixNode with structural equality), `lib/core/engine/parser.dart` (precedence climbing), `test/core/engine/parser_test.dart`.
+Tests: `2+3×4` tree, `2^3^2` right-assoc, `−2^2` = −(2^2), signed exponent, unary vs ×, brackets, left-assoc − ÷ ×, implicit × precedence (incl. `1÷2π`), exact decimals, trailing dot, constants, syntax errors; 18 parser tests; `flutter test` 70/70 pass; `flutter analyze` clean.
+Notes for next session: parser still rejects `FunctionToken`, `PostfixToken` and `AnsToken` — T08 adds postfix (precedence 6) + functions + auto-close. Precedence constants live in `Parser`; implicit × is `OperatorToken.implicit` at level 3. `FuncNode`/`PostfixNode` already exist. `_parsePrimary` currently throws when `)` is missing, which T08 must relax for auto-closing.
+Next: T08 Parser: postfix, functions, auto-close
