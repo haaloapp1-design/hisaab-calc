@@ -48,7 +48,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 - [x] **T15 InputBuffer: digits, decimal, operators** — Read: §5 (rows digit, `.`, operator).
   Done when: leading-zero, one-dot, operator-replace, negative-after-× rules tested.
-- [ ] **T16 InputBuffer: brackets, ±, backspace** — Read: §5 (rows `(`, `)`, `±`, `⌫`, `C`).
+- [x] **T16 InputBuffer: brackets, ±, backspace** — Read: §5 (rows `(`, `)`, `±`, `⌫`, `C`).
   Done when: `)` only when valid, `±` wrap/unwrap, ⌫ removes `sin(` in one step; tests.
 - [ ] **T17 CalculatorController + live preview** — Read: §5 (live preview), ARCHITECTURE (State).
   Riverpod Notifier with `onKey(CalcKey)`; preview rule. Done when: controller tests with MemoryKvStore pass.

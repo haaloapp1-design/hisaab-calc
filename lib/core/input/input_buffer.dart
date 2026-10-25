@@ -57,9 +57,9 @@ final class InputBuffer {
     return _startNumber('0.');
   }
 
-  /// §5 operator row: replaces a trailing operator, except `−` after `×`/`÷`
-  /// (and `(` in T16), which starts a negative number. An empty buffer starts
-  /// from [startValue] — the controller passes `Ans`, the default is `0`.
+  /// §5 operator row: replaces a trailing operator, except `−` after `×`/`÷`/`(`
+  /// (and a function's bracket), which starts a negative number. An empty buffer
+  /// starts from [startValue] — the controller passes `Ans`, the default is `0`.
   InputBuffer appendOperator(
     OperatorType operator, {
     NumberToken startValue = const NumberToken('0'),
@@ -105,12 +105,94 @@ final class InputBuffer {
     return this;
   }
 
-  InputBuffer _startNumber(String value) {
+  /// §5 `(` row: always allowed; after a value the hidden `×` is inserted.
+  InputBuffer appendLeftParen() => _appendValue(const LeftParenToken());
+
+  /// §5 `)` row: only when a bracket is open and the last token is a value.
+  InputBuffer appendRightParen() {
+    if (_openCount <= _closeCount) {
+      return this;
+    }
+    final Token? previous = last;
+    if (previous == null || !_endsValue(previous)) {
+      return this;
+    }
+    return InputBuffer(<Token>[...tokens, const RightParenToken()]);
+  }
+
+  /// §5 `±` row: wraps the current number as `(−n)` and unwraps it again.
+  ///
+  /// A number that already carries a `UnaryToken` (for example `5×−5`) toggles
+  /// that sign instead of gaining a second wrapper.
+  InputBuffer toggleSign() {
+    if (tokens.isEmpty) {
+      return this;
+    }
+
+    final List<Token> next = List<Token>.of(tokens);
+
+    if (_endsWithNegativeNumberWrapper(next)) {
+      final int start = next.length - 4;
+      final Token number = next[start + 2];
+      next.replaceRange(start, next.length, <Token>[number]);
+      return InputBuffer(next);
+    }
+
+    if (next.last is NumberToken) {
+      final int signIndex = next.length - 2;
+      if (signIndex >= 0 && next[signIndex] is UnaryToken) {
+        next.removeAt(signIndex);
+        return InputBuffer(next);
+      }
+
+      final NumberToken number = next.removeLast() as NumberToken;
+      next
+        ..add(const LeftParenToken())
+        ..add(const UnaryToken(negative: true))
+        ..add(number)
+        ..add(const RightParenToken());
+      return InputBuffer(next);
+    }
+
+    return this;
+  }
+
+  /// §5 `⌫` row: removes one token, or one digit from the last number.
+  InputBuffer backspace() {
+    if (tokens.isEmpty) {
+      return this;
+    }
+
+    final List<Token> next = List<Token>.of(tokens);
+    final Token previous = next.last;
+
+    if (previous is NumberToken) {
+      final String value = previous.value;
+      if (value.length <= 1) {
+        next.removeLast();
+      } else {
+        next[next.length - 1] = NumberToken(
+          value.substring(0, value.length - 1),
+        );
+      }
+      return InputBuffer(next);
+    }
+
+    next.removeLast();
+    return InputBuffer(next);
+  }
+
+  /// §5 `C`/`AC`: clears the buffer; memory and `Ans` live elsewhere.
+  InputBuffer clear() => const InputBuffer.empty();
+
+  InputBuffer _startNumber(String value) => _appendValue(NumberToken(value));
+
+  InputBuffer _appendValue(Token token) {
     final List<Token> next = List<Token>.of(tokens);
     if (next.isNotEmpty && _endsValue(next.last)) {
       next.add(const OperatorToken(OperatorType.multiply, implicit: true));
     }
-    next.add(NumberToken(value));
+    next.add(token);
     return InputBuffer(next);
   }
 
@@ -118,6 +200,24 @@ final class InputBuffer {
     final List<Token> next = List<Token>.of(tokens);
     next[next.length - 1] = token;
     return InputBuffer(next);
+  }
+
+  int get _openCount => tokens
+      .where((Token token) => token is LeftParenToken || token is FunctionToken)
+      .length;
+
+  int get _closeCount => tokens.whereType<RightParenToken>().length;
+
+  static bool _endsWithNegativeNumberWrapper(List<Token> tokens) {
+    if (tokens.length < 4) {
+      return false;
+    }
+    final int start = tokens.length - 4;
+    return tokens[start] is LeftParenToken &&
+        tokens[start + 1] is UnaryToken &&
+        (tokens[start + 1] as UnaryToken).negative &&
+        tokens[start + 2] is NumberToken &&
+        tokens[start + 3] is RightParenToken;
   }
 
   static int _digitCount(String value) => value.replaceAll('.', '').length;

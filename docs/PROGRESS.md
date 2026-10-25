@@ -34,6 +34,9 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — `InputBuffer` inserts the hidden `OperatorToken(multiply, implicit: true)` itself when a digit or dot starts after a value — the buffer bypasses the tokenizer, so §3's implicit-× post-pass would otherwise be lost.
 - 2026-10-25 — `appendOperator` takes `startValue` (default `NumberToken('0')`) instead of reading `Ans` — `lib/core/input/` is pure and stateless; T17 passes `NumberToken(ans.toString())` to honour §5's "start from Ans".
 - 2026-10-25 — A trailing `UnaryToken` is dropped before an operator is applied, and non-minus operators after a function/`(` are ignored — §5 does not define these incomplete states; dropping the sign makes `5×−` + `+` become `5+`, and ignoring avoids invalid `sin(+` / `(+` buffers.
+- 2026-10-25 — A `FunctionToken` counts as an open bracket for the `)` rule — it owns its `(`, so `sin(30)` must be closable even though no `LeftParenToken` was typed.
+- 2026-10-25 — `±` only wraps the last `NumberToken` (or toggles a `UnaryToken` already attached to it) and is a no-op on constants, groups and operators — §5 says "current number"; wrapping whole groups would need matching-bracket logic and is not in the spec.
+- 2026-10-25 — `⌫` shortens a `NumberToken` by one character but deletes every other token whole — §5 asks for one digit at a time inside a number and one tap for a function token such as `sin(`.
 
 ## Log entry template
 
@@ -159,3 +162,10 @@ Changed: new `lib/core/input/input_buffer.dart` (immutable `InputBuffer`, `appen
 Tests: digits append/leading-zero (`05`→`5`, `000`→`0`, `007`→`7`), 15-digit cap, implicit × after `π`/`)`, new number after an operator; one dot per number, leading `.`→`0.`, dot after a value→implicit ×; operator append/replace (`+` then `×`→`×`), `−` after `×`/`÷`→`UnaryToken`, `−` after `+` replaces, empty buffer→`0+`/`0−` and custom start value, dangling sign replacement, operator after a value, no operator after a function except `−`; 17 tests; `flutter test` 164/164 pass; `flutter analyze` clean.
 Notes for next session: `InputBuffer` is immutable and returns `this` for no-ops; T16 adds `(`, `)`, `±`, `⌫`, `C` on the same class. The buffer inserts the hidden `×` itself because it bypasses the tokenizer. `appendOperator` takes `startValue` (default `NumberToken('0')`); T17 passes `NumberToken(ans.toString())` for §5's "start from Ans". `RightParenToken`/`ConstantToken`/`PostfixToken`/`AnsToken` already count as value-ending for implicit ×, so T16 only needs the bracket rules.
 Next: T16 InputBuffer: brackets, ±, backspace
+
+### T16 — InputBuffer: brackets, ±, backspace — 2026-10-25
+Status: DONE
+Changed: `lib/core/input/input_buffer.dart` (`appendLeftParen`, `appendRightParen`, `toggleSign`, `backspace`, `clear`, bracket counters, `_appendValue`), new `test/core/input/input_buffer_brackets_test.dart` and `test/core/input/input_buffer_editing_test.dart`.
+Tests: `(` always allowed and implicit × after values; `)` rejected with no open bracket, after `(`, an operator, a function token or a unary sign, accepted after a number/constant/postfix/`)` and in nested/function brackets; `±` wraps `5`→`(−5)` and unwraps, wraps only the current number (`2+5`→`2+(−5)`), keeps decimals, toggles an existing unary (`5×−5`→`5×5`) instead of double-wrapping, no-op on empty/operator/constant/group; ⌫ removes one digit, dot, operator, bracket or whole `sin(` token, and C clears; 16 tests; `flutter test` 180/180 pass; `flutter analyze` clean.
+Notes for next session: `appendRightParen` counts `FunctionToken` as an open bracket because it owns its `(`. `toggleSign` only targets the last `NumberToken` (or unwraps an exact `(`, unary, number, `)` tail), so constants/groups are unchanged. `backspace` shortens `NumberToken.value` by one character and removes any other token whole; `clear()` returns `InputBuffer.empty()` and leaves memory/Ans to the controller. T17 wires `CalcKey` → these methods.
+Next: T17 CalculatorController + live preview
