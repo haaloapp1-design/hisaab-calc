@@ -30,7 +30,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `2+3×4`→14 tree, `2^3^2` right-assoc, `−2^2` = −(2^2), brackets; tests on AST shape.
 - [x] **T08 Parser: postfix, functions, auto-close** — Read: §3, §4.
   Done when: `5!`, `50%`, `x²`, `sin(30`, `((2+3` (auto-closed) parse; tests.
-- [ ] **T09 Evaluator: arithmetic with Decimal** — Read: §2.
+- [x] **T09 Evaluator: arithmetic with Decimal** — Read: §2.
   Done when: `0.1+0.2`=`0.3`, `1÷3×3`=`1`, `5÷0`→divideByZero; tests.
 - [ ] **T10 Percent rules** — Read: §4.
   Done when: all 5 rows of the §4 table pass as tests.

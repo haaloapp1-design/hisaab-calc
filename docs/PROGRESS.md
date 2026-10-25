@@ -94,3 +94,10 @@ Changed: `lib/core/engine/parser.dart` (postfix loop, `FunctionToken` → `FuncN
 Tests: `5!`, `50%`, `5²`, `5³`, postfix vs `^`/unary, repeated postfix, postfix on brackets, `sin(30)`, nested functions, `2sin(30)`, `√(144)`, `(2+3`, `((2+3`, `2(3`, `sin(30`, `sin(30^2`, `sin((2+3`; 29 parser tests; `flutter test` 81/81 pass; `flutter analyze` clean.
 Notes for next session: §4 percent is an *evaluation* rule — parser produces `add(200, PostfixNode(percent, 10))`, so T10 must special-case `+`/`−` with a percent right operand. `AnsToken` still unsupported (T18). Auto-close only at end of input; `sin(30))` is a syntax error.
 Next: T09 Evaluator: arithmetic with Decimal
+
+### T09 — Evaluator: arithmetic with Decimal — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/evaluator.dart` (`evaluate(Node)`, exact `+ − × ÷`, unary, constants, division-by-zero, 1e300 overflow), `test/core/engine/evaluator_test.dart`.
+Tests: `0.1+0.2` exactly `0.3`, `1÷3×3` rounds to 1 at 12 places, `5÷0`/`0÷0` → divideByZero + propagation, unary, exact halves, π/e at 20 dp, overflow at 1e300; 11 tests; `flutter test` 92/92 pass; `flutter analyze` clean.
+Notes for next session: the *exact* `1÷3×3` value is 0.999…9 (32 nines) — T13 must round to 12 significant digits for display. `evaluate` returns `Failure(CalcError.syntax)` for power/mod/postfix/functions until T10–T12. T14's facade must catch `FormatException` from tokenizer/parser and return `Failure(CalcError.syntax)`. Division uses `toDecimal(scaleOnInfinitePrecision: 32)`.
+Next: T10 Percent rules
