@@ -52,6 +52,13 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — History push on `=` is deferred to T28 — no history store exists yet; the controller already has the result/expression pair it will need.
 - 2026-10-25 — `Ans` is written to `ans_v1` on every successful `=` through a chained future (`persistDone` is the test hook), and a restore never overwrites an `Ans` already produced by an evaluation — saves are async but ordered.
 - 2026-10-25 — `CalcState.result` is a `Decimal?` and `error` a `CalcError?` — the display formats the result with the current settings (T22/T27) and shows `error.displayText` (§7).
+- 2026-10-25 — `BottomNav` lives in `lib/shared/widgets/` and is owned by `ShellPage` (ARCHITECTURE Navigation), with the four destinations in a `NavDestination` enum — every tab uses one nav and pages provide only their content above it.
+- 2026-10-25 — Nav icons are the closest Material outlined glyphs (`calculate_outlined`, `swap_horiz_rounded`, `grid_view_rounded`, `schedule_rounded`) instead of the design's inline SVGs — the app ships no SVG assets and Material icons keep the same 22 px optical size; sizes, colours and layout follow `01-basic.html` exactly.
+- 2026-10-25 — Nav tokens added: `navDivider` `#EDF0FA`, item radius 14, row gap 6, icon/label gap 3, item vertical padding 7, icon 22, bar padding 10/20/14 — the HTML values were not covered by DESIGN.md, so they live in `app_tokens.dart` rather than in the widget.
+- 2026-10-25 — The selected tab index is local `StatefulWidget` state in `ShellPage`, not a Riverpod provider — it is ephemeral navigation state, and ARCHITECTURE's provider table has no shell provider; app data stays in Riverpod.
+- 2026-10-25 — The shell wraps the nav in a white `ColoredBox` + `SafeArea(top: false)` — the design is a fixed 390×844 frame, so the device's bottom inset has to be handled here.
+- 2026-10-25 — Placeholder tabs: Calculator keeps the blue top, the other three use `background` with a hub title — T23/T36/T41/T29 replace them, so they use only tokens and no fake data.
+- 2026-10-25 — `CalculatorApp.home` is `ShellPage` and the old theme-probe page was deleted — the probe had served its purpose in T02 and its assertions now live in `app_test.dart` against the real shell.
 
 ## Log entry template
 
@@ -198,3 +205,10 @@ Changed: new `lib/core/input/last_operation.dart` (repeat `=` data + `apply`), n
 Tests: `5+3===` → 8/11/14; repeat uses the rightmost top-level operator (`2+3×4=` 14 → 56) and a negative operand (`5×−2=` −10 → 20); Ans written to `MemoryKvStore` and read back; digit/function after `=` starts fresh; operator after `=` continues (`8×2` preview 16 → 16); postfix/`±` apply to the result; error keeps the buffer and can be fixed (`5÷0=` → backspace → 2 → 2.5); empty `=` no-op; bare `5==` stays 5; syntax error on `2+=`; `LastOperation` bracket/function/implicit-× cases; `flutter test` 250/250 pass; `flutter analyze` clean.
 Notes for next session: history push on `=` is still pending (T28) — `_applyResult` is the one place to add it. `CalcState` now has `result`/`error`/`justEvaluated`/`lastOperation`; T22 renders `result ?? preview` and `error.displayText`. T24 still needs `2nd` and `mode`; T27 must replace the hard-coded `AngleMode.deg` in `_previewFor` and `LastOperation.apply`.
 Next: T19 App shell and bottom nav
+
+### T19 — App shell and bottom nav — 2026-10-25
+Status: DONE
+Changed: new `lib/shared/widgets/bottom_nav.dart` (`NavDestination` enum + `BottomNav` with active pill), new `lib/features/shell/shell_page.dart` (`ShellPage`, `IndexedStack` of 4 tabs, placeholders), `lib/app.dart` (home is the shell, theme probe removed), `lib/theme/app_tokens.dart` (nav divider colour, item radius, nav sizes), new `test/shared/widgets/bottom_nav_test.dart`, new `test/features/shell/shell_page_test.dart`, rewritten `test/app_test.dart`.
+Tests: nav renders the 4 labels in order; the active item uses the `keyOperator` pill and `primary` colour while inactive items stay `inkMuted`/transparent; taps report indices 2/3; the top divider is `navDivider` at 1 px, the icon is 22 px and the item meets the 44 px tap target; the shell starts at index 0 with 4 `IndexedStack` children, nav taps move it to 1/2/3 and back, and the pill follows; app boots with the shell and all four nav labels; `flutter test` 257/257 pass; `flutter analyze` clean.
+Notes for next session: T20 builds `BlueHeader`, `WhiteSheet` and `Segmented` in `lib/shared/widgets/`; the calculator placeholder in `shell_page.dart` must be replaced by the real page in T23 — the shell owns the nav, so the calculator page should not add a second one. If a later screen (converter/tools/history) needs the nav inside its own white sheet per its HTML, reuse `BottomNav` there and remove the shell bar for that tab.
+Next: T20 Shared widgets

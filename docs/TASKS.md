@@ -57,7 +57,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 3 — Calculator UI
 
-- [ ] **T19 App shell and bottom nav** — Read: DESIGN (BottomNav), ARCHITECTURE (Navigation).
+- [x] **T19 App shell and bottom nav** — Read: DESIGN (BottomNav), ARCHITECTURE (Navigation).
   Done when: 4 tabs switch with IndexedStack; placeholder pages; matches design nav.
 - [ ] **T20 Shared widgets** — Read: DESIGN (Components). `BlueHeader`, `WhiteSheet`, `Segmented`.
   Done when: used on a placeholder page; widget test renders them.

@@ -30,6 +30,9 @@ abstract final class AppColors {
   static const Color ink = Color(0xFF18224F);
   static const Color inkMuted = Color(0xFF5A6487);
 
+  // Navigation
+  static const Color navDivider = Color(0xFFEDF0FA);
+
   // States
   static const Color disabled = Color(0xFFA3ABC7);
   static const Color disabledBorder = Color(0xFFDCE1F2);
@@ -62,6 +65,8 @@ abstract final class AppRadii {
   static const double segmentedTrack = 14;
   static const double segmentedPill = 10;
 
+  static const double navItem = 14;
+
   static const double card = 18;
   static const double cardLarge = 20;
 }
@@ -85,6 +90,13 @@ abstract final class AppSizes {
   static const double segmentedHeight = 44;
   static const double handleWidth = 44;
   static const double handleHeight = 4;
+
+  static const double navGap = 6;
+  static const double navItemGap = 3;
+  static const double navItemPadding = 7;
+  static const double navIcon = 22;
+  static const double navPaddingTop = 10;
+  static const double navPaddingBottom = 14;
 
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
