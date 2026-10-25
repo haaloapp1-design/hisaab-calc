@@ -40,7 +40,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `ln`, `log`, `eˣ`, `10ˣ`, `√144`=12 exact, `∛−8`=−2, `xʸ` rules, `5!`=120, `171!`→overflow, `1/0`→error; tests.
 - [x] **T13 Formatter** — Read: §8.
   Done when: separators, auto vs fixed decimals, sci notation thresholds, trailing zero strip, `−` sign; tests.
-- [ ] **T14 Engine facade + big test table** — Read: §1.
+- [x] **T14 Engine facade + big test table** — Read: §1.
   `CalcEngine.evaluate(tokens, {angleMode})` → CalcResult. Add a 40+ row table test covering §2–§8.
   Done when: all pass.
 

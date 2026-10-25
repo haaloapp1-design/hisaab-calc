@@ -27,6 +27,9 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — Auto formatting uses §8's 12 significant digits, not the "up to 10 significant decimals" wording in SPEC's settings screen — BUSINESS_LOGIC is the engine-rules doc and T13 reads §8; the settings UI can still describe it loosely.
 - 2026-10-25 — In scientific notation a fixed decimal setting keeps its zeros (`1.00E+18`) while Auto strips them (`1E+18`) — §8.1 says fixed keeps trailing zeros and §8.2 caps the mantissa at 10 digits; both rules are honoured.
 - 2026-10-25 — `formatTypedNumber` lives in the formatter for the expression line (§8.6) — it groups typed digits without rounding, so the display layer never re-implements separator logic.
+- 2026-10-25 — `CalcEngine` is an `abstract final class` with static `evaluate`/`evaluateSource` in `lib/core/engine/calc_engine.dart` — the engine is stateless and T14 names `CalcEngine.evaluate(tokens, …)`; no instance/provider is needed.
+- 2026-10-25 — The facade catches only `FormatException` (tokenizer/parser) and maps it to `CalcError.syntax`; evaluator code is written to return `Failure` for every bad case, so other exceptions stay visible as bugs instead of being silently swallowed.
+- 2026-10-25 — The §2–§8 acceptance table asserts the final display string (evaluate → `formatNumber`) rather than only `CalcResult` — it is the contract the UI shows, and it keeps formatter regressions visible.
 
 ## Log entry template
 
@@ -138,3 +141,10 @@ Changed: new `lib/core/engine/formatter.dart` (`NumberFormatOptions`, `formatNum
 Tests: Auto keeps `0.3`, strips `1.2300`→`1.23`, rounds to 12 significant digits (`1.234567890123456`→`1.23456789012`, 32-nines→`1`), groups `1234567.891`→`1,234,567.891`; fixed 0/2/10 places with half-up (`1.005`→`1.01`) and trailing zeros (`1.5`→`1.50`, `2`→`2.00`); grouping off; de locale `1.234.567,891`; `numberFormatOptionsFor` en_US/de_DE; sci thresholds `1e14` plain vs `1e15`→`1E+15`, `1e-9` plain vs `1e-10`→`1E-10`, 10-digit mantissa `1.23456789E+18`, `2.5E-11`, fixed 2 `1.00E+18`; display `−` vs copy `-`; typed expression numbers keep digits (`12.50`, `12.`) and group; 15 tests; `flutter test` 143/143 pass; `flutter analyze` clean.
 Notes for next session: the formatter is pure Dart and takes separators as strings, so T14/T20 can call `numberFormatOptionsFor(Locale.toString(), decimalPlaces: settings.decimals, useGrouping: settings.separators)` without importing Flutter. `formatTypedNumber` is for the expression line (§8.6) and never rounds. Auto uses §8's 12 significant digits (SPEC's settings text says "up to 10 significant decimals" — §8 wins for the engine; logged). Sci notation rounds/keeps zeros based on the fixed setting: Auto strips, fixed keeps (`1.00E+18`). T14 builds `CalcEngine` on top of tokenize→parse→evaluate→format.
 Next: T14 Engine facade + big test table
+
+### T14 — Engine facade + big test table — 2026-10-25
+Status: DONE
+Changed: new `lib/core/engine/calc_engine.dart` (`abstract final class CalcEngine` with static `evaluate(List<Token>, {angleMode})` and `evaluateSource(String, {angleMode})`), new `test/core/engine/calc_engine_test.dart` (70-row table).
+Tests: 70 rows covering §2 exact arithmetic/division, powers/`x²`/`x³`, unary/constants, §4 percent, §6 trig/logs/roots/factorial, §8 grouping/rounding/sci thresholds, auto-close and §7 errors — all source→display strings; plus `evaluateSource` = `evaluate(tokens)`, unknown text/empty input → `Invalid input` (no throw), and angle-mode forwarding; `flutter test` 147/147 pass; `flutter analyze` clean.
+Notes for next session: `CalcEngine` catches `FormatException` from the tokenizer/parser and returns `Failure(CalcError.syntax)`; the evaluator itself never throws. `evaluate` takes the `List<Token>` from the input buffer, `evaluateSource` is for paste/history/tests. The table formats with default `formatNumber` (grouping on, Auto 12 digits), so any future formatter change must keep these rows green. Phase 1 (engine) is complete — T15 starts the input buffer.
+Next: T15 InputBuffer: digits, decimal, operators
