@@ -11,6 +11,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — `kotlin.incremental=false` in `android/gradle.properties` — pub cache is on C: and the project on D:, which breaks Kotlin's incremental caches ("different roots").
 - 2026-10-25 — Ubuntu bundled in `assets/fonts/` (400/500/700 + UFL.txt) instead of using `google_fonts`, which was removed — fonts must work offline and in widget tests; DESIGN.md allows bundling.
 - 2026-10-25 — `MemoryKvStore` lives in `lib/core/storage/` and `kvStoreProvider` in its own file `kv_store_provider.dart` — shared by every future test/provider override instead of test-only code.
+- 2026-10-25 — Token model: `FunctionToken` owns its `(`, hidden `×` is `OperatorToken(multiply, implicit: true)`, and `CalcError.domain` displays "Undefined" — matches §1 ("sin( is ONE token") and §7; T05/T06 tokenize into this.
 
 ## Log entry template
 
@@ -52,3 +53,10 @@ Changed: `lib/core/storage/kv_store.dart` (interface), `memory_kv_store.dart`, `
 Tests: memory get/set/overwrite/remove/seed-copy (5), prefs persistence + new-instance reads (2), provider default + override (2); `flutter test` 15/15 pass; `flutter analyze` clean; `flutter build apk --debug` builds.
 Notes for next session: `kvStoreProvider` defaults to `PrefsStore()` (lazy — no async init in `main`), override it with `MemoryKvStore` in tests. `PrefsStore` accepts an optional `SharedPreferences` positionally for tests. No JSON helpers yet; settings/history will store JSON strings themselves.
 Next: T04 Results and errors
+
+### T04 — Results and errors — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/calc_result.dart` (sealed `CalcResult` = `Success(Decimal)` / `Failure(CalcError)`), `lib/core/engine/token.dart` (token model), `test/core/engine/calc_result_test.dart`, `test/core/engine/token_test.dart`.
+Tests: §7 display texts + all five errors, Success/Failure equality, exhaustive switch (4), token equality incl. hidden × (4); `flutter test` 25/25 pass; `flutter analyze` clean.
+Notes for next session: T05 tokenizes into the existing `Token` classes — `FunctionToken('sin')` already represents `sin(`, closing bracket is a separate `RightParenToken`; `NumberToken.value` is unsigned raw digits; operators are `OperatorType` (add/subtract/multiply/divide/power/mod); postfix is `PostfixType` (factorial/percent/square/cube); constants pi/e; `AnsToken`. `CalcError.domain` shows "Undefined"; §7's "Invalid input" variant uses `syntax`.
+Next: T05 Tokenizer: numbers, operators, brackets
