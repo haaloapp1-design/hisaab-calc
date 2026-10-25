@@ -18,6 +18,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — `origin` = https://github.com/haaloapp1-design/hisaab-calc and every task ends with `git push` — user asked for the repo to be kept in sync.
 - 2026-10-25 — Parser auto-closes missing `)` at the end of the token list (not only on `=`) — live preview and `=` share one code path; a missing `)` anywhere else stays a syntax error.
 - 2026-10-25 — `x²`/`x³` are parsed in the postfix loop (tightest) instead of at power level 5 — `2²^3` then means `(2²)^3`, the usual calculator reading.
+- 2026-10-25 — §4 percent-of-left is implemented in the evaluator (`_binary` sees `right is PostfixNode(percent)`), not in the parser as the doc suggests — the rule needs the *evaluated* left operand; the parser still emits plain `PostfixNode(percent, …)`.
 
 ## Log entry template
 
@@ -101,3 +102,10 @@ Changed: `lib/core/engine/evaluator.dart` (`evaluate(Node)`, exact `+ − × ÷`
 Tests: `0.1+0.2` exactly `0.3`, `1÷3×3` rounds to 1 at 12 places, `5÷0`/`0÷0` → divideByZero + propagation, unary, exact halves, π/e at 20 dp, overflow at 1e300; 11 tests; `flutter test` 92/92 pass; `flutter analyze` clean.
 Notes for next session: the *exact* `1÷3×3` value is 0.999…9 (32 nines) — T13 must round to 12 significant digits for display. `evaluate` returns `Failure(CalcError.syntax)` for power/mod/postfix/functions until T10–T12. T14's facade must catch `FormatException` from tokenizer/parser and return `Failure(CalcError.syntax)`. Division uses `toDecimal(scaleOnInfinitePrecision: 32)`.
 Next: T10 Percent rules
+
+### T10 — Percent rules — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/evaluator.dart` (`PostfixType.percent` → `value × 0.01`, §4 percent-of-left special case for `+`/`−`), `test/core/engine/evaluator_test.dart`.
+Tests: all 5 §4 rows (`50%`→0.5, `200+10%`→220, `200−10%`→180, `200×10%`→20, `200÷10%`→2000), left operand as expression (`(100+100)+10%`→220), percent amount as expression (`200+(10+5)%`→230), rule only on the right of `+`/`−` (`10%+200`→200.1, `10%×200`→20), left-assoc chains (`200+10%+5`→225, `200−10%−5`→175), `50%%`→0.005, failure propagation; 9 percent tests; `flutter test` 101/101 pass; `flutter analyze` clean.
+Notes for next session: §4 lives in the evaluator, not the parser — the special case needs the *evaluated* left value, so `_binary` inspects `right is PostfixNode(percent)` before evaluating the right side. Percent binds as a postfix, so `200+10%` parses as `add(200, PostfixNode(percent, 10))`. Factorial/square/cube still return `Failure(CalcError.syntax)` (T12).
+Next: T11 Trig functions

@@ -65,6 +65,52 @@ void main() {
     });
   });
 
+  group('percent (§4)', () {
+    test('50% alone is 0.5', () {
+      expect(eval('50%'), Success(Decimal.parse('0.5')));
+    });
+
+    test('percent after + or − is taken of the left operand', () {
+      expect(valueOf(eval('200+10%')), Decimal.fromInt(220));
+      expect(valueOf(eval('200−10%')), Decimal.fromInt(180));
+    });
+
+    test('percent after × or ÷ is a plain fraction', () {
+      expect(valueOf(eval('200×10%')), Decimal.fromInt(20));
+      expect(valueOf(eval('200÷10%')), Decimal.fromInt(2000));
+    });
+
+    test('the left operand may itself be an expression', () {
+      expect(valueOf(eval('(100+100)+10%')), Decimal.fromInt(220));
+      expect(valueOf(eval('(100+100)−10%')), Decimal.fromInt(180));
+    });
+
+    test('the percent amount may itself be an expression', () {
+      expect(valueOf(eval('200+(10+5)%')), Decimal.fromInt(230));
+      expect(valueOf(eval('200−(10+5)%')), Decimal.fromInt(170));
+    });
+
+    test('only the right operand of + or − gets the special case', () {
+      expect(valueOf(eval('10%+200')), Decimal.parse('200.1'));
+      expect(valueOf(eval('10%×200')), Decimal.fromInt(20));
+    });
+
+    test('left-associative chains apply the rule per step', () {
+      // (200 + 10%) + 5 = 220 + 5
+      expect(valueOf(eval('200+10%+5')), Decimal.fromInt(225));
+      // (200 − 10%) − 5 = 180 − 5
+      expect(valueOf(eval('200−10%−5')), Decimal.fromInt(175));
+    });
+
+    test('repeated percent divides by 100 twice', () {
+      expect(valueOf(eval('50%%')), Decimal.parse('0.005'));
+    });
+
+    test('a failing left operand still propagates', () {
+      expect(eval('1÷0+10%'), const Failure(CalcError.divideByZero));
+    });
+  });
+
   group('overflow', () {
     test('values at or above 1e300 fail', () {
       expect(

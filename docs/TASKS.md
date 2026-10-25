@@ -32,7 +32,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: `5!`, `50%`, `x²`, `sin(30`, `((2+3` (auto-closed) parse; tests.
 - [x] **T09 Evaluator: arithmetic with Decimal** — Read: §2.
   Done when: `0.1+0.2`=`0.3`, `1÷3×3`=`1`, `5÷0`→divideByZero; tests.
-- [ ] **T10 Percent rules** — Read: §4.
+- [x] **T10 Percent rules** — Read: §4.
   Done when: all 5 rows of the §4 table pass as tests.
 - [ ] **T11 Trig functions** — Read: §2 (snap), §6.
   Done when: DEG `sin(30)`=0.5, `sin(180)`=0, `tan(90)`→Undefined, `sin⁻¹(2)`→domain; RAD `cos(π)`=−1; tests.
