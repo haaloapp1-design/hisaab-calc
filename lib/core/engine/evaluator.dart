@@ -15,12 +15,12 @@ final Decimal _snapLimit = Decimal.parse('1e-12');
 final Decimal _minusOne = Decimal.fromInt(-1);
 final Decimal _ninety = Decimal.fromInt(90);
 final Decimal _oneEighty = Decimal.fromInt(180);
+final Decimal _maxExactExponent = Decimal.fromInt(1000);
+final Decimal _maxFactorial = Decimal.fromInt(170);
 
 /// Evaluates an AST with exact [Decimal] arithmetic (BUSINESS_LOGIC §2, §4, §6).
 ///
-/// Trig functions honour [angleMode] (DEG by default, like the app). Powers,
-/// factorial, roots, logs and exponentials arrive in T12 and currently report
-/// `CalcError.syntax` instead of throwing.
+/// Trig functions honour [angleMode] (DEG by default, like the app).
 CalcResult evaluate(Node node, {AngleMode angleMode = AngleMode.deg}) {
   switch (node) {
     case NumberNode(:final Decimal value):
@@ -45,14 +45,7 @@ CalcResult evaluate(Node node, {AngleMode angleMode = AngleMode.deg}) {
       if (inner is Failure) {
         return inner;
       }
-      final Decimal value = (inner as Success).value;
-      return switch (postfix) {
-        PostfixType.percent => _check(_percentOf(value)),
-        // Factorial, square and cube arrive in T12.
-        PostfixType.factorial ||
-        PostfixType.square ||
-        PostfixType.cube => const Failure(CalcError.syntax),
-      };
+      return _postfix(postfix, (inner as Success).value);
     case FuncNode(:final String name, :final Node argument):
       return _function(name, argument, angleMode);
   }
@@ -100,10 +93,18 @@ CalcResult _binary(
       b == Decimal.zero
           ? const Failure(CalcError.divideByZero)
           : _check((a / b).toDecimal(scaleOnInfinitePrecision: 32)),
-    // Powers and mod are added in T12.
-    OperatorType.power || OperatorType.mod => const Failure(CalcError.syntax),
+    OperatorType.power => _power(a, b),
+    // `mod` belongs to programmer mode (integer Word), not the Decimal engine.
+    OperatorType.mod => const Failure(CalcError.syntax),
   };
 }
+
+CalcResult _postfix(PostfixType postfix, Decimal value) => switch (postfix) {
+  PostfixType.percent => _check(_percentOf(value)),
+  PostfixType.factorial => _factorial(value),
+  PostfixType.square => _check(value * value),
+  PostfixType.cube => _check(value * value * value),
+};
 
 CalcResult _function(String name, Node argument, AngleMode angleMode) {
   final CalcResult argumentResult = evaluate(argument, angleMode: angleMode);
@@ -134,9 +135,69 @@ CalcResult _function(String name, Node argument, AngleMode angleMode) {
       fn: math.atan,
       bounded: false,
     ),
-    // Roots, logs and exponentials arrive in T12.
+    'ln' =>
+      x <= Decimal.zero
+          ? const Failure(CalcError.domain)
+          : _fromDouble(math.log(x.toDouble())),
+    'log' =>
+      x <= Decimal.zero
+          ? const Failure(CalcError.domain)
+          : _fromDouble(math.log(x.toDouble()) / math.ln10),
+    'eˣ' => _fromDouble(math.exp(x.toDouble())),
+    '10ˣ' => _fromDouble(math.pow(10, x.toDouble()).toDouble()),
+    '√' => _root(x, cube: false),
+    '∛' => _root(x, cube: true),
     _ => const Failure(CalcError.syntax),
   };
+}
+
+/// §6: integer exponents use exact Decimal `pow`; other cases go via double.
+CalcResult _power(Decimal base, Decimal exponent) {
+  if (base == Decimal.zero && exponent == Decimal.zero) {
+    return Success(Decimal.one);
+  }
+  if (exponent.isInteger && exponent.abs() <= _maxExactExponent) {
+    if (base == Decimal.zero && exponent.sign < 0) {
+      return const Failure(CalcError.divideByZero);
+    }
+    final exact = base.pow(exponent.toBigInt().toInt());
+    return _check(exact.toDecimal(scaleOnInfinitePrecision: 32));
+  }
+  if (base.sign < 0) {
+    return const Failure(CalcError.domain);
+  }
+  return _fromDouble(math.pow(base.toDouble(), exponent.toDouble()).toDouble());
+}
+
+/// §2: perfect squares/cubes of small Decimals come back exact because the
+/// 15-significant-digit rounding removes the IEEE noise (e.g. `√144 = 12`).
+CalcResult _root(Decimal x, {required bool cube}) {
+  if (!cube && x < Decimal.zero) {
+    return const Failure(CalcError.domain);
+  }
+  final double input = x.toDouble();
+  final double result = cube
+      ? (input < 0
+            ? -math.pow(-input, 1 / 3).toDouble()
+            : math.pow(input, 1 / 3).toDouble())
+      : math.sqrt(input);
+  return _fromDouble(result);
+}
+
+/// §6: `n!` is exact for a non-negative integer up to 170; larger overflows.
+CalcResult _factorial(Decimal value) {
+  if (!value.isInteger || value.sign < 0) {
+    return const Failure(CalcError.domain);
+  }
+  if (value > _maxFactorial) {
+    return const Failure(CalcError.overflow);
+  }
+  BigInt result = BigInt.one;
+  final int n = value.toBigInt().toInt();
+  for (int i = 2; i <= n; i++) {
+    result *= BigInt.from(i);
+  }
+  return _check(Decimal.fromBigInt(result));
 }
 
 /// §6: `tan` is undefined at 90° + k·180° (or where cos ≈ 0 in RAD).

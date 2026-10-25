@@ -195,6 +195,117 @@ void main() {
     });
   });
 
+  group('logs and exponentials', () {
+    test('ln', () {
+      expect(valueOf(eval('ln(1)')), Decimal.zero);
+      expect(valueOf(eval('ln(e)')), Decimal.one);
+      expect(eval('ln(0)'), const Failure(CalcError.domain));
+      expect(eval('ln(−1)'), const Failure(CalcError.domain));
+    });
+
+    test('log is base 10', () {
+      expect(valueOf(eval('log(1000)')), Decimal.fromInt(3));
+      expect(valueOf(eval('log(1)')), Decimal.zero);
+      expect(valueOf(eval('log(0.001)')), Decimal.fromInt(-3));
+      expect(eval('log(−10)'), const Failure(CalcError.domain));
+    });
+
+    test('eˣ and 10ˣ', () {
+      expect(valueOf(eval('eˣ(0)')), Decimal.one);
+      expect(valueOf(eval('eˣ(1)')), Decimal.parse('2.71828182845905'));
+      expect(valueOf(eval('10ˣ(0)')), Decimal.one);
+      expect(valueOf(eval('10ˣ(2)')), Decimal.fromInt(100));
+      expect(valueOf(eval('10ˣ(−2)')), Decimal.parse('0.01'));
+    });
+
+    test('exponential overflow', () {
+      expect(eval('eˣ(710)'), const Failure(CalcError.overflow));
+    });
+  });
+
+  group('roots', () {
+    test('perfect squares and cubes come back exact', () {
+      expect(valueOf(eval('√(144)')), Decimal.fromInt(12));
+      expect(valueOf(eval('√(2.25)')), Decimal.parse('1.5'));
+      expect(valueOf(eval('∛(27)')), Decimal.fromInt(3));
+      expect(valueOf(eval('∛(−8)')), Decimal.fromInt(-2));
+      expect(valueOf(eval('√(9+16)')), Decimal.fromInt(5));
+      expect(valueOf(eval('∛(−8−19)')), Decimal.fromInt(-3));
+    });
+
+    test('non-perfect roots are rounded to 15 significant digits', () {
+      expect(valueOf(eval('√(2)')), Decimal.parse('1.41421356237310'));
+    });
+
+    test('zero and negative inputs', () {
+      expect(valueOf(eval('√(0)')), Decimal.zero);
+      expect(valueOf(eval('∛(0)')), Decimal.zero);
+      expect(eval('√(−4)'), const Failure(CalcError.domain));
+    });
+  });
+
+  group('powers', () {
+    test('integer exponents are exact', () {
+      expect(valueOf(eval('2^10')), Decimal.fromInt(1024));
+      expect(
+        valueOf(eval('2^100')),
+        Decimal.parse('1267650600228229401496703205376'),
+      );
+      expect(valueOf(eval('(−2)^3')), Decimal.fromInt(-8));
+      expect(valueOf(eval('(−2)^2')), Decimal.fromInt(4));
+      expect(valueOf(eval('2^−2')), Decimal.parse('0.25'));
+    });
+
+    test('0^0 is 1 and negative exponents divide', () {
+      expect(valueOf(eval('0^0')), Decimal.one);
+      expect(valueOf(eval('0^2')), Decimal.zero);
+      expect(eval('0^−1'), const Failure(CalcError.divideByZero));
+      expect(
+        valueOf(eval('3^−1')).round(scale: 12),
+        Decimal.parse('0.333333333333'),
+      );
+    });
+
+    test('power is right-associative', () {
+      expect(valueOf(eval('2^3^2')), Decimal.fromInt(512));
+    });
+
+    test('non-integer exponents use the double path', () {
+      expect(valueOf(eval('2^0.5')), Decimal.parse('1.41421356237310'));
+      expect(valueOf(eval('9^0.5')), Decimal.fromInt(3));
+      expect(eval('(−2)^0.5'), const Failure(CalcError.domain));
+    });
+
+    test('huge powers overflow', () {
+      expect(eval('10^400'), const Failure(CalcError.overflow));
+    });
+  });
+
+  group('factorial and postfix powers', () {
+    test('factorial is exact', () {
+      expect(valueOf(eval('0!')), Decimal.one);
+      expect(valueOf(eval('1!')), Decimal.one);
+      expect(valueOf(eval('5!')), Decimal.fromInt(120));
+      expect(valueOf(eval('10!')), Decimal.fromInt(3628800));
+      expect(valueOf(eval('20!')), Decimal.parse('2432902008176640000'));
+      expect(valueOf(eval('5!+1')), Decimal.fromInt(121));
+    });
+
+    test('factorial domain and overflow', () {
+      expect(eval('5.5!'), const Failure(CalcError.domain));
+      expect(eval('(−3)!'), const Failure(CalcError.domain));
+      expect(eval('171!'), const Failure(CalcError.overflow));
+    });
+
+    test('square and cube are exact', () {
+      expect(valueOf(eval('5²')), Decimal.fromInt(25));
+      expect(valueOf(eval('5³')), Decimal.fromInt(125));
+      expect(valueOf(eval('(−3)²')), Decimal.fromInt(9));
+      expect(valueOf(eval('(−3)³')), Decimal.fromInt(-27));
+      expect(valueOf(eval('2²+1')), Decimal.fromInt(5));
+    });
+  });
+
   group('overflow', () {
     test('values at or above 1e300 fail', () {
       expect(

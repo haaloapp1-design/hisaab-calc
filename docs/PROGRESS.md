@@ -21,6 +21,9 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — §4 percent-of-left is implemented in the evaluator (`_binary` sees `right is PostfixNode(percent)`), not in the parser as the doc suggests — the rule needs the *evaluated* left operand; the parser still emits plain `PostfixNode(percent, …)`.
 - 2026-10-25 — `AngleMode` lives in `lib/core/engine/angle_mode.dart` as a pure-Dart enum, and `evaluate` takes it as `{AngleMode angleMode = AngleMode.deg}` — SPEC says DEG is the default; T14 can pass the settings value straight through without the engine importing settings.
 - 2026-10-25 — Trig results use `double.toStringAsPrecision(15)` then `Decimal.parse` — the string route applies the §2 15-significant-digit rule directly and parses exactly; a raw double-to-Decimal conversion would keep binary noise.
+- 2026-10-25 — `0^negative` returns `divideByZero` (e.g. `0^−1`) — the docs do not name this case; `1/0` is the closest rule, and `Decimal.pow` would otherwise throw from a zero denominator.
+- 2026-10-25 — Factorial accepts `n ≤ 170` per §6, but the §2 `1e300` cap still applies to the result, so factorials above 166! report `overflow` — the two rules overlap; §2 is the global safety limit.
+- 2026-10-25 — `mod` stays a programmer-mode (integer `Word`) operator and returns `Failure(syntax)` in the Decimal engine — §11 defines it on signed integers, and no scientific keypad emits it.
 
 ## Log entry template
 
@@ -118,3 +121,10 @@ Changed: new `lib/core/engine/angle_mode.dart` (`enum AngleMode { deg, rad }`), 
 Tests: DEG `sin(30)`=0.5, `sin(180)`/`sin(360)`/`cos(90)` snap to 0, `cos(60)`=0.5, `cos(180)`=−1, `tan(45)`=1, `tan(180)`=0, `tan(90/270/−90)`→domain, `sin⁻¹(0.5)`=30, `cos⁻¹(0.5)`=60, `tan⁻¹(1)`=45, `sin⁻¹(1)`=90, `cos⁻¹(−1)`=180, `sin⁻¹(2)`/`sin⁻¹(−2)`/`cos⁻¹(1.5)`→domain, trig inside expressions; RAD `cos(π)`=−1, `sin(π÷2)`=1, `tan(π÷2)`→domain, `sin⁻¹(1)`=π/2, `sin(30)` and `2×sin(30)` prove the mode threads through the tree; 12 trig tests; `flutter test` 113/113 pass; `flutter analyze` clean.
 Notes for next session: `evaluate` takes `AngleMode` as an optional named parameter and every recursive call forwards it; T14's facade can pass `settings.angle` straight through. Transcendental results go through `_fromDouble` (NaN→domain, infinite→overflow, `toStringAsPrecision(15)`, snap `<1e-12` to 0). `tan` DEG checks `x % 180 == 90` on the Decimal (covers ±90, 270…); RAD checks `|cos(x)| < 1e-12`. `ln log eˣ 10ˣ √ ∛`, `^`, `mod`, `!`, `x²`/`x³` still return `Failure(CalcError.syntax)` (T12).
 Next: T12 Other functions
+
+### T12 — Other functions — 2026-10-25
+Status: DONE
+Changed: `lib/core/engine/evaluator.dart` (`ln`, `log`, `eˣ`, `10ˣ`, `√`, `∛`, `xʸ` with exact integer exponents, `n!` via BigInt, `x²`/`x³`), `test/core/engine/evaluator_test.dart`.
+Tests: `ln(1)`=0, `ln(e)`=1, `ln(0)`/`ln(−1)`→domain, `log(1000)`=3, `log(0.001)`=−3, `log(−10)`→domain, `eˣ(0)`=1, `eˣ(1)`=2.71828182845905, `10ˣ(2)`=100, `10ˣ(−2)`=0.01, `eˣ(710)`→overflow; `√144`=12 exact, `√2.25`=1.5, `√(9+16)`=5, `∛27`=3, `∛−8`=−2, `√2`=1.41421356237310, `√(−4)`→domain; `2^10`, `2^100` (31 digits), `(−2)^3`, `2^−2`, `0^0`=1, `0^−1`→divideByZero, `3^−1` truncates at 32 places, `2^3^2`=512, `2^0.5`, `(−2)^0.5`→domain, `10^400`→overflow; `0!`/`1!`/`5!`/`10!`/`20!` exact, `5.5!`/`(−3)!`→domain, `171!`→overflow; `5²`/`5³`/`(−3)²`/`(−3)³`; 15 new tests; `flutter test` 128/128 pass; `flutter analyze` clean.
+Notes for next session: integer `xʸ` (|y| ≤ 1000) uses `Decimal.pow` → `Rational.toDecimal(scaleOnInfinitePrecision: 32)`, so negative integer exponents truncate like `÷`; non-integer `y` goes through `math.pow` and `_fromDouble`, and a negative base there is `domain`. `√`/`∛` rely on the 15-digit rounding to return perfect squares/cubes exactly (`√144` → `12`). `mod` is deliberately still `Failure(syntax)`: it is a programmer-mode integer operator (§11), not a Decimal-engine one. `1/x` is a keypad input (`1÷…`), not a function. T13 is the formatter next.
+Next: T13 Formatter
