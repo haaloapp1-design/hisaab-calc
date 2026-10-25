@@ -30,6 +30,9 @@ abstract final class AppColors {
   static const Color ink = Color(0xFF18224F);
   static const Color inkMuted = Color(0xFF5A6487);
 
+  // Segmented control
+  static const Color segmentedInactive = Color(0xFFE4E9FF);
+
   // Navigation
   static const Color navDivider = Color(0xFFEDF0FA);
 
@@ -57,6 +60,7 @@ abstract final class AppColors {
 abstract final class AppRadii {
   static const double sheet = 32;
   static const double handle = 2;
+  static const double header = 28;
 
   static const double keyBasic = 18;
   static const double keyScientific = 14;
@@ -78,6 +82,18 @@ abstract final class AppSizes {
   static const double sheetPaddingTop = 12;
   static const double sheetPaddingSide = 20;
   static const double sheetPaddingBottom = 14;
+  static const double sheetContentGap = 14;
+
+  static const double headerPaddingTop = 20;
+  static const double hubHeaderPaddingTop = 24;
+  static const double hubHeaderPaddingBottom = 20;
+  static const double headerSubtitleGap = 6;
+  static const double headerIcon = 22;
+
+  static const double segmentedTopGap = 14;
+  static const double segmentGap = 4;
+  static const double segmentTrackPadding = 4;
+  static const double segmentPillPadding = 10;
 
   static const double keyHeightBasic = 60;
   static const double keyHeightScientific = 46;
@@ -174,6 +190,16 @@ abstract final class AppTypography {
   static const TextStyle small = TextStyle(
     fontFamily: fontFamily,
     fontSize: 13,
+    fontWeight: regular,
+  );
+  static const TextStyle hubSubtitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
+  );
+  static const TextStyle segmentedLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
     fontWeight: regular,
   );
   static const TextStyle navLabel = TextStyle(

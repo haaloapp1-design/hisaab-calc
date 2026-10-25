@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../shared/widgets/blue_header.dart';
 import '../../shared/widgets/bottom_nav.dart';
+import '../../shared/widgets/segmented.dart';
+import '../../shared/widgets/white_sheet.dart';
 import '../../theme/app_tokens.dart';
 
 /// The app shell: four tabs kept alive in an [IndexedStack] with the shared
@@ -52,9 +55,25 @@ class _ShellPageState extends State<ShellPage> {
   }
 }
 
-/// Temporary blue-top calculator tab until T23 builds the real page.
-class _CalculatorPlaceholder extends StatelessWidget {
+/// Temporary calculator tab until T23 builds the real page.
+///
+/// It is the first user of the shared [BlueHeader], [Segmented] and
+/// [WhiteSheet], so T20's widgets are exercised on a real screen.
+class _CalculatorPlaceholder extends StatefulWidget {
   const _CalculatorPlaceholder();
+
+  @override
+  State<_CalculatorPlaceholder> createState() => _CalculatorPlaceholderState();
+}
+
+class _CalculatorPlaceholderState extends State<_CalculatorPlaceholder> {
+  static const List<String> _modes = <String>[
+    'Basic',
+    'Scientific',
+    'Programmer',
+  ];
+
+  int _mode = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -62,25 +81,42 @@ class _CalculatorPlaceholder extends StatelessWidget {
       color: AppColors.primary,
       child: SafeArea(
         bottom: false,
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                'Calculator',
-                style: AppTypography.hubTitle.copyWith(
-                  color: AppColors.onPrimary,
+        child: Column(
+          children: <Widget>[
+            BlueHeader(
+              title: 'Calculator',
+              actionIcon: Icons.tune_rounded,
+              actionTooltip: 'Settings',
+              onAction: () {},
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.screenPadding,
+                AppSizes.segmentedTopGap,
+                AppSizes.screenPadding,
+                0,
+              ),
+              child: Segmented(
+                labels: _modes,
+                selectedIndex: _mode,
+                onSelected: (int index) => setState(() => _mode = index),
+              ),
+            ),
+            const Spacer(),
+            WhiteSheet(
+              child: SizedBox(
+                height: AppSizes.keyHeightBasic * 2,
+                child: Center(
+                  child: Text(
+                    '${_modes[_mode]} mode',
+                    style: AppTypography.body.copyWith(
+                      color: AppColors.inkMuted,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: AppSizes.navItemGap * 2),
-              Text(
-                'Basic · Scientific · Programmer',
-                style: AppTypography.small.copyWith(
-                  color: AppColors.onPrimaryMuted,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

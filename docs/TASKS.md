@@ -59,7 +59,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 - [x] **T19 App shell and bottom nav** — Read: DESIGN (BottomNav), ARCHITECTURE (Navigation).
   Done when: 4 tabs switch with IndexedStack; placeholder pages; matches design nav.
-- [ ] **T20 Shared widgets** — Read: DESIGN (Components). `BlueHeader`, `WhiteSheet`, `Segmented`.
+- [x] **T20 Shared widgets** — Read: DESIGN (Components). `BlueHeader`, `WhiteSheet`, `Segmented`.
   Done when: used on a placeholder page; widget test renders them.
 - [ ] **T21 Keys and keypad grid** — Read: DESIGN (Shape, Type, key colours).
   `CalcKeyButton(kind)` (number/function/operator/equals/disabled), `Keypad(spec, columns)`; press animation; semantic labels.

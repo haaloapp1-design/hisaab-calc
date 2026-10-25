@@ -1,5 +1,8 @@
 import 'package:calculator/features/shell/shell_page.dart';
+import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/shared/widgets/bottom_nav.dart';
+import 'package:calculator/shared/widgets/segmented.dart';
+import 'package:calculator/shared/widgets/white_sheet.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:calculator/theme/app_tokens.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +27,27 @@ void main() {
 
     expect(stack(tester).index, 0);
     expect(stack(tester).children.length, 4);
-    expect(find.text('Basic · Scientific · Programmer'), findsOneWidget);
+    expect(find.byType(BlueHeader), findsOneWidget);
+    expect(find.byType(Segmented), findsOneWidget);
+    expect(find.byType(WhiteSheet), findsOneWidget);
+    expect(find.text('Basic mode'), findsOneWidget);
     expect(find.byType(BottomNav), findsOneWidget);
+  });
+
+  testWidgets('the placeholder segmented control switches the shown mode', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app());
+
+    expect(find.text('Basic mode'), findsOneWidget);
+
+    await tester.tap(find.text('Scientific'));
+    await tester.pump();
+    expect(find.text('Scientific mode'), findsOneWidget);
+
+    await tester.tap(find.text('Programmer'));
+    await tester.pump();
+    expect(find.text('Programmer mode'), findsOneWidget);
   });
 
   testWidgets('picking a nav item switches the IndexedStack', (tester) async {
