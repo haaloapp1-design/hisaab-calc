@@ -21,6 +21,7 @@ abstract final class AppColors {
 
   // Keys
   static const Color keyNumber = Color(0xFFF6F7FD);
+  static const Color keyNumberScientific = Color(0xFFF9FAFE);
   static const Color keyNumberBorder = Color(0xFFE4E8F7);
   static const Color keyFunction = Color(0xFFEEF1FB);
   static const Color keyOperator = Color(0xFFE6EBFC);
@@ -117,6 +118,16 @@ abstract final class AppSizes {
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
+
+  static const double disabledDash = 4;
+  static const double disabledDashGap = 4;
+}
+
+/// Motion values from DESIGN "Components" (key press feedback).
+abstract final class AppMotion {
+  static const Duration keyPress = Duration(milliseconds: 80);
+  static const double keyPressScale = 0.96;
+  static const double keyPressDarken = 0.06;
 }
 
 /// Font sizes and weights from the DESIGN type table.
@@ -169,6 +180,36 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: medium,
+  );
+  static const TextStyle keyFunctionBasic = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 22,
+    fontWeight: bold,
+  );
+  static const TextStyle keyOperatorBasic = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 28,
+    fontWeight: regular,
+  );
+  static const TextStyle keyOperatorScientific = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 24,
+    fontWeight: regular,
+  );
+  static const TextStyle keyEqualsBasic = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 30,
+    fontWeight: regular,
+  );
+  static const TextStyle keyEqualsScientific = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 26,
+    fontWeight: regular,
+  );
+  static const TextStyle keyDisabled = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 22,
+    fontWeight: regular,
   );
 
   // Text
