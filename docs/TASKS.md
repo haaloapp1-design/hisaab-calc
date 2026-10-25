@@ -38,7 +38,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   Done when: DEG `sin(30)`=0.5, `sin(180)`=0, `tan(90)`→Undefined, `sin⁻¹(2)`→domain; RAD `cos(π)`=−1; tests.
 - [x] **T12 Other functions** — Read: §6.
   Done when: `ln`, `log`, `eˣ`, `10ˣ`, `√144`=12 exact, `∛−8`=−2, `xʸ` rules, `5!`=120, `171!`→overflow, `1/0`→error; tests.
-- [ ] **T13 Formatter** — Read: §8.
+- [x] **T13 Formatter** — Read: §8.
   Done when: separators, auto vs fixed decimals, sci notation thresholds, trailing zero strip, `−` sign; tests.
 - [ ] **T14 Engine facade + big test table** — Read: §1.
   `CalcEngine.evaluate(tokens, {angleMode})` → CalcResult. Add a 40+ row table test covering §2–§8.
