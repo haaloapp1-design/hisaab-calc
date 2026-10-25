@@ -11,7 +11,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T01 Packages and skeleton** — Read: ARCHITECTURE (Packages, Folder structure).
   Add packages; create every folder in `lib/` and `test/` with an empty placeholder where needed; `main.dart` shows a blank `ProviderScope` app.
   Done when: `flutter analyze` clean, app runs, folders match ARCHITECTURE.
-- [ ] **T02 Theme tokens** — Read: DESIGN.md.
+- [x] **T02 Theme tokens** — Read: DESIGN.md.
   Create `app_tokens.dart` (all colours, radii, sizes) and `app_theme.dart` (light theme, Ubuntu font).
   Done when: app shows a test screen using primary + sheet colours; no hard-coded colours outside theme/.
 - [ ] **T03 Storage layer** — Read: ARCHITECTURE (State, `kvStoreProvider`).

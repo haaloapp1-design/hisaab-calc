@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+
+/// Design tokens from `docs/DESIGN.md`.
+///
+/// Widgets must use these values instead of hard-coded colours, font sizes or
+/// radii. Everything visual in the app starts here.
+abstract final class AppColors {
+  // Brand
+  static const Color primary = Color(0xFF2D46B9);
+  static const Color primaryDeep = Color(0xFF1F3391);
+  static const Color primaryTrack = Color(0xFF3E58C8);
+
+  // On blue
+  static const Color onPrimary = Color(0xFFFFFFFF);
+  static const Color onPrimaryMuted = Color(0xFFDDE3FF);
+  static const Color dividerOnPrimary = Color(0xFF5A72D6);
+
+  // Surfaces
+  static const Color sheet = Color(0xFFFFFFFF);
+  static const Color background = Color(0xFFF4F6FD);
+
+  // Keys
+  static const Color keyNumber = Color(0xFFF6F7FD);
+  static const Color keyNumberBorder = Color(0xFFE4E8F7);
+  static const Color keyFunction = Color(0xFFEEF1FB);
+  static const Color keyOperator = Color(0xFFE6EBFC);
+  static const Color keyOperatorBorder = Color(0xFFD6DDF8);
+
+  // Text
+  static const Color ink = Color(0xFF18224F);
+  static const Color inkMuted = Color(0xFF5A6487);
+
+  // States
+  static const Color disabled = Color(0xFFA3ABC7);
+  static const Color disabledBorder = Color(0xFFDCE1F2);
+  static const Color warning = Color(0xFFF5B971);
+  static const Color danger = Color(0xFFB4410E);
+  static const Color dangerSurface = Color(0xFFFFF4EE);
+
+  // Accent choices shown in Settings
+  static const Color accentTeal = Color(0xFF0F766E);
+  static const Color accentViolet = Color(0xFF7C3AED);
+  static const Color accentRust = Color(0xFFC2410C);
+
+  static const List<Color> accentSwatches = <Color>[
+    primary,
+    accentTeal,
+    accentViolet,
+    accentRust,
+  ];
+}
+
+/// Corner radii.
+abstract final class AppRadii {
+  static const double sheet = 32;
+  static const double handle = 2;
+
+  static const double keyBasic = 18;
+  static const double keyScientific = 14;
+  static const double keyConverter = 16;
+
+  static const double segmentedTrack = 14;
+  static const double segmentedPill = 10;
+
+  static const double card = 18;
+  static const double cardLarge = 20;
+}
+
+/// Heights, paddings, gaps and other measurements.
+abstract final class AppSizes {
+  static const double screenPadding = 20;
+  static const double screenPaddingWide = 24;
+  static const double sheetPaddingTop = 12;
+  static const double sheetPaddingSide = 20;
+  static const double sheetPaddingBottom = 14;
+
+  static const double keyHeightBasic = 60;
+  static const double keyHeightScientific = 46;
+  static const double keyHeightConverter = 52;
+
+  static const double keyGapBasic = 12;
+  static const double keyGapScientific = 8;
+  static const double keyGapConverter = 10;
+
+  static const double segmentedHeight = 44;
+  static const double handleWidth = 44;
+  static const double handleHeight = 4;
+
+  static const double minTapTarget = 44;
+  static const double borderWidth = 1;
+  static const double icon = 24;
+}
+
+/// Font sizes and weights from the DESIGN type table.
+abstract final class AppTypography {
+  static const String fontFamily = 'Ubuntu';
+
+  static const FontWeight regular = FontWeight.w400;
+  static const FontWeight medium = FontWeight.w500;
+  static const FontWeight bold = FontWeight.w700;
+
+  // Result / expression
+  static const TextStyle resultBasic = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 60,
+    fontWeight: medium,
+  );
+  static const TextStyle resultBasicMin = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 32,
+    fontWeight: medium,
+  );
+  static const TextStyle resultScientific = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 52,
+    fontWeight: medium,
+  );
+  static const TextStyle converterValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 38,
+    fontWeight: medium,
+  );
+  static const TextStyle expression = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 20,
+    fontWeight: regular,
+  );
+
+  // Keys
+  static const TextStyle keyNumberBasic = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 26,
+    fontWeight: regular,
+  );
+  static const TextStyle keyNumberScientific = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 22,
+    fontWeight: regular,
+  );
+  static const TextStyle keyFunction = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: medium,
+  );
+
+  // Text
+  static const TextStyle screenTitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 17,
+    fontWeight: medium,
+  );
+  static const TextStyle hubTitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 26,
+    fontWeight: medium,
+  );
+  static const TextStyle body = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: regular,
+  );
+  static const TextStyle small = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: regular,
+  );
+  static const TextStyle navLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: medium,
+  );
+}
