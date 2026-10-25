@@ -82,7 +82,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 5 — History and memory
 
-- [ ] **T28 History store** — Read: §10.
+- [x] **T28 History store** — Read: §10.
   Done when: add/skip-duplicate/max 500/retention cleanup/grouping helpers tested.
 - [ ] **T29 History page** — Read: SPEC §2. Screen 04 (`docs/screens/04-history-memory.html`).
   Done when: `=` adds entries; grouped list; tap loads into calculator; search; copy all; clear with confirm.

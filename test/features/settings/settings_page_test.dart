@@ -2,6 +2,9 @@ import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
+import 'package:calculator/features/history/history_controller.dart';
+import 'package:calculator/features/history/history_entry.dart';
+import 'package:calculator/features/history/history_log.dart';
 import 'package:calculator/features/settings/settings_controller.dart';
 import 'package:calculator/features/settings/settings_model.dart';
 import 'package:calculator/features/settings/settings_page.dart';
@@ -356,7 +359,7 @@ void main() {
     expect(find.text('30 days'), findsOneWidget);
   });
 
-  testWidgets('Clear asks first, then wipes settings, Ans and mode', (
+  testWidgets('Clear asks first, then wipes settings, history, Ans and mode', (
     tester,
   ) async {
     designSurface(tester);
@@ -367,6 +370,14 @@ void main() {
         ).encode(),
         CalculatorController.ansKey: '42',
         CalculatorController.modeKey: 'scientific',
+        HistoryController.key: HistoryLog.encode(<HistoryEntry>[
+          HistoryEntry.create(
+            expression: '2 + 3',
+            result: '5',
+            mode: HistoryMode.basic,
+            createdAt: DateTime(2024, 3, 9),
+          ),
+        ]),
       },
     );
     await tester.pumpWidget(app(store));
@@ -387,6 +398,7 @@ void main() {
     expect(find.byKey(const Key('clear-dialog')), findsNothing);
     expect(await store.getString(SettingsController.key), isNotNull);
     expect(await store.getString(CalculatorController.ansKey), '42');
+    expect(await store.getString(HistoryController.key), isNotNull);
 
     await tester.tap(find.byKey(const Key('clear-data')));
     await tester.pumpAndSettle();
@@ -396,6 +408,7 @@ void main() {
     expect(await store.getString(SettingsController.key), isNull);
     expect(await store.getString(CalculatorController.ansKey), isNull);
     expect(await store.getString(CalculatorController.modeKey), isNull);
+    expect(await store.getString(HistoryController.key), isNull);
     expect(
       tester.widget<ThemeSelector>(find.byType(ThemeSelector)).value,
       AppThemeMode.system,
