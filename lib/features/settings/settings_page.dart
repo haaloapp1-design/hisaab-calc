@@ -7,6 +7,7 @@ import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_controller.dart';
 import '../history/history_controller.dart';
+import '../history/memory_controller.dart';
 import 'settings_controller.dart';
 import 'settings_model.dart';
 import 'widgets/accent_selector.dart';
@@ -194,14 +195,15 @@ class SettingsPage extends ConsumerWidget {
 
   /// SPEC §3 "Clear all saved data (confirm dialog)".
   ///
-  /// The settings and calculator controllers own their own keys; later
-  /// features (memory, currency) add their clears here too.
+  /// The settings, calculator, history and memory controllers own their own
+  /// keys; the currency cache adds its clear here too.
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
     final SettingsController settings = ref.read(settingsProvider.notifier);
     final CalculatorController calculator = ref.read(
       calculatorProvider.notifier,
     );
     final HistoryController history = ref.read(historyProvider.notifier);
+    final MemoryController memory = ref.read(memoryProvider.notifier);
 
     final bool confirmed =
         await showDialog<bool>(
@@ -210,8 +212,8 @@ class SettingsPage extends ConsumerWidget {
             key: const Key('clear-dialog'),
             title: const Text('Clear all saved data?'),
             content: const Text(
-              'This removes your settings, history and saved answers from '
-              'this device. It cannot be undone.',
+              'This removes your settings, history, memory and saved answers '
+              'from this device. It cannot be undone.',
             ),
             actions: <Widget>[
               TextButton(
@@ -241,5 +243,6 @@ class SettingsPage extends ConsumerWidget {
     await settings.clearSavedData();
     await calculator.clearSavedData();
     await history.clear();
+    await memory.clear();
   }
 }

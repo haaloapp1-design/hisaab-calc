@@ -116,6 +116,15 @@ class CalculatorController extends Notifier<CalcState> {
   /// SPEC §1.3 toggles the scientific alternate key set.
   void toggleSecond() => state = state.copyWith(second: !state.second);
 
+  /// SPEC 2 `MR`: inserts a memory slot's value as number tokens.
+  ///
+  /// Like `Ans`, recalling after `=` starts a new expression; mid-expression it
+  /// appends to what is already typed.
+  void insertMemory(Decimal value) {
+    final InputBuffer start = _startBuffer(CalcKey.ans);
+    _set(start.appendValueTokens(valueTokens(value)), second: state.second);
+  }
+
   /// SPEC §1.3 the DEG/RAD chip above the display.
   void setAngleMode(AngleMode angleMode) {
     if (state.angleMode == angleMode) {

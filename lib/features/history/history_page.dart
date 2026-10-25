@@ -15,6 +15,7 @@ import 'widgets/history_actions.dart';
 import 'widgets/history_entry_sheet.dart';
 import 'widgets/history_list.dart';
 import 'widgets/history_search_field.dart';
+import 'widgets/memory_list.dart';
 
 /// The History tab (SPEC §2, screen `04-history-memory.html`).
 ///
@@ -96,7 +97,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
                       onTap: _load,
                       onLongPress: _showEntryActions,
                     )
-                  : const _MemoryPlaceholder(),
+                  : MemoryList(onOpenCalculator: widget.onOpenCalculator),
             ),
             HistoryActions(
               onCopyAll: () => _copyAll(visible),
@@ -216,29 +217,5 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       return;
     }
     await ref.read(historyProvider.notifier).clear();
-  }
-}
-
-/// The Memory tab is T30; until then it explains the empty state.
-class _MemoryPlaceholder extends StatelessWidget {
-  const _MemoryPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
-        child: Text(
-          'No saved memory yet',
-          key: const Key('history-memory-placeholder'),
-          textAlign: TextAlign.center,
-          style: AppTypography.historyEmpty.copyWith(
-            color: palette.onPrimaryMuted,
-          ),
-        ),
-      ),
-    );
   }
 }

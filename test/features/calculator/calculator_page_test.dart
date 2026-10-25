@@ -1,11 +1,13 @@
 import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/engine/calc_result.dart';
+import 'package:calculator/core/memory/memory_slots.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calculator_page.dart';
 import 'package:calculator/features/calculator/widgets/display.dart';
 import 'package:calculator/features/calculator/widgets/calc_key_button.dart';
 import 'package:calculator/features/calculator/widgets/keypad.dart';
+import 'package:calculator/features/history/memory_controller.dart';
 import 'package:calculator/features/settings/settings_controller.dart';
 import 'package:calculator/features/settings/settings_model.dart';
 import 'package:calculator/features/settings/settings_page.dart';
@@ -14,6 +16,7 @@ import 'package:calculator/shared/widgets/segmented.dart';
 import 'package:calculator/shared/widgets/white_sheet.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:calculator/theme/app_tokens.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -203,39 +206,42 @@ void main() {
     expect(resultStyle(tester).color, AppColors.onPrimary);
   });
 
-  testWidgets('Scientific mode shows the 5×7 keypad, chips and compact metrics', (
-    tester,
-  ) async {
-    designSurface(tester);
-    await tester.pumpWidget(app());
+  testWidgets(
+    'Scientific mode shows the 5×7 keypad, chips and compact metrics',
+    (tester) async {
+      designSurface(tester);
+      await tester.pumpWidget(app());
 
-    await tester.tap(find.text('Scientific'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Scientific'));
+      await tester.pumpAndSettle();
 
-    expect(find.byType(CalcKeyButton), findsNWidgets(35));
-    final Keypad keypad = tester.widget<Keypad>(find.byType(Keypad));
-    expect(keypad.columns, 5);
-    expect(keypad.density, CalcKeyDensity.scientific);
+      expect(find.byType(CalcKeyButton), findsNWidgets(35));
+      final Keypad keypad = tester.widget<Keypad>(find.byType(Keypad));
+      expect(keypad.columns, 5);
+      expect(keypad.density, CalcKeyDensity.scientific);
 
-    expect(find.byKey(const Key('angle-controls')), findsOneWidget);
-    expect(find.text('DEG'), findsOneWidget);
-    expect(find.text('RAD'), findsOneWidget);
-    expect(find.byKey(const Key('bracket-badge')), findsNothing);
+      expect(find.byKey(const Key('angle-controls')), findsOneWidget);
+      expect(find.text('DEG'), findsOneWidget);
+      expect(find.text('RAD'), findsOneWidget);
+      expect(find.byKey(const Key('bracket-badge')), findsNothing);
 
-    expect(resultStyle(tester).fontSize, 52);
-    final Finder seven = find
-        .ancestor(of: key('7'), matching: find.byType(CalcKeyButton))
-        .first;
-    expect(tester.getSize(seven).height, 46);
-    expect(tester.getRect(seven).left, AppSizes.sheetScientificPaddingSide);
+      expect(resultStyle(tester).fontSize, 52);
+      final Finder seven = find
+          .ancestor(of: key('7'), matching: find.byType(CalcKeyButton))
+          .first;
+      expect(tester.getSize(seven).height, 46);
+      expect(tester.getRect(seven).left, AppSizes.sheetScientificPaddingSide);
 
-    final WhiteSheet sheet = tester.widget<WhiteSheet>(find.byType(WhiteSheet));
-    expect(
-      (sheet.padding! as EdgeInsets).left,
-      AppSizes.sheetScientificPaddingSide,
-    );
-    expect(sheet.contentGap, AppSizes.sheetScientificContentGap);
-  });
+      final WhiteSheet sheet = tester.widget<WhiteSheet>(
+        find.byType(WhiteSheet),
+      );
+      expect(
+        (sheet.padding! as EdgeInsets).left,
+        AppSizes.sheetScientificPaddingSide,
+      );
+      expect(sheet.contentGap, AppSizes.sheetScientificContentGap);
+    },
+  );
 
   testWidgets('the DEG/RAD chip changes how trig evaluates', (tester) async {
     designSurface(tester);
@@ -279,9 +285,9 @@ void main() {
       expect(key(label), findsOneWidget, reason: label);
     }
     expect(
-      tester.widget<CalcKeyButton>(
-        find.widgetWithText(CalcKeyButton, '2nd'),
-      ).kind,
+      tester
+          .widget<CalcKeyButton>(find.widgetWithText(CalcKeyButton, '2nd'))
+          .kind,
       CalcKeyKind.active,
     );
 
@@ -290,9 +296,9 @@ void main() {
     expect(resultText(tester), '30');
     expect(key('sin'), findsOneWidget);
     expect(
-      tester.widget<CalcKeyButton>(
-        find.widgetWithText(CalcKeyButton, '2nd'),
-      ).kind,
+      tester
+          .widget<CalcKeyButton>(find.widgetWithText(CalcKeyButton, '2nd'))
+          .kind,
       CalcKeyKind.function,
     );
   });
@@ -333,7 +339,9 @@ void main() {
     expect(resultText(tester), '0.25');
   });
 
-  testWidgets('the chosen mode is remembered on the next launch', (tester) async {
+  testWidgets('the chosen mode is remembered on the next launch', (
+    tester,
+  ) async {
     designSurface(tester);
     final MemoryKvStore store = MemoryKvStore();
     Widget page() => ProviderScope(
@@ -345,20 +353,14 @@ void main() {
     await tester.pump();
     await tester.tap(find.text('Scientific'));
     await tester.pumpAndSettle();
-    expect(
-      tester.widget<Segmented>(find.byType(Segmented)).selectedIndex,
-      1,
-    );
+    expect(tester.widget<Segmented>(find.byType(Segmented)).selectedIndex, 1);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
     await tester.pumpWidget(page());
     await tester.pumpAndSettle();
 
-    expect(
-      tester.widget<Segmented>(find.byType(Segmented)).selectedIndex,
-      1,
-    );
+    expect(tester.widget<Segmented>(find.byType(Segmented)).selectedIndex, 1);
     expect(find.byType(CalcKeyButton), findsNWidgets(35));
   });
 
@@ -416,10 +418,7 @@ void main() {
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
 
-    expect(
-      tester.widget<Keypad>(find.byType(Keypad)).haptics,
-      isFalse,
-    );
+    expect(tester.widget<Keypad>(find.byType(Keypad)).haptics, isFalse);
     expect(tester.widget<Keypad>(find.byType(Keypad)).sounds, isTrue);
 
     await tapKeys(tester, <String>['1', '8', '0', '0']);
@@ -476,5 +475,73 @@ void main() {
 
     expect(expressionText(tester), '1800 + 200');
     expect(resultText(tester), '2000');
+  });
+
+  testWidgets('a stored memory value shows in the display chip', (
+    tester,
+  ) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      MemoryController.key: MemorySlots.encode(<Decimal?>[
+        Decimal.fromInt(128),
+      ]),
+    });
+    await tester.pumpWidget(app(store));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('display-memory')), findsOneWidget);
+    expect(find.text('M = 128'), findsOneWidget);
+  });
+
+  testWidgets('the chip long-press stores and clears the main memory', (
+    tester,
+  ) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      MemoryController.key: MemorySlots.encode(<Decimal?>[
+        Decimal.fromInt(128),
+      ]),
+    });
+    await tester.pumpWidget(app(store));
+    await tester.pumpAndSettle();
+
+    await tapKeys(tester, <String>['5']);
+    expect(find.text('M = 128'), findsOneWidget);
+
+    await tester.longPress(find.byKey(const Key('display-memory')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('memory-store')), findsOneWidget);
+    expect(find.byKey(const Key('memory-clear')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('memory-store')));
+    await tester.pumpAndSettle();
+
+    final ProviderContainer container = ProviderScope.containerOf(
+      tester.element(find.byType(CalculatorPage)),
+    );
+    expect(container.read(memoryProvider)[0], Decimal.fromInt(128));
+    expect(container.read(memoryProvider)[1], Decimal.fromInt(5));
+    expect(find.text('M = 128'), findsOneWidget);
+    expect(
+      MemorySlots.decode(await store.getString(MemoryController.key))[1],
+      Decimal.fromInt(5),
+    );
+
+    await tester.longPress(find.byKey(const Key('display-memory')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('memory-clear')));
+    await tester.pumpAndSettle();
+
+    // M2 moved up into the main slot, so the chip follows it.
+    expect(container.read(memoryProvider)[0], Decimal.fromInt(5));
+    expect(find.text('M = 5'), findsOneWidget);
+
+    await tester.longPress(find.byKey(const Key('display-memory')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('memory-clear')));
+    await tester.pumpAndSettle();
+
+    expect(container.read(memoryProvider)[0], isNull);
+    expect(find.byKey(const Key('display-memory')), findsNothing);
   });
 }

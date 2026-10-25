@@ -1,10 +1,12 @@
 import 'package:calculator/core/engine/angle_mode.dart';
+import 'package:calculator/core/memory/memory_slots.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
 import 'package:calculator/features/history/history_controller.dart';
 import 'package:calculator/features/history/history_entry.dart';
 import 'package:calculator/features/history/history_log.dart';
+import 'package:calculator/features/history/memory_controller.dart';
 import 'package:calculator/features/settings/settings_controller.dart';
 import 'package:calculator/features/settings/settings_model.dart';
 import 'package:calculator/features/settings/settings_page.dart';
@@ -16,6 +18,7 @@ import 'package:calculator/features/settings/widgets/toggle_switch.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:calculator/theme/app_tokens.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -95,9 +98,9 @@ void main() {
     expect(find.text('Degrees'), findsOneWidget);
     expect(find.text('30 days'), findsOneWidget);
     expect(
-      tester.widget<ToggleSwitch>(
-        find.byKey(const Key('switch-thousands')),
-      ).value,
+      tester
+          .widget<ToggleSwitch>(find.byKey(const Key('switch-thousands')))
+          .value,
       isTrue,
     );
     expect(
@@ -157,10 +160,7 @@ void main() {
       trackDecoration.borderRadius,
       BorderRadius.circular(AppRadii.settingsTrack),
     );
-    expect(
-      track.padding,
-      const EdgeInsets.all(AppSizes.settingsTrackPadding),
-    );
+    expect(track.padding, const EdgeInsets.all(AppSizes.settingsTrackPadding));
 
     final Container selectedPill = tester.widget<Container>(
       find.descendant(
@@ -202,7 +202,8 @@ void main() {
         matching: find.byType(Container),
       ),
     );
-    final BoxDecoration dotDecoration = selectedDot.decoration! as BoxDecoration;
+    final BoxDecoration dotDecoration =
+        selectedDot.decoration! as BoxDecoration;
     expect(dotDecoration.color, AppColors.primary);
     expect(
       dotDecoration.border,
@@ -311,15 +312,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(
-      tester.widget<ToggleSwitch>(
-        find.byKey(const Key('switch-thousands')),
-      ).value,
+      tester
+          .widget<ToggleSwitch>(find.byKey(const Key('switch-thousands')))
+          .value,
       isFalse,
     );
     expect(
-      tester.widget<ToggleSwitch>(
-        find.byKey(const Key('switch-haptics')),
-      ).value,
+      tester
+          .widget<ToggleSwitch>(find.byKey(const Key('switch-haptics')))
+          .value,
       isFalse,
     );
     expect(
@@ -363,23 +364,23 @@ void main() {
     tester,
   ) async {
     designSurface(tester);
-    final MemoryKvStore store = MemoryKvStore(
-      <String, String>{
-        SettingsController.key: const Settings(
-          accent: AccentSwatch.rust,
-        ).encode(),
-        CalculatorController.ansKey: '42',
-        CalculatorController.modeKey: 'scientific',
-        HistoryController.key: HistoryLog.encode(<HistoryEntry>[
-          HistoryEntry.create(
-            expression: '2 + 3',
-            result: '5',
-            mode: HistoryMode.basic,
-            createdAt: DateTime(2024, 3, 9),
-          ),
-        ]),
-      },
-    );
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      SettingsController.key: const Settings(accent: AccentSwatch.rust)
+          .encode(),
+      CalculatorController.ansKey: '42',
+      CalculatorController.modeKey: 'scientific',
+      HistoryController.key: HistoryLog.encode(<HistoryEntry>[
+        HistoryEntry.create(
+          expression: '2 + 3',
+          result: '5',
+          mode: HistoryMode.basic,
+          createdAt: DateTime(2024, 3, 9),
+        ),
+      ]),
+      MemoryController.key: MemorySlots.encode(<Decimal?>[
+        Decimal.fromInt(128),
+      ]),
+    });
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
 
@@ -399,6 +400,7 @@ void main() {
     expect(await store.getString(SettingsController.key), isNotNull);
     expect(await store.getString(CalculatorController.ansKey), '42');
     expect(await store.getString(HistoryController.key), isNotNull);
+    expect(await store.getString(MemoryController.key), isNotNull);
 
     await tester.tap(find.byKey(const Key('clear-data')));
     await tester.pumpAndSettle();
@@ -409,6 +411,7 @@ void main() {
     expect(await store.getString(CalculatorController.ansKey), isNull);
     expect(await store.getString(CalculatorController.modeKey), isNull);
     expect(await store.getString(HistoryController.key), isNull);
+    expect(await store.getString(MemoryController.key), isNull);
     expect(
       tester.widget<ThemeSelector>(find.byType(ThemeSelector)).value,
       AppThemeMode.system,

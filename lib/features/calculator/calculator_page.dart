@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/engine/angle_mode.dart';
 import '../../core/engine/formatter.dart';
+import '../../core/memory/memory_slots.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../shared/widgets/segmented.dart';
 import '../../shared/widgets/white_sheet.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import '../history/memory_controller.dart';
+import '../history/widgets/memory_menu.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_format.dart';
 import '../settings/settings_model.dart';
@@ -41,6 +44,7 @@ class CalculatorPage extends ConsumerWidget {
     final AppPalette palette = AppPalette.of(context);
     final CalcState calc = ref.watch(calculatorProvider);
     final Settings settings = ref.watch(settingsProvider);
+    final memory = ref.watch(memoryProvider);
     final CalculatorController controller = ref.read(
       calculatorProvider.notifier,
     );
@@ -109,6 +113,13 @@ class CalculatorPage extends ConsumerWidget {
                     result: formatNumber(calc.displayValue, options: format),
                     preview: calc.result == null && calc.preview != null,
                     error: calc.error,
+                    memory: MemorySlots.showsChip(memory)
+                        ? formatNumber(
+                            MemorySlots.mainOrZero(memory),
+                            options: format,
+                          )
+                        : null,
+                    onMemoryLongPress: () => _showMemoryMenu(context, ref),
                     density: scientific
                         ? DisplayDensity.scientific
                         : DisplayDensity.basic,
@@ -149,6 +160,26 @@ class CalculatorPage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// SPEC 2: a long press on the memory chip offers MS and MC.
+  Future<void> _showMemoryMenu(BuildContext context, WidgetRef ref) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext sheetContext) => MemoryMenu(
+        onStore: () {
+          Navigator.of(sheetContext).pop();
+          ref
+              .read(memoryProvider.notifier)
+              .store(ref.read(calculatorProvider).displayValue);
+        },
+        onClear: () {
+          Navigator.of(sheetContext).pop();
+          ref.read(memoryProvider.notifier).clearSlot(0);
+        },
       ),
     );
   }

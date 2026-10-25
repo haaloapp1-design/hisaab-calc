@@ -30,6 +30,7 @@ class Display extends StatelessWidget {
     this.preview = false,
     this.error,
     this.memory,
+    this.onMemoryLongPress,
     this.density = DisplayDensity.basic,
   });
 
@@ -47,6 +48,9 @@ class Display extends StatelessWidget {
 
   /// Formatted memory value; the chip is hidden when null.
   final String? memory;
+
+  /// Long-pressing the memory chip opens the MS/MC actions (SPEC 2).
+  final VoidCallback? onMemoryLongPress;
 
   final DisplayDensity density;
 
@@ -73,7 +77,7 @@ class Display extends StatelessWidget {
           Row(
             children: <Widget>[
               if (memory != null) ...<Widget>[
-                _MemoryChip(memory: memory!),
+                _MemoryChip(memory: memory!, onLongPress: onMemoryLongPress),
                 const SizedBox(width: AppSizes.displayGap),
               ],
               Expanded(
@@ -135,31 +139,40 @@ _DisplayMetrics _metricsFor(DisplayDensity density) => switch (density) {
 
 /// The `M = 128` chip (13 px `#C7D1FF` on a 1 px `dividerOnPrimary` border).
 class _MemoryChip extends StatelessWidget {
-  const _MemoryChip({required this.memory});
+  const _MemoryChip({required this.memory, this.onLongPress});
 
   final String memory;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
 
-    return Container(
-      key: const Key('display-memory'),
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSizes.chipPaddingV,
-        horizontal: AppSizes.chipPaddingH,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadii.chip),
-        border: Border.all(
-          color: palette.dividerOnPrimary,
-          width: AppSizes.borderWidth,
+    return Semantics(
+      button: onLongPress != null,
+      label: onLongPress == null ? null : 'Memory options',
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onLongPress: onLongPress,
+        child: Container(
+          key: const Key('display-memory'),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSizes.chipPaddingV,
+            horizontal: AppSizes.chipPaddingH,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadii.chip),
+            border: Border.all(
+              color: palette.dividerOnPrimary,
+              width: AppSizes.borderWidth,
+            ),
+          ),
+          child: Text(
+            'M = $memory',
+            maxLines: 1,
+            style: AppTypography.small.copyWith(color: palette.onPrimaryFaint),
+          ),
         ),
-      ),
-      child: Text(
-        'M = $memory',
-        maxLines: 1,
-        style: AppTypography.small.copyWith(color: palette.onPrimaryFaint),
       ),
     );
   }
@@ -266,7 +279,10 @@ class _ResultLine extends StatelessWidget {
     );
     double size = maxSize;
     while (size > minSize) {
-      painter.text = TextSpan(text: text, style: style.copyWith(fontSize: size));
+      painter.text = TextSpan(
+        text: text,
+        style: style.copyWith(fontSize: size),
+      );
       painter.layout();
       if (painter.width <= constraints.maxWidth) {
         break;

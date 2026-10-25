@@ -754,6 +754,34 @@ void main() {
     });
   });
 
+  group('memory recall', () {
+    test('inserts a slot value as number tokens mid-expression', () async {
+      await press(<CalcKey>[CalcKey.digit2, CalcKey.add]);
+
+      controller().insertMemory(Decimal.parse('-3.5'));
+
+      expect(tokens(), <Token>[
+        const NumberToken('2'),
+        const OperatorToken(OperatorType.add),
+        const LeftParenToken(),
+        const UnaryToken(negative: true),
+        const NumberToken('3.5'),
+        const RightParenToken(),
+      ]);
+      expect(calc().preview, Decimal.parse('-1.5'));
+    });
+
+    test('starts a new expression after =', () async {
+      await press(<CalcKey>[CalcKey.digit5, CalcKey.equals]);
+
+      controller().insertMemory(Decimal.fromInt(7));
+
+      expect(tokens(), <Token>[const NumberToken('7')]);
+      expect(calc().justEvaluated, isFalse);
+      expect(calc().displayValue, Decimal.fromInt(7));
+    });
+  });
+
   group('clearSavedData', () {
     test('forgets Ans and the mode and returns to the launch state', () async {
       await store.setString(CalculatorController.ansKey, '12');

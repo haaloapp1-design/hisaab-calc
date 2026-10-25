@@ -47,6 +47,9 @@ abstract final class AppColors {
   // History (screen 04)
   static const Color historyDivider = Color(0xFF4A62CF);
 
+  // Memory (screen 04)
+  static const Color memoryButtonBorder = Color(0xFF7F93E3);
+
   // States
   static const Color disabled = Color(0xFFA3ABC7);
   static const Color disabledBorder = Color(0xFFDCE1F2);
@@ -86,6 +89,9 @@ abstract final class AppRadii {
 
   static const double historyAction = 16;
   static const double historySearch = 14;
+
+  static const double memoryCard = 16;
+  static const double memoryButton = 12;
 
   static const double card = 18;
   static const double cardLarge = 20;
@@ -191,6 +197,17 @@ abstract final class AppSizes {
   static const double historySearchTopGap = 14;
   static const double historySearchPaddingH = 14;
   static const double historySearchRadius = 14;
+
+  // Memory (screen 04)
+  static const double memoryListPaddingTop = 16;
+  static const double memoryListPaddingSide = 24;
+  static const double memoryCardGap = 6;
+  static const double memoryCardPaddingV = 12;
+  static const double memoryCardPaddingH = 14;
+  static const double memorySlotGap = 2;
+  static const double memoryButtonGap = 6;
+  static const double memoryButtonHeight = 44;
+  static const double memoryButtonPaddingH = 12;
 
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
@@ -377,6 +394,26 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: medium,
+  );
+  static const TextStyle memorySlot = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: regular,
+  );
+  static const TextStyle memoryValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 26,
+    fontWeight: medium,
+  );
+  static const TextStyle memoryRecall = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: bold,
+  );
+  static const TextStyle memoryAdjust = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
   );
 
   // Settings (screen 05)

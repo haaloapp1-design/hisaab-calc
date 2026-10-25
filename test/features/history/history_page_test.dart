@@ -1,13 +1,17 @@
 import 'package:calculator/core/engine/formatter.dart';
+import 'package:calculator/core/memory/memory_slots.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/features/calculator/calc_state.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
+import 'package:calculator/core/input/calc_key.dart';
 import 'package:calculator/features/history/history_controller.dart';
 import 'package:calculator/features/history/history_entry.dart';
 import 'package:calculator/features/history/history_log.dart';
 import 'package:calculator/features/history/history_page.dart';
+import 'package:calculator/features/history/memory_controller.dart';
 import 'package:calculator/theme/app_theme.dart';
+import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,13 +35,15 @@ void main() {
 
   late ProviderContainer container;
 
-  void boot({List<HistoryEntry>? stored}) {
+  void boot({List<HistoryEntry>? stored, List<Decimal?>? memory}) {
     container = ProviderContainer(
       overrides: [
         kvStoreProvider.overrideWithValue(
           MemoryKvStore(<String, String>{
             if (stored != null)
               HistoryController.key: HistoryLog.encode(stored),
+            if (memory != null)
+              MemoryController.key: MemorySlots.encode(memory),
           }),
         ),
       ],
@@ -235,16 +241,92 @@ void main() {
     });
   });
 
-  testWidgets('the Memory tab shows its empty state until T30', (tester) async {
-    designSurface(tester);
-    boot();
-    await tester.pumpWidget(app());
-    await tester.pumpAndSettle();
+  group('Memory tab', () {
+    testWidgets('stores the current value from its empty state', (
+      tester,
+    ) async {
+      designSurface(tester);
+      boot();
+      container.read(calculatorProvider.notifier).onKey(CalcKey.digit5);
+      await tester.pumpWidget(app());
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Memory'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Memory'));
+      await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('history-memory-placeholder')), findsOneWidget);
-    expect(find.byKey(const Key('history-empty')), findsNothing);
+      expect(find.byKey(const Key('memory-empty')), findsOneWidget);
+      expect(find.byKey(const Key('history-empty')), findsNothing);
+
+      await tester.tap(find.byKey(const Key('memory-empty-store')));
+      await tester.pumpAndSettle();
+
+      expect(container.read(memoryProvider)[0], Decimal.fromInt(5));
+      expect(find.byKey(const Key('memory-slot-M1')), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
+      expect(find.byKey(const Key('memory-empty')), findsNothing);
+    });
+
+    testWidgets('shows the used slots with their MR, M+ and M- buttons', (
+      tester,
+    ) async {
+      designSurface(tester);
+      bool opened = false;
+      boot(memory: <Decimal?>[Decimal.fromInt(10), Decimal.fromInt(20)]);
+      await tester.pumpWidget(app(onOpenCalculator: () => opened = true));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Memory'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('memory-slot-M1')), findsOneWidget);
+      expect(find.byKey(const Key('memory-slot-M2')), findsOneWidget);
+      expect(find.byKey(const Key('memory-slot-M3')), findsNothing);
+      expect(find.byKey(const Key('memory-recall-M1')), findsOneWidget);
+      expect(find.byKey(const Key('memory-add-M2')), findsOneWidget);
+      expect(find.byKey(const Key('memory-subtract-M2')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('memory-recall-M1')));
+      await tester.pump();
+
+      expect(opened, isTrue);
+      expect(
+        container.read(calculatorProvider).displayValue,
+        Decimal.fromInt(10),
+      );
+      expect(
+        formatExpression(container.read(calculatorProvider).buffer.tokens),
+        '10',
+      );
+
+      // The calculator now shows 10, so M2 is 20 + 10 after M+.
+      await tester.tap(find.byKey(const Key('memory-add-M2')));
+      await tester.pump();
+      expect(container.read(memoryProvider)[1], Decimal.fromInt(30));
+
+      await tester.tap(find.byKey(const Key('memory-subtract-M2')));
+      await tester.pump();
+      expect(container.read(memoryProvider)[1], Decimal.fromInt(20));
+    });
+
+    testWidgets('a recall after = starts a new expression', (tester) async {
+      designSurface(tester);
+      boot(memory: <Decimal?>[Decimal.parse('2.5')]);
+      container
+        ..read(calculatorProvider.notifier).onKey(CalcKey.digit5)
+        ..read(calculatorProvider.notifier).onKey(CalcKey.equals);
+      await tester.pumpWidget(app());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Memory'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('memory-recall-M1')));
+      await tester.pump();
+
+      expect(container.read(calculatorProvider).justEvaluated, isFalse);
+      expect(
+        formatExpression(container.read(calculatorProvider).buffer.tokens),
+        '2.5',
+      );
+    });
   });
 }
