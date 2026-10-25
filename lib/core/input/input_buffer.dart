@@ -108,6 +108,33 @@ final class InputBuffer {
   /// §5 `(` row: always allowed; after a value the hidden `×` is inserted.
   InputBuffer appendLeftParen() => _appendValue(const LeftParenToken());
 
+  /// §5 "functions insert with an open bracket": `sin` becomes `sin(` as one
+  /// token, and after a value the hidden `×` is inserted.
+  InputBuffer appendFunction(String name) => _appendValue(FunctionToken(name));
+
+  /// §3 constants π and e; after a value this inserts the hidden `×`.
+  InputBuffer appendConstant(MathConstant constant) =>
+      _appendValue(ConstantToken(constant));
+
+  /// §3 postfix `!`, `%`, `²`, `³`: needs a value on its left to attach to.
+  InputBuffer appendPostfix(PostfixType postfix) {
+    if (tokens.isEmpty || !_endsValue(tokens.last)) {
+      return this;
+    }
+    return InputBuffer(<Token>[...tokens, PostfixToken(postfix)]);
+  }
+
+  /// Appends a value the engine produced, such as `Ans` (§5 "inserts the last
+  /// result as a number token"). A negative value arrives as `(−n)` tokens.
+  InputBuffer appendValueTokens(List<Token> valueTokens) {
+    final List<Token> next = List<Token>.of(tokens);
+    if (next.isNotEmpty && _endsValue(next.last)) {
+      next.add(const OperatorToken(OperatorType.multiply, implicit: true));
+    }
+    next.addAll(valueTokens);
+    return InputBuffer(next);
+  }
+
   /// §5 `)` row: only when a bracket is open and the last token is a value.
   InputBuffer appendRightParen() {
     if (_openCount <= _closeCount) {
@@ -187,14 +214,8 @@ final class InputBuffer {
 
   InputBuffer _startNumber(String value) => _appendValue(NumberToken(value));
 
-  InputBuffer _appendValue(Token token) {
-    final List<Token> next = List<Token>.of(tokens);
-    if (next.isNotEmpty && _endsValue(next.last)) {
-      next.add(const OperatorToken(OperatorType.multiply, implicit: true));
-    }
-    next.add(token);
-    return InputBuffer(next);
-  }
+  InputBuffer _appendValue(Token token) =>
+      appendValueTokens(<Token>[token]);
 
   InputBuffer _replaceLast(Token token) {
     final List<Token> next = List<Token>.of(tokens);
