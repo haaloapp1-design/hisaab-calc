@@ -46,7 +46,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 2 — Input rules
 
-- [ ] **T15 InputBuffer: digits, decimal, operators** — Read: §5 (rows digit, `.`, operator).
+- [x] **T15 InputBuffer: digits, decimal, operators** — Read: §5 (rows digit, `.`, operator).
   Done when: leading-zero, one-dot, operator-replace, negative-after-× rules tested.
 - [ ] **T16 InputBuffer: brackets, ±, backspace** — Read: §5 (rows `(`, `)`, `±`, `⌫`, `C`).
   Done when: `)` only when valid, `±` wrap/unwrap, ⌫ removes `sin(` in one step; tests.

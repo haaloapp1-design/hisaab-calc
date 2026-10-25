@@ -30,6 +30,10 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-25 — `CalcEngine` is an `abstract final class` with static `evaluate`/`evaluateSource` in `lib/core/engine/calc_engine.dart` — the engine is stateless and T14 names `CalcEngine.evaluate(tokens, …)`; no instance/provider is needed.
 - 2026-10-25 — The facade catches only `FormatException` (tokenizer/parser) and maps it to `CalcError.syntax`; evaluator code is written to return `Failure` for every bad case, so other exceptions stay visible as bugs instead of being silently swallowed.
 - 2026-10-25 — The §2–§8 acceptance table asserts the final display string (evaluate → `formatNumber`) rather than only `CalcResult` — it is the contract the UI shows, and it keeps formatter regressions visible.
+- 2026-10-25 — `InputBuffer` is immutable: every key returns a new buffer, and a no-op returns `this` — the T17 Notifier can skip rebuilds by identity, and the rules stay pure and testable.
+- 2026-10-25 — `InputBuffer` inserts the hidden `OperatorToken(multiply, implicit: true)` itself when a digit or dot starts after a value — the buffer bypasses the tokenizer, so §3's implicit-× post-pass would otherwise be lost.
+- 2026-10-25 — `appendOperator` takes `startValue` (default `NumberToken('0')`) instead of reading `Ans` — `lib/core/input/` is pure and stateless; T17 passes `NumberToken(ans.toString())` to honour §5's "start from Ans".
+- 2026-10-25 — A trailing `UnaryToken` is dropped before an operator is applied, and non-minus operators after a function/`(` are ignored — §5 does not define these incomplete states; dropping the sign makes `5×−` + `+` become `5+`, and ignoring avoids invalid `sin(+` / `(+` buffers.
 
 ## Log entry template
 
@@ -148,3 +152,10 @@ Changed: new `lib/core/engine/calc_engine.dart` (`abstract final class CalcEngin
 Tests: 70 rows covering §2 exact arithmetic/division, powers/`x²`/`x³`, unary/constants, §4 percent, §6 trig/logs/roots/factorial, §8 grouping/rounding/sci thresholds, auto-close and §7 errors — all source→display strings; plus `evaluateSource` = `evaluate(tokens)`, unknown text/empty input → `Invalid input` (no throw), and angle-mode forwarding; `flutter test` 147/147 pass; `flutter analyze` clean.
 Notes for next session: `CalcEngine` catches `FormatException` from the tokenizer/parser and returns `Failure(CalcError.syntax)`; the evaluator itself never throws. `evaluate` takes the `List<Token>` from the input buffer, `evaluateSource` is for paste/history/tests. The table formats with default `formatNumber` (grouping on, Auto 12 digits), so any future formatter change must keep these rows green. Phase 1 (engine) is complete — T15 starts the input buffer.
 Next: T15 InputBuffer: digits, decimal, operators
+
+### T15 — InputBuffer: digits, decimal, operators — 2026-10-25
+Status: DONE
+Changed: new `lib/core/input/input_buffer.dart` (immutable `InputBuffer`, `appendDigit`, `appendDecimalPoint`, `appendOperator`, `maxDigits`, token equality), new `test/core/input/input_buffer_test.dart`.
+Tests: digits append/leading-zero (`05`→`5`, `000`→`0`, `007`→`7`), 15-digit cap, implicit × after `π`/`)`, new number after an operator; one dot per number, leading `.`→`0.`, dot after a value→implicit ×; operator append/replace (`+` then `×`→`×`), `−` after `×`/`÷`→`UnaryToken`, `−` after `+` replaces, empty buffer→`0+`/`0−` and custom start value, dangling sign replacement, operator after a value, no operator after a function except `−`; 17 tests; `flutter test` 164/164 pass; `flutter analyze` clean.
+Notes for next session: `InputBuffer` is immutable and returns `this` for no-ops; T16 adds `(`, `)`, `±`, `⌫`, `C` on the same class. The buffer inserts the hidden `×` itself because it bypasses the tokenizer. `appendOperator` takes `startValue` (default `NumberToken('0')`); T17 passes `NumberToken(ans.toString())` for §5's "start from Ans". `RightParenToken`/`ConstantToken`/`PostfixToken`/`AnsToken` already count as value-ending for implicit ×, so T16 only needs the bracket rules.
+Next: T16 InputBuffer: brackets, ±, backspace
