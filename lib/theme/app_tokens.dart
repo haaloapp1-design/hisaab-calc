@@ -13,6 +13,7 @@ abstract final class AppColors {
   // On blue
   static const Color onPrimary = Color(0xFFFFFFFF);
   static const Color onPrimaryMuted = Color(0xFFDDE3FF);
+  static const Color onPrimaryFaint = Color(0xFFC7D1FF);
   static const Color dividerOnPrimary = Color(0xFF5A72D6);
 
   // Surfaces
@@ -70,6 +71,8 @@ abstract final class AppRadii {
   static const double segmentedTrack = 14;
   static const double segmentedPill = 10;
 
+  static const double chip = 10;
+
   static const double navItem = 14;
 
   static const double card = 18;
@@ -95,6 +98,14 @@ abstract final class AppSizes {
   static const double segmentGap = 4;
   static const double segmentTrackPadding = 4;
   static const double segmentPillPadding = 10;
+
+  static const double displayPaddingSide = 24;
+  static const double displayPaddingBottom = 22;
+  static const double displayScientificPaddingBottom = 18;
+  static const double displayGap = 10;
+  static const double displayScientificGap = 8;
+  static const double chipPaddingV = 4;
+  static const double chipPaddingH = 10;
 
   static const double keyHeightBasic = 60;
   static const double keyHeightScientific = 46;
@@ -143,16 +154,19 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 60,
     fontWeight: medium,
+    height: 1.05,
   );
   static const TextStyle resultBasicMin = TextStyle(
     fontFamily: fontFamily,
     fontSize: 32,
     fontWeight: medium,
+    height: 1.05,
   );
   static const TextStyle resultScientific = TextStyle(
     fontFamily: fontFamily,
     fontSize: 52,
     fontWeight: medium,
+    height: 1.05,
   );
   static const TextStyle converterValue = TextStyle(
     fontFamily: fontFamily,
@@ -163,6 +177,13 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: regular,
+    letterSpacing: 0.5,
+  );
+  static const TextStyle expressionScientific = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 19,
+    fontWeight: regular,
+    letterSpacing: 0.5,
   );
 
   // Keys

@@ -64,7 +64,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T21 Keys and keypad grid** — Read: DESIGN (Shape, Type, key colours).
   `CalcKeyButton(kind)` (number/function/operator/equals/disabled), `Keypad(spec, columns)`; press animation; semantic labels.
   Done when: widget test renders a 4×5 spec.
-- [ ] **T22 Display widget** — Read: SPEC §1.1, DESIGN (Type).
+- [x] **T22 Display widget** — Read: SPEC §1.1, DESIGN (Type).
   Done when: expression line scrolls, result auto-shrinks, preview colour, error text, memory chip.
 - [ ] **T23 Basic mode wired** — Read: SPEC §1.2.
   Done when: tapping keys on device calculates correctly end to end (`docs/screens/01-basic.html`).
