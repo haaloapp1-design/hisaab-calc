@@ -1,3 +1,4 @@
+import 'package:calculator/core/currency/currency_config.dart';
 import 'package:calculator/core/currency/currency_repository.dart';
 import 'package:calculator/core/currency/rates.dart';
 import 'package:calculator/core/engine/angle_mode.dart';
@@ -8,6 +9,7 @@ import 'package:calculator/core/units/converter_memory.dart';
 import 'package:calculator/core/units/unit_catalog.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
 import 'package:calculator/features/converter/converter_memory_controller.dart';
+import 'package:calculator/features/currency/currency_controller.dart';
 import 'package:calculator/features/history/history_controller.dart';
 import 'package:calculator/features/history/history_entry.dart';
 import 'package:calculator/features/history/history_log.dart';
@@ -400,6 +402,7 @@ void main() {
         },
         fetchedAt: DateTime.utc(2026, 10, 26),
       ).encode(),
+      CurrencyController.key: CurrencyConfig.defaults.encode(),
     });
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
@@ -423,6 +426,7 @@ void main() {
     expect(await store.getString(MemoryController.key), isNotNull);
     expect(await store.getString(ConverterMemoryController.key), isNotNull);
     expect(await store.getString(CurrencyRepository.cacheKey), isNotNull);
+    expect(await store.getString(CurrencyController.key), isNotNull);
 
     await tester.tap(find.byKey(const Key('clear-data')));
     await tester.pumpAndSettle();
@@ -436,6 +440,7 @@ void main() {
     expect(await store.getString(MemoryController.key), isNull);
     expect(await store.getString(ConverterMemoryController.key), isNull);
     expect(await store.getString(CurrencyRepository.cacheKey), isNull);
+    expect(await store.getString(CurrencyController.key), isNull);
     expect(
       tester.widget<ThemeSelector>(find.byType(ThemeSelector)).value,
       AppThemeMode.system,

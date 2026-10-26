@@ -284,6 +284,43 @@ abstract final class AppSizes {
   static const double converterPickerCheck = 20;
   static const double converterPickerMaxHeight = 0.7;
 
+  // Currency (screen 08)
+  static const double currencyTopPaddingTop = 18;
+  static const double currencyTopPaddingSide = 24;
+  static const double currencyTopPaddingBottom = 24;
+  static const double currencyTopGap = 12;
+  static const double currencyBasePillPaddingV = 8;
+  static const double currencyBasePillPaddingH = 12;
+  static const double currencyBasePillRadius = 12;
+  static const double currencyBasePillGap = 8;
+  static const double currencyBaseArrow = 14;
+  static const double currencyAmountHeight = 62;
+  static const double currencyStatusDot = 8;
+  static const double currencyStatusGap = 8;
+  static const double currencySheetPaddingTop = 12;
+  static const double currencySheetPaddingSide = 20;
+  static const double currencySheetGap = 10;
+  static const double currencyRowPaddingV = 10;
+  static const double currencyRowPaddingH = 12;
+  static const double currencyRowRadius = 16;
+  static const double currencyRowGap = 12;
+  static const double currencyCodeWidth = 48;
+  static const double currencyCodeHeight = 40;
+  static const double currencyCodeRadius = 12;
+  static const double currencyRowContentGap = 2;
+  static const double currencyAddHeight = 48;
+  static const double currencyAddRadius = 16;
+  static const double currencyAddBottom = 14;
+  static const double currencyAddDash = 5;
+  static const double currencyAddDashGap = 4;
+  static const double currencyPickerMaxHeight = 0.7;
+  static const double currencyPickerTitleGap = 8;
+  static const double currencyPickerSearchHeight = 44;
+  static const double currencyPickerRowHeight = 52;
+  static const double currencyPickerChipWidth = 44;
+  static const double currencyPickerChipHeight = 32;
+  static const double currencyPickerCheck = 20;
+
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
@@ -466,6 +503,54 @@ abstract final class AppTypography {
   static const TextStyle converterError = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
+    fontWeight: medium,
+  );
+
+  // Currency (screen 08)
+  static const TextStyle currencyAmount = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 52,
+    fontWeight: medium,
+    height: 1.05,
+  );
+  static const TextStyle currencyBaseCode = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: bold,
+  );
+  static const TextStyle currencyBaseName = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
+  );
+  static const TextStyle currencyStatus = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: regular,
+  );
+  static const TextStyle currencyCode = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: bold,
+  );
+  static const TextStyle currencyName = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: regular,
+  );
+  static const TextStyle currencyRate = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: regular,
+  );
+  static const TextStyle currencyValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 20,
+    fontWeight: medium,
+  );
+  static const TextStyle currencyAdd = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
     fontWeight: medium,
   );
   static const TextStyle segmentedLabel = TextStyle(

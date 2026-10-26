@@ -1,3 +1,4 @@
+import 'package:calculator/core/currency/currency_repository.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/units/converter_memory.dart';
@@ -6,11 +7,15 @@ import 'package:calculator/features/converter/converter_hub_page.dart';
 import 'package:calculator/features/converter/converter_memory_controller.dart';
 import 'package:calculator/features/converter/converter_page.dart';
 import 'package:calculator/features/converter/widgets/hub_search_field.dart';
+import 'package:calculator/features/currency/currency_page.dart';
+import 'package:calculator/features/currency/currency_repository_provider.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 void main() {
   Widget app({
@@ -316,5 +321,42 @@ void main() {
     expect(page.from, isNull);
     expect(page.to, isNull);
     expect(find.text('1 m = 3.28084 ft'), findsOneWidget);
+  });
+
+  testWidgets('the currency card opens the currency page by default', (
+    tester,
+  ) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore();
+    final CurrencyRepository repository = CurrencyRepository(
+      store: store,
+      client: MockClient(
+        (http.Request request) async => http.Response(
+          '{"result":"success","base_code":"USD",'
+          '"rates":{"USD":1,"PKR":278.5}}',
+          200,
+        ),
+      ),
+      clock: () => DateTime.utc(2026, 10, 26, 12),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          kvStoreProvider.overrideWithValue(store),
+          currencyRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const ConverterHubPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('hub-currency-card')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CurrencyPage), findsOneWidget);
   });
 }

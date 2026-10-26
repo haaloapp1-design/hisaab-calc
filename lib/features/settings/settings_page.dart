@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/engine/angle_mode.dart';
+import '../../core/storage/kv_store_provider.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_controller.dart';
 import '../converter/converter_memory_controller.dart';
+import '../currency/currency_controller.dart';
 import '../currency/currency_repository_provider.dart';
 import '../history/history_controller.dart';
 import '../history/memory_controller.dart';
@@ -251,5 +253,7 @@ class SettingsPage extends ConsumerWidget {
     await memory.clear();
     await converter.clear();
     await ref.read(currencyRepositoryProvider).clear();
+    await ref.read(kvStoreProvider).remove(CurrencyController.key);
+    ref.invalidate(currencyProvider);
   }
 }

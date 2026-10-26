@@ -6,6 +6,7 @@ import '../../core/units/unit_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import '../currency/currency_page.dart';
 import 'converter_memory_controller.dart';
 import 'converter_page.dart';
 import 'widgets/category_grid.dart';
@@ -19,7 +20,8 @@ import 'widgets/unit_search_results.dart';
 ///
 /// It owns only the search text. A category or a search result opens the unit
 /// converter unless the caller supplies its own callback; a favourite pair
-/// opens it with both sides; the currency card stays a callback for T39.
+/// opens it with both sides; the currency card opens [CurrencyPage] unless a
+/// callback overrides it.
 class ConverterHubPage extends ConsumerStatefulWidget {
   const ConverterHubPage({
     super.key,
@@ -113,7 +115,7 @@ class _ConverterHubPageState extends ConsumerState<ConverterHubPage> {
             FavouritesCard(favourites: favourites, onSelected: _openPair),
             const SizedBox(height: AppSizes.hubContentGap),
           ],
-          CurrencyCard(onTap: widget.onCurrencyTap),
+          CurrencyCard(onTap: _openCurrency),
           const SizedBox(height: AppSizes.hubContentGap),
           CategoryGrid(onSelected: _selectCategory),
         ],
@@ -148,6 +150,19 @@ class _ConverterHubPageState extends ConsumerState<ConverterHubPage> {
       MaterialPageRoute<void>(
         builder: (BuildContext context) =>
             ConverterPage(category: category, from: from, to: to),
+      ),
+    );
+  }
+
+  void _openCurrency() {
+    final VoidCallback? callback = widget.onCurrencyTap;
+    if (callback != null) {
+      callback();
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const CurrencyPage(),
       ),
     );
   }
