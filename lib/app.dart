@@ -20,7 +20,7 @@ class CalculatorApp extends ConsumerWidget {
     final Color accent = settings.accent.color;
 
     return MaterialApp(
-      title: 'Calculator',
+      title: 'Hisab',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(accent: accent),
       darkTheme: AppTheme.dark(accent: accent),

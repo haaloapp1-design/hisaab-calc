@@ -1,6 +1,6 @@
 # SPEC — Features, screen by screen
 
-App name: **Calculator**. Platforms: Android first, iOS second. Portrait phone layout (390×844 design size).
+App name: **Hisab**. Platforms: Android first, iOS second. Portrait phone layout (390×844 design size).
 Works fully offline except live currency rates. Navigation: bottom bar with 4 tabs
 (Calculator, Convert, Tools, History) + Settings from the gear/sliders icon on Calculator.
 

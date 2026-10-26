@@ -130,3 +130,13 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [ ] **T48 Accessibility pass** — Semantic labels on every key/icon button, text scale 1.3 without overflow, contrast check.
 - [ ] **T49 Dark theme** — Read: DESIGN (Dark theme). Done when: every screen readable in dark.
 - [ ] **T50 Release prep** — App name, icon, splash, Android release build runs on a real phone; update README.
+
+
+## Extra
+
+- [x] **T51 App name and icon** — Read: `ICON_README.md`, `flutter_launcher_icons.yaml`.
+  Rename the app to **Hisab** everywhere: Android `android:label` in `android/app/src/main/AndroidManifest.xml`,
+  iOS `CFBundleDisplayName` and `CFBundleName` in `ios/Runner/Info.plist`, `MaterialApp.title`, the header title in the UI,
+  and "Calculator" in docs/SPEC.md. Do NOT change the Dart package name or applicationId.
+  Add `flutter_launcher_icons` as a dev dependency, run `dart run flutter_launcher_icons`.
+  Done when: `flutter analyze` clean, app installs on a phone showing "Hisab" with the حساب icon.

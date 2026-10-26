@@ -66,7 +66,7 @@ class CalculatorPage extends ConsumerWidget {
         child: Column(
           children: <Widget>[
             BlueHeader(
-              title: 'Calculator',
+              title: 'Hisab',
               actionIcon: Icons.tune_rounded,
               actionTooltip: 'Settings',
               onAction: () => _openSettings(context),

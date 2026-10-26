@@ -64,7 +64,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byType(BlueHeader),
-        matching: find.text('Calculator'),
+        matching: find.text('Hisab'),
       ),
       findsOneWidget,
     );

@@ -1,0 +1,13 @@
+# Generates every Android and iOS icon size from the 1024 px masters.
+# Run:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  # Android 8+ adaptive icon (cobalt background + white word)
+  adaptive_icon_background: "#2D46B9"
+  adaptive_icon_foreground: "assets/icon/icon_foreground.png"
+  # Android 13+ themed (monochrome) icon
+  adaptive_icon_monochrome: "assets/icon/icon_monochrome.png"
