@@ -93,7 +93,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 - [x] **T31 Word and base formatting** — Read: §11.
   Done when: mask/signed view/two's complement/HEX-OCT-BIN strings (BIN grouped) tested, incl. 8/16/32/64-bit.
-- [ ] **T32 Programmer evaluation** — Read: §11 (ops, precedence).
+- [x] **T32 Programmer evaluation** — Read: §11 (ops, precedence).
   Done when: AND/OR/XOR/NOT/NAND/shifts/mod/÷ truncation/overflow wrap tested.
 - [ ] **T33 Programmer UI** — Read: SPEC §1.4. Screen 03 (`docs/screens/03-programmer.html`).
   Done when: base rows tap to switch, invalid digits disabled, word size chip, keys work.

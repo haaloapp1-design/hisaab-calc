@@ -67,6 +67,75 @@ final class Word {
   /// The same width with a new value, re-masked (§11 wrap-around).
   Word withValue(BigInt value) => Word(value, size: size);
 
+  // Operations on the signed values, every result re-masked (§11).
+
+  /// `a + b`, wrapping two's complement.
+  Word add(Word other) => _withOther(other, signed + other.signed);
+
+  /// `a − b`, wrapping two's complement.
+  Word subtract(Word other) => _withOther(other, signed - other.signed);
+
+  /// `a × b`, wrapping two's complement.
+  Word multiply(Word other) => _withOther(other, signed * other.signed);
+
+  /// `a ÷ b`, truncated toward zero. The caller rejects `b = 0`.
+  Word divide(Word other) => _withOther(other, signed ~/ other.signed);
+
+  /// `a mod b`, remainder with the sign of the dividend (unlike `%`).
+  Word modulo(Word other) => _withOther(other, signed.remainder(other.signed));
+
+  /// `a AND b`.
+  Word bitAnd(Word other) => _withOther(other, signed & other.signed);
+
+  /// `a OR b`.
+  Word bitOr(Word other) => _withOther(other, signed | other.signed);
+
+  /// `a XOR b`.
+  Word bitXor(Word other) => _withOther(other, signed ^ other.signed);
+
+  /// `NOT a = ~a & mask`.
+  Word bitNot() => Word(~signed, size: size);
+
+  /// `NAND = ~(a & b) & mask`.
+  Word nand(Word other) => bitAnd(other).bitNot();
+
+  /// `a << n` then mask; every bit is gone once `n` reaches the word size.
+  Word shiftLeft(BigInt count) {
+    _checkCount(count);
+    if (count >= BigInt.from(size.bits)) {
+      return Word.zero(size: size);
+    }
+    return withValue(signed << count.toInt());
+  }
+
+  /// `a >> n`, arithmetic (keeps the sign); a large `n` leaves only the sign.
+  Word shiftRight(BigInt count) {
+    _checkCount(count);
+    if (count >= BigInt.from(size.bits)) {
+      return Word(
+        signed.isNegative ? BigInt.from(-1) : BigInt.zero,
+        size: size,
+      );
+    }
+    return withValue(signed >> count.toInt());
+  }
+
+  /// `±`: the same value with the opposite sign, re-masked.
+  Word negate() => withValue(-signed);
+
+  /// Re-masks [value] in this width after checking [other]'s width.
+  Word _withOther(Word other, BigInt value) {
+    assert(other.size == size, 'both operands must use the same word size');
+    return withValue(value);
+  }
+
+  /// Shift distances are non-negative; the parser reports a domain error.
+  static void _checkCount(BigInt count) {
+    if (count.isNegative) {
+      throw ArgumentError.value(count, 'count', 'must not be negative');
+    }
+  }
+
   @override
   bool operator ==(Object other) =>
       other is Word && other.size == size && other.raw == raw;

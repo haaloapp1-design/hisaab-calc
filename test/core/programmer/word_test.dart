@@ -170,4 +170,83 @@ void main() {
       );
     });
   });
+
+  group('operations', () {
+    Word w(int value, {WordSize size = WordSize.bits32}) =>
+        Word(BigInt.from(value), size: size);
+
+    test('adds, subtracts and multiplies signed values', () {
+      expect(w(2).add(w(3)).signed, BigInt.from(5));
+      expect(w(2).subtract(w(5)).signed, BigInt.from(-3));
+      expect(w(-2).multiply(w(3)).signed, BigInt.from(-6));
+      expect(w(-2).multiply(w(-3)).signed, BigInt.from(6));
+    });
+
+    test('divide truncates toward zero and mod keeps the dividend sign', () {
+      expect(w(-7).divide(w(2)).signed, BigInt.from(-3));
+      expect(w(7).divide(w(-2)).signed, BigInt.from(-3));
+      expect(w(-7).divide(w(-2)).signed, BigInt.from(3));
+      expect(w(-5).modulo(w(3)).signed, BigInt.from(-2));
+      expect(w(5).modulo(w(-3)).signed, BigInt.from(2));
+      expect(w(-5).modulo(w(-3)).signed, BigInt.from(-2));
+    });
+
+    test('bitwise ops work on the signed values and re-mask', () {
+      expect(w(5).bitAnd(w(3)).signed, BigInt.from(1));
+      expect(w(5).bitOr(w(3)).signed, BigInt.from(7));
+      expect(w(5).bitXor(w(3)).signed, BigInt.from(6));
+      expect(w(5).bitNot().signed, BigInt.from(-6));
+      expect(w(0).bitNot().signed, BigInt.from(-1));
+      expect(w(5).nand(w(3)).signed, BigInt.from(-2));
+      expect(w(-6).bitAnd(w(3)).signed, BigInt.from(2));
+    });
+
+    test('shifts mask the result and keep the sign on the right', () {
+      expect(w(1).shiftLeft(BigInt.from(3)).signed, BigInt.from(8));
+      expect(w(8).shiftRight(BigInt.from(1)).signed, BigInt.from(4));
+      expect(w(-8).shiftRight(BigInt.from(1)).signed, BigInt.from(-4));
+      expect(w(-1).shiftRight(BigInt.from(1)).signed, BigInt.from(-1));
+      expect(w(-1).shiftLeft(BigInt.from(1)).signed, BigInt.from(-2));
+      expect(w(1).shiftLeft(BigInt.from(32)).signed, BigInt.zero);
+      expect(w(1).shiftRight(BigInt.from(40)).signed, BigInt.zero);
+      expect(w(-1).shiftRight(BigInt.from(40)).signed, BigInt.from(-1));
+    });
+
+    test('8-bit operations wrap two\'s complement', () {
+      expect(
+        w(127, size: WordSize.bits8).add(w(1, size: WordSize.bits8)).signed,
+        BigInt.from(-128),
+      );
+      expect(
+        w(
+          100,
+          size: WordSize.bits8,
+        ).multiply(w(3, size: WordSize.bits8)).signed,
+        BigInt.from(44),
+      );
+      expect(
+        w(1, size: WordSize.bits8).shiftLeft(BigInt.from(7)).signed,
+        BigInt.from(-128),
+      );
+      expect(
+        w(1, size: WordSize.bits8).shiftLeft(BigInt.from(8)).signed,
+        BigInt.zero,
+      );
+      expect(
+        w(-8, size: WordSize.bits8).shiftRight(BigInt.from(4)).signed,
+        BigInt.from(-1),
+      );
+    });
+
+    test('negate flips the sign and re-masks', () {
+      expect(w(5).negate().signed, BigInt.from(-5));
+      expect(w(-5).negate().signed, BigInt.from(5));
+      expect(w(-128, size: WordSize.bits8).negate().signed, BigInt.from(-128));
+    });
+
+    test('a negative shift count is a caller error', () {
+      expect(() => w(1).shiftLeft(BigInt.from(-1)), throwsArgumentError);
+      expect(() => w(1).shiftRight(BigInt.from(-1)), throwsArgumentError);
+    });
+  });
 }
