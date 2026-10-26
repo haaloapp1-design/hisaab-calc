@@ -1,3 +1,4 @@
+import 'package:calculator/core/engine/formatter.dart';
 import 'package:calculator/core/programmer/base_format.dart';
 import 'package:calculator/core/programmer/word.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -134,6 +135,66 @@ void main() {
 
       expect(rows[NumberBase.dec], '−1');
       expect(rows[NumberBase.hex], 'FF');
+    });
+  });
+
+  group('formatBaseValue', () {
+    test('groups the DEC row with the Settings separator', () {
+      final Word word = Word(BigInt.from(2021));
+
+      expect(formatBaseValue(word, NumberBase.dec), '2,021');
+      expect(formatBaseValue(word, NumberBase.hex), '7E5');
+      expect(formatBaseValue(word, NumberBase.oct), '3745');
+      expect(formatBaseValue(word, NumberBase.bin), '0111 1110 0101');
+    });
+
+    test('groups a negative DEC value after the sign', () {
+      final Word word = Word(BigInt.from(-2021));
+
+      expect(formatBaseValue(word, NumberBase.dec), '−2,021');
+    });
+
+    test('honours the grouping switch and a locale separator', () {
+      final Word word = Word(BigInt.from(1234567));
+
+      expect(
+        formatBaseValue(
+          word,
+          NumberBase.dec,
+          options: const NumberFormatOptions(useGrouping: false),
+        ),
+        '1234567',
+      );
+      expect(
+        formatBaseValue(
+          word,
+          NumberBase.dec,
+          options: const NumberFormatOptions(groupSeparator: '.'),
+        ),
+        '1.234.567',
+      );
+    });
+
+    test('never groups HEX/OCT/BIN', () {
+      final Word word = Word(BigInt.from(1234567));
+
+      expect(formatBaseValue(word, NumberBase.hex), '12D687');
+      expect(
+        formatBaseValue(word, NumberBase.bin),
+        '0001 0010 1101 0110 1000 0111',
+      );
+    });
+
+    test('keeps a 64-bit DEC value in plain digits', () {
+      final Word word = Word(
+        BigInt.parse('9223372036854775807'),
+        size: WordSize.bits64,
+      );
+
+      expect(
+        formatBaseValue(word, NumberBase.dec),
+        '9,223,372,036,854,775,807',
+      );
     });
   });
 }

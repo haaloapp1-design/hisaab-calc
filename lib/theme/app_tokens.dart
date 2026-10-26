@@ -209,6 +209,15 @@ abstract final class AppSizes {
   static const double memoryButtonHeight = 44;
   static const double memoryButtonPaddingH = 12;
 
+  // Programmer (screen 03)
+  static const double programmerDisplaySide = 20;
+  static const double programmerDisplayBottom = 16;
+  static const double programmerDisplayGap = 6;
+  static const double baseRowPaddingV = 6;
+  static const double baseRowPaddingH = 12;
+  static const double baseRowNameWidth = 40;
+  static const double baseRowGap = 12;
+
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
@@ -441,5 +450,47 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: medium,
+  );
+
+  // Programmer (screen 03)
+  static const TextStyle programmerValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 44,
+    fontWeight: medium,
+    height: 1.05,
+  );
+
+  /// The big line is smaller in BIN so 32 bits stay readable (screen 03).
+  static const TextStyle programmerValueBinary = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 28,
+    fontWeight: medium,
+    height: 1.05,
+  );
+
+  static const TextStyle baseRowName = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: bold,
+    // Explicit heights keep the fixed-height display stable across platforms
+    // (the bundled font and the monospace fallback have different metrics).
+    height: 1.2,
+  );
+
+  /// The design sets the base rows in Ubuntu Mono; the app bundles only Ubuntu,
+  /// so the platform's monospace face keeps the digit columns aligned.
+  static const TextStyle baseRowValue = TextStyle(
+    fontFamily: 'monospace',
+    fontSize: 16,
+    fontWeight: regular,
+    height: 1.2,
+  );
+
+  /// Line 1 of the display: the source being typed (SPEC §1.1).
+  static const TextStyle programmerExpression = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: regular,
+    height: 1.2,
   );
 }

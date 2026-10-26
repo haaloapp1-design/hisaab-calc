@@ -82,6 +82,13 @@ String formatTypedNumber(
   return dot == -1 ? integer : '$integer${options.decimalSeparator}$fraction';
 }
 
+/// Groups an already-formatted integer's digits (§8.4), e.g. `2021` → `2,021`.
+///
+/// [digits] must not carry a sign; callers strip it and put it back, which is
+/// what the programmer DEC row needs.
+String groupDigits(String digits, {String separator = ','}) =>
+    _group(digits, separator);
+
 /// §1.1 line 1: renders the typed tokens as the expression line.
 ///
 /// Typed numbers keep exactly what the user entered (only grouping, §8.6).

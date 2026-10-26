@@ -1,3 +1,4 @@
+import '../engine/formatter.dart';
 import 'word.dart';
 
 /// The four bases programmer mode shows, in the row order of SPEC §1.4.
@@ -34,6 +35,27 @@ Map<NumberBase, String> formatBases(Word word) => <NumberBase, String>{
   for (final NumberBase base in NumberBase.values)
     base: formatInBase(word, base),
 };
+
+/// The display string for [word] in [base] with the Settings separators.
+///
+/// DEC gets the thousands separator (§8.4) because `formatNumber` would turn a
+/// 64-bit value into scientific notation; HEX/OCT/BIN are digit patterns and
+/// are never grouped.
+String formatBaseValue(
+  Word word,
+  NumberBase base, {
+  NumberFormatOptions options = const NumberFormatOptions(),
+}) {
+  if (base != NumberBase.dec) {
+    return formatInBase(word, base);
+  }
+  final BigInt value = word.signed;
+  final String digits = value.abs().toString();
+  final String body = options.useGrouping
+      ? groupDigits(digits, separator: options.groupSeparator)
+      : digits;
+  return value.isNegative ? '−$body' : body;
+}
 
 /// §11: pad to a multiple of 4 bits, then group by 4 (`0111 1110 0101`).
 String _groupBinary(String digits) {

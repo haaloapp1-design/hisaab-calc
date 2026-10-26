@@ -39,6 +39,10 @@ void main() {
   Finder key(String label) =>
       find.descendant(of: find.byType(Keypad), matching: find.text(label));
 
+  /// The whole key cell, for measuring the grid rather than the glyph.
+  Finder keyButton(String label) =>
+      find.ancestor(of: key(label), matching: find.byType(CalcKeyButton));
+
   String resultText(WidgetTester tester) =>
       tester.widget<Text>(find.byKey(const Key('display-result'))).data!;
 
@@ -188,7 +192,7 @@ void main() {
     expect(tester.widget<Segmented>(find.byType(Segmented)).selectedIndex, 1);
 
     await tester.tap(find.text('Programmer'));
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(tester.widget<Segmented>(find.byType(Segmented)).selectedIndex, 2);
   });
 
@@ -364,17 +368,200 @@ void main() {
     expect(find.byType(CalcKeyButton), findsNWidgets(35));
   });
 
-  testWidgets('Programmer still shows the Basic keypad until T33', (
+  testWidgets('Programmer mode shows the 5×7 keypad and the base rows', (
     tester,
   ) async {
     designSurface(tester);
     await tester.pumpWidget(app());
 
     await tester.tap(find.text('Programmer'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(CalcKeyButton), findsNWidgets(35));
+    expect(find.byKey(const Key('angle-controls')), findsNothing);
+    expect(find.byKey(const Key('programmer-display')), findsOneWidget);
+    expect(find.text('32-bit'), findsOneWidget);
+
+    for (final String label in <String>[
+      'AND',
+      'OR',
+      'XOR',
+      'NOT',
+      'NAND',
+      '<<',
+      '>>',
+      'AC',
+      '⌫',
+      'mod',
+      'A',
+      'F',
+      '=',
+    ]) {
+      expect(key(label), findsOneWidget, reason: label);
+    }
+
+    // Scientific density: 46 px keys on the 8 px grid, five per row.
+    final Rect and = tester.getRect(keyButton('AND'));
+    expect(and.height, AppSizes.keyHeightScientific);
+    expect(
+      tester.getRect(keyButton('OR')).left - and.right,
+      AppSizes.keyGapScientific,
+    );
+    expect(
+      tester.getRect(keyButton('A')).top - and.bottom,
+      AppSizes.keyGapScientific,
+    );
+    expect(tester.getRect(keyButton('B')).left, and.left);
+  });
+
+  testWidgets('typing a bitwise expression previews then commits it', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.tap(find.text('Programmer'));
+    await tester.pumpAndSettle();
+
+    await tapKeys(tester, <String>['5', 'AND', '3']);
+
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-expression'))).data,
+      '5 AND 3',
+    );
+    final Text preview = tester.widget<Text>(
+      find.byKey(const Key('programmer-value')),
+    );
+    expect(preview.data, '1');
+    expect(preview.style?.color, AppColors.onPrimaryMuted);
+
+    await tapKeys(tester, <String>['=']);
+
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-expression'))).data,
+      '',
+    );
+    final Text committed = tester.widget<Text>(
+      find.byKey(const Key('programmer-value')),
+    );
+    expect(committed.data, '1');
+    expect(committed.style?.color, AppColors.onPrimary);
+  });
+
+  testWidgets('a base row converts the value and disables unreadable digits', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.tap(find.text('Programmer'));
+    await tester.pumpAndSettle();
+
+    await tapKeys(tester, <String>['2', '0', '2', '1']);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('base-value-dec'))).data,
+      '2,021',
+    );
+
+    await tester.tap(find.byKey(const Key('base-hex')));
     await tester.pump();
 
-    expect(find.byType(CalcKeyButton), findsNWidgets(20));
-    expect(find.byKey(const Key('angle-controls')), findsNothing);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-value'))).data,
+      '7E5',
+    );
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-expression'))).data,
+      '7E5',
+    );
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('A')).kind,
+      CalcKeyKind.number,
+    );
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('9')).kind,
+      CalcKeyKind.number,
+    );
+
+    await tester.tap(find.byKey(const Key('base-oct')));
+    await tester.pump();
+
+    expect(
+      tester.widget<Text>(find.byKey(const Key('base-value-oct'))).data,
+      '3745',
+    );
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('8')).kind,
+      CalcKeyKind.disabled,
+    );
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('7')).kind,
+      CalcKeyKind.number,
+    );
+
+    // Tapping a disabled key does not type it.
+    await tester.tap(key('8'), warnIfMissed: false);
+    await tester.pump();
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-value'))).data,
+      '3745',
+    );
+
+    await tester.tap(find.byKey(const Key('base-bin')));
+    await tester.pump();
+
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('1')).kind,
+      CalcKeyKind.number,
+    );
+    expect(
+      tester.widget<CalcKeyButton>(keyButton('2')).kind,
+      CalcKeyKind.disabled,
+    );
+  });
+
+  testWidgets('the word-size chip changes the width and toasts a truncation', (
+    tester,
+  ) async {
+    designSurface(tester);
+    // The shell supplies the Scaffold in production; this page-level test needs
+    // one for the truncation toast.
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const Scaffold(body: CalculatorPage()),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Programmer'));
+    await tester.pumpAndSettle();
+
+    await tapKeys(tester, <String>['2', '5', '5']);
+
+    await tester.tap(find.byKey(const Key('word-size-chip')));
+    await tester.pumpAndSettle();
+
+    for (final int bits in <int>[8, 16, 32, 64]) {
+      expect(find.byKey(Key('word-size-$bits')), findsOneWidget);
+    }
+
+    await tester.tap(find.byKey(const Key('word-size-8')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('8-bit'), findsOneWidget);
+    expect(find.text('Value truncated to 8-bit'), findsOneWidget);
+    expect(
+      tester.widget<Text>(find.byKey(const Key('programmer-value'))).data,
+      '−1',
+    );
+
+    await tester.tap(find.byKey(const Key('word-size-chip')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('word-size-16')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('16-bit'), findsOneWidget);
+    expect(find.text('Value truncated to 16-bit'), findsNothing);
   });
 
   testWidgets('the Settings header action opens the Settings page', (
