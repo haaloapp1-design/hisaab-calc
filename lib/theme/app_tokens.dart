@@ -218,6 +218,32 @@ abstract final class AppSizes {
   static const double baseRowNameWidth = 40;
   static const double baseRowGap = 12;
 
+  // Converter hub (screen 06)
+  static const double hubHeaderGap = 14;
+  static const double hubSearchHeight = 48;
+  static const double hubSearchPaddingH = 14;
+  static const double hubSearchRadius = 14;
+  static const double hubSearchIcon = 18;
+  static const double hubSearchGap = 10;
+  static const double hubContentPaddingTop = 16;
+  static const double hubContentGap = 12;
+  static const double hubCurrencyPaddingV = 14;
+  static const double hubCurrencyPaddingH = 16;
+  static const double hubCurrencyGap = 14;
+  static const double hubCurrencyIcon = 46;
+  static const double hubCurrencyIconRadius = 14;
+  static const double hubCurrencyChevron = 20;
+  static const double hubGridGap = 10;
+  static const double hubCellHeight = 86;
+  static const double hubCellGap = 8;
+  static const double hubChipHeight = 32;
+  static const double hubChipMinWidth = 40;
+  static const double hubChipPaddingH = 8;
+  static const double hubResultPaddingV = 14;
+  static const double hubResultPaddingH = 16;
+  static const double hubResultGap = 2;
+  static const int hubGridColumns = 3;
+
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
@@ -361,6 +387,21 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: regular,
+  );
+  static const TextStyle hubItemTitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: medium,
+  );
+  static const TextStyle hubChip = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: bold,
+  );
+  static const TextStyle hubCurrencyGlyph = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 20,
+    fontWeight: bold,
   );
   static const TextStyle segmentedLabel = TextStyle(
     fontFamily: fontFamily,

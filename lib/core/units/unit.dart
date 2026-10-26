@@ -2,26 +2,30 @@ import 'package:decimal/decimal.dart';
 
 /// The converter categories, in the order the hub shows them (SPEC §4).
 enum UnitCategory {
-  length('Length', 'm'),
-  area('Area', 'm²'),
-  volume('Volume', 'L'),
-  mass('Mass', 'kg'),
-  temperature('Temperature', 'K'),
-  speed('Speed', 'm/s'),
-  time('Time', 's'),
-  data('Data', 'B'),
-  pressure('Pressure', 'Pa'),
-  energy('Energy', 'J'),
-  power('Power', 'W'),
-  angle('Angle', 'rad');
+  length('Length', 'm', 'm'),
+  area('Area', 'm²', 'm²'),
+  volume('Volume', 'L', 'L'),
+  mass('Mass', 'kg', 'kg'),
+  temperature('Temperature', 'K', '°C'),
+  speed('Speed', 'm/s', 'km/h'),
+  time('Time', 's', 'h'),
+  data('Data', 'B', 'MB'),
+  pressure('Pressure', 'Pa', 'Pa'),
+  energy('Energy', 'J', 'J'),
+  power('Power', 'W', 'W'),
+  angle('Angle', 'rad', 'rad');
 
-  const UnitCategory(this.label, this.baseSymbol);
+  const UnitCategory(this.label, this.baseSymbol, this.hubSymbol);
 
   /// The hub and picker name, e.g. `Length`.
   final String label;
 
   /// The symbol of the category's base unit (BUSINESS_LOGIC §12).
   final String baseSymbol;
+
+  /// The chip on the converter hub (`06-converter-hub.html`): a familiar unit
+  /// rather than the base, e.g. `°C` for temperature.
+  final String hubSymbol;
 }
 
 /// One unit of measure (BUSINESS_LOGIC §12).

@@ -346,4 +346,60 @@ void main() {
       expect(UnitCatalog.byId(unit.id), same(unit));
     }
   });
+
+  test('gives each hub tile the symbol the screen shows', () {
+    expect(
+      UnitCategory.values.map((UnitCategory category) => category.hubSymbol),
+      <String>[
+        'm',
+        'm²',
+        'L',
+        'kg',
+        '°C',
+        'km/h',
+        'h',
+        'MB',
+        'Pa',
+        'J',
+        'W',
+        'rad',
+      ],
+    );
+    expect(UnitCategory.temperature.baseSymbol, 'K');
+    expect(UnitCategory.temperature.hubSymbol, '°C');
+  });
+
+  test('searches units by name or symbol, in catalog order', () {
+    expect(
+      UnitCatalog.search('marla').map((UnitMatch match) => match.unit.id),
+      <String>['marla'],
+    );
+    expect(
+      UnitCatalog.search('inch').map((UnitMatch match) => match.unit.id),
+      <String>['in', 'in2', 'psi'],
+    );
+    expect(
+      UnitCatalog.search('GALLON').map((UnitMatch match) => match.unit.id),
+      <String>['gal_us', 'gal_uk'],
+    );
+    expect(
+      UnitCatalog.search('km/h').map((UnitMatch match) => match.unit.id),
+      <String>['kmh'],
+    );
+  });
+
+  test('search trims, ignores case and returns the category', () {
+    final List<UnitMatch> matches = UnitCatalog.search('  PSI ');
+    expect(matches, hasLength(1));
+    expect(matches.single.category, UnitCategory.pressure);
+    expect(matches.single.unit, same(UnitCatalog.byId('psi')));
+    expect(matches.single.toString(), 'Pressure/psi');
+
+    expect(UnitCatalog.search('°C').single.category, UnitCategory.temperature);
+  });
+
+  test('a blank search matches nothing', () {
+    expect(UnitCatalog.search(''), isEmpty);
+    expect(UnitCatalog.search('   '), isEmpty);
+  });
 }

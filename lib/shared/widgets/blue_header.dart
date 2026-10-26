@@ -19,6 +19,7 @@ class BlueHeader extends StatelessWidget {
     super.key,
     required this.title,
     this.subtitle,
+    this.child,
     this.onBack,
     this.backTooltip = 'Back',
     this.actionIcon,
@@ -39,6 +40,10 @@ class BlueHeader extends StatelessWidget {
        assert(
          subtitle == null || large,
          'a subtitle is only part of the large header',
+       ),
+       assert(
+         child == null || large,
+         'a child is only part of the large header',
        );
 
   /// The screen name.
@@ -46,6 +51,9 @@ class BlueHeader extends StatelessWidget {
 
   /// The one-line explanation under a large title (hub screens only).
   final String? subtitle;
+
+  /// Extra content under a large title, e.g. the converter hub's search field.
+  final Widget? child;
 
   /// Shows a back button in the leading slot when set.
   final VoidCallback? onBack;
@@ -128,6 +136,10 @@ class BlueHeader extends StatelessWidget {
               color: palette.onPrimaryMuted,
             ),
           ),
+        ],
+        if (child != null) ...<Widget>[
+          const SizedBox(height: AppSizes.hubHeaderGap),
+          child!,
         ],
       ],
     );

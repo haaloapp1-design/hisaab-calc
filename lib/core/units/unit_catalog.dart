@@ -189,6 +189,38 @@ abstract final class UnitCatalog {
     }
     return null;
   }
+
+  /// Every unit whose name or symbol contains [query], in catalog order.
+  ///
+  /// The hub search is a plain, case-insensitive substring match, so `inch`
+  /// finds both `Inch` and `Square inch`. A blank query matches nothing.
+  static List<UnitMatch> search(String query) {
+    final String needle = query.trim().toLowerCase();
+    if (needle.isEmpty) {
+      return const <UnitMatch>[];
+    }
+    final List<UnitMatch> matches = <UnitMatch>[];
+    for (final UnitCategoryData entry in categories) {
+      for (final Unit unit in entry.units) {
+        if (unit.name.toLowerCase().contains(needle) ||
+            unit.symbol.toLowerCase().contains(needle)) {
+          matches.add(UnitMatch(entry.category, unit));
+        }
+      }
+    }
+    return matches;
+  }
+}
+
+/// One result of [UnitCatalog.search]: the unit and the category it belongs to.
+final class UnitMatch {
+  const UnitMatch(this.category, this.unit);
+
+  final UnitCategory category;
+  final Unit unit;
+
+  @override
+  String toString() => '${category.label}/${unit.id}';
 }
 
 final Decimal _kelvinOffset = Decimal.parse('273.15');
