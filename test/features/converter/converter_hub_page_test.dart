@@ -1,9 +1,13 @@
+import 'package:calculator/core/storage/kv_store_provider.dart';
+import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/units/unit_catalog.dart';
 import 'package:calculator/features/converter/converter_hub_page.dart';
+import 'package:calculator/features/converter/converter_page.dart';
 import 'package:calculator/features/converter/widgets/hub_search_field.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -11,12 +15,15 @@ void main() {
     ValueChanged<UnitCategory>? onCategorySelected,
     ValueChanged<UnitMatch>? onUnitSelected,
     VoidCallback? onCurrencyTap,
-  }) => MaterialApp(
-    theme: AppTheme.light(),
-    home: ConverterHubPage(
-      onCategorySelected: onCategorySelected,
-      onUnitSelected: onUnitSelected,
-      onCurrencyTap: onCurrencyTap,
+  }) => ProviderScope(
+    overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: ConverterHubPage(
+        onCategorySelected: onCategorySelected,
+        onUnitSelected: onUnitSelected,
+        onCurrencyTap: onCurrencyTap,
+      ),
     ),
   );
 
@@ -187,5 +194,37 @@ void main() {
     expect(units, hasLength(1));
     expect(units.single.category, UnitCategory.area);
     expect(units.single.unit.id, 'marla');
+  });
+
+  testWidgets('opens the unit converter for a category and a search result', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('hub-category-length')));
+    await tester.pumpAndSettle();
+
+    final ConverterPage categoryPage = tester.widget<ConverterPage>(
+      find.byType(ConverterPage),
+    );
+    expect(categoryPage.category, UnitCategory.length);
+    expect(categoryPage.from, isNull);
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.byType(ConverterPage), findsNothing);
+
+    await tester.enterText(searchField(), 'marla');
+    await tester.pump();
+    await tester.tap(find.byKey(const Key('hub-result-area-marla')));
+    await tester.pumpAndSettle();
+
+    final ConverterPage unitPage = tester.widget<ConverterPage>(
+      find.byType(ConverterPage),
+    );
+    expect(unitPage.category, UnitCategory.area);
+    expect(unitPage.from?.id, 'marla');
   });
 }

@@ -105,7 +105,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T35 Converter logic** — Read: §12 (temperature, rule line, "is also").
   Done when: `5 km→mi`=3.10686, `100°C→°F`=212, `−40°C→°F`=−40, below 0 K error; tests.
 - [x] **T36 Converter hub page** — Screen 06 (`docs/screens/06-converter-hub.html`). Done when: grid, currency card, search across units works.
-- [ ] **T37 Unit convert page** — Screen 07 (`docs/screens/07-unit-converter.html`). Done when: live conversion, unit pickers (bottom sheet list), swap, rule line, is-also list, keypad.
+- [x] **T37 Unit convert page** — Screen 07 (`docs/screens/07-unit-converter.html`). Done when: live conversion, unit pickers (bottom sheet list), swap, rule line, is-also list, keypad.
 - [ ] **T38 Favourites and memory of last pair** — Done when: star saves pair (shown on hub), last category/pair restored, "Save to history" works.
 
 ## Phase 8 — Currency

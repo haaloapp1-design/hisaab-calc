@@ -18,6 +18,7 @@ void main() {
     expect(palette.dividerOnPrimary, AppColors.dividerOnPrimary);
     expect(palette.historyDivider, AppColors.historyDivider);
     expect(palette.memoryButtonBorder, AppColors.memoryButtonBorder);
+    expect(palette.converterCardBorder, AppColors.converterCardBorder);
     expect(palette.sheet, AppColors.sheet);
     expect(palette.background, AppColors.background);
     expect(palette.keyNumber, AppColors.keyNumber);
@@ -71,6 +72,7 @@ void main() {
         palette.dividerOnPrimary,
         palette.historyDivider,
         palette.memoryButtonBorder,
+        palette.converterCardBorder,
         palette.keyOperator,
         palette.keyOperatorBorder,
         palette.segmentedInactive,

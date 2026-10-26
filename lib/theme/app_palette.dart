@@ -25,6 +25,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.dividerOnPrimary,
     required this.historyDivider,
     required this.memoryButtonBorder,
+    required this.converterCardBorder,
     required this.sheet,
     required this.background,
     required this.keyNumber,
@@ -57,6 +58,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color dividerOnPrimary;
   final Color historyDivider;
   final Color memoryButtonBorder;
+  final Color converterCardBorder;
   final Color sheet;
   final Color background;
   final Color keyNumber;
@@ -90,6 +92,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     dividerOnPrimary: AppColors.dividerOnPrimary,
     historyDivider: AppColors.historyDivider,
     memoryButtonBorder: AppColors.memoryButtonBorder,
+    converterCardBorder: AppColors.converterCardBorder,
     sheet: AppColors.sheet,
     background: AppColors.background,
     keyNumber: AppColors.keyNumber,
@@ -128,6 +131,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       dividerOnPrimary: _mixWhite(accent, 0.22),
       historyDivider: _mixWhite(accent, 0.20),
       memoryButtonBorder: _mixWhite(accent, 0.48),
+      converterCardBorder: _mixWhite(accent, 0.55),
       sheet: AppColors.sheet,
       background: AppColors.background,
       keyNumber: AppColors.keyNumber,
@@ -169,6 +173,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       dividerOnPrimary: _mixWhite(accent, 0.22),
       historyDivider: _mixWhite(accent, 0.22),
       memoryButtonBorder: _mixWhite(accent, 0.45),
+      converterCardBorder: Color.lerp(accent, sheet, 0.55)!,
       sheet: sheet,
       background: _darkBackground,
       keyNumber: _darkKeys,
@@ -235,6 +240,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? dividerOnPrimary,
     Color? historyDivider,
     Color? memoryButtonBorder,
+    Color? converterCardBorder,
     Color? sheet,
     Color? background,
     Color? keyNumber,
@@ -266,6 +272,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     dividerOnPrimary: dividerOnPrimary ?? this.dividerOnPrimary,
     historyDivider: historyDivider ?? this.historyDivider,
     memoryButtonBorder: memoryButtonBorder ?? this.memoryButtonBorder,
+    converterCardBorder: converterCardBorder ?? this.converterCardBorder,
     sheet: sheet ?? this.sheet,
     background: background ?? this.background,
     keyNumber: keyNumber ?? this.keyNumber,
@@ -305,6 +312,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
       dividerOnPrimary: blend(dividerOnPrimary, other.dividerOnPrimary),
       historyDivider: blend(historyDivider, other.historyDivider),
       memoryButtonBorder: blend(memoryButtonBorder, other.memoryButtonBorder),
+      converterCardBorder: blend(
+        converterCardBorder,
+        other.converterCardBorder,
+      ),
       sheet: blend(sheet, other.sheet),
       background: blend(background, other.background),
       keyNumber: blend(keyNumber, other.keyNumber),

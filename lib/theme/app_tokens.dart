@@ -50,6 +50,9 @@ abstract final class AppColors {
   // Memory (screen 04)
   static const Color memoryButtonBorder = Color(0xFF7F93E3);
 
+  // Unit converter (screen 07)
+  static const Color converterCardBorder = Color(0xFF9FB0F2);
+
   // States
   static const Color disabled = Color(0xFFA3ABC7);
   static const Color disabledBorder = Color(0xFFDCE1F2);
@@ -244,6 +247,36 @@ abstract final class AppSizes {
   static const double hubResultGap = 2;
   static const int hubGridColumns = 3;
 
+  // Unit converter (screen 07)
+  static const double converterCardsTopGap = 16;
+  static const double converterCardPaddingV = 14;
+  static const double converterCardPaddingH = 16;
+  static const double converterCardGap = 12;
+  static const double converterCardContentGap = 6;
+  static const double converterCardBorderWidth = 2;
+  static const double converterValueHeight = 46;
+  static const double converterUnitPillPaddingV = 6;
+  static const double converterUnitPillPaddingH = 10;
+  static const double converterUnitPillGap = 6;
+  static const double converterUnitPillIcon = 14;
+  static const double converterSwapSize = 48;
+  static const double converterSwapBorder = 4;
+  static const double converterSwapIcon = 20;
+  static const double converterRulePaddingTop = 8;
+  static const double converterRulePaddingH = 4;
+  static const double converterAlsoPaddingTop = 10;
+  static const double converterAlsoPaddingSide = 24;
+  static const double converterAlsoPaddingBottom = 14;
+  static const double converterAlsoTitleGap = 4;
+  static const double converterAlsoRowPaddingV = 5;
+  static const double converterAlsoValueGap = 12;
+  static const double converterSheetPaddingBottom = 18;
+  static const double converterKeypadGap = 12;
+  static const double converterPickerTitleGap = 8;
+  static const double converterPickerRowHeight = 48;
+  static const double converterPickerCheck = 20;
+  static const double converterPickerMaxHeight = 0.7;
+
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
@@ -402,6 +435,31 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: bold,
+  );
+  static const TextStyle converterUnitPill = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: medium,
+  );
+  static const TextStyle converterAlsoTitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: bold,
+  );
+  static const TextStyle converterKeyNumber = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 24,
+    fontWeight: regular,
+  );
+  static const TextStyle converterKeyFunction = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: bold,
+  );
+  static const TextStyle converterError = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: medium,
   );
   static const TextStyle segmentedLabel = TextStyle(
     fontFamily: fontFamily,

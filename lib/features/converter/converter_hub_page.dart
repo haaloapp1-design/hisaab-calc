@@ -4,6 +4,7 @@ import '../../core/units/unit_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import 'converter_page.dart';
 import 'widgets/category_grid.dart';
 import 'widgets/currency_card.dart';
 import 'widgets/hub_search_field.dart';
@@ -12,8 +13,9 @@ import 'widgets/unit_search_results.dart';
 /// The Convert tab: currency card, twelve category tiles and unit search
 /// (SPEC §4, screen `06-converter-hub.html`).
 ///
-/// It owns only the search text; picking a category, a unit or currency is
-/// forwarded to the callbacks, which T37/T39 wire to the next pages.
+/// It owns only the search text. A category or a search result opens the unit
+/// converter (T37) unless the caller supplies its own callback; the currency
+/// card stays a callback for T39.
 class ConverterHubPage extends StatefulWidget {
   const ConverterHubPage({
     super.key,
@@ -22,10 +24,10 @@ class ConverterHubPage extends StatefulWidget {
     this.onCurrencyTap,
   });
 
-  /// Opens the unit converter for [UnitCategory] (T37).
+  /// Overrides the default push of [ConverterPage] for a category.
   final ValueChanged<UnitCategory>? onCategorySelected;
 
-  /// Opens the unit converter on the found [UnitMatch] (T37).
+  /// Overrides the default push of [ConverterPage] for a search result.
   final ValueChanged<UnitMatch>? onUnitSelected;
 
   /// Opens the currency converter (T39).
@@ -79,7 +81,7 @@ class _ConverterHubPageState extends State<ConverterHubPage> {
                     ? _buildHub(context)
                     : UnitSearchResults(
                         matches: matches,
-                        onSelected: widget.onUnitSelected,
+                        onSelected: _selectUnit,
                       ),
               ),
             ),
@@ -101,8 +103,35 @@ class _ConverterHubPageState extends State<ConverterHubPage> {
         children: <Widget>[
           CurrencyCard(onTap: widget.onCurrencyTap),
           const SizedBox(height: AppSizes.hubContentGap),
-          CategoryGrid(onSelected: widget.onCategorySelected),
+          CategoryGrid(onSelected: _selectCategory),
         ],
+      ),
+    );
+  }
+
+  void _selectCategory(UnitCategory category) {
+    final ValueChanged<UnitCategory>? callback = widget.onCategorySelected;
+    if (callback != null) {
+      callback(category);
+      return;
+    }
+    _openConverter(category);
+  }
+
+  void _selectUnit(UnitMatch match) {
+    final ValueChanged<UnitMatch>? callback = widget.onUnitSelected;
+    if (callback != null) {
+      callback(match);
+      return;
+    }
+    _openConverter(match.category, from: match.unit);
+  }
+
+  void _openConverter(UnitCategory category, {Unit? from}) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) =>
+            ConverterPage(category: category, from: from),
       ),
     );
   }
