@@ -110,7 +110,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 8 — Currency
 
-- [ ] **T39 Rates and repository** — Read: §13.
+- [x] **T39 Rates and repository** — Read: §13.
   Done when: cross-rate maths, cache save/load, 6 h policy, status values; tests use a fake http client.
 - [ ] **T40 Currency page** — Read: SPEC §5. Screen 08 (`docs/screens/08-currency.html`).
   Done when: base + amount, list, add/remove/reorder, refresh + pull-to-refresh, offline shows cached date.
