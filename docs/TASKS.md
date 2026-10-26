@@ -100,7 +100,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 7 — Unit converter
 
-- [ ] **T34 Unit catalog** — Read: §12, SPEC §4 (units list).
+- [x] **T34 Unit catalog** — Read: §12, SPEC §4 (units list).
   Done when: all categories/units as const data with factors; test that every unit converts 1 → base → 1 unchanged.
 - [ ] **T35 Converter logic** — Read: §12 (temperature, rule line, "is also").
   Done when: `5 km→mi`=3.10686, `100°C→°F`=212, `−40°C→°F`=−40, below 0 K error; tests.
