@@ -28,7 +28,7 @@ class BlueHeader extends StatelessWidget {
     this.actionIconSize = AppSizes.headerIcon,
     this.large = false,
     this.rounded = false,
-    this.bottomPadding = 0,
+    this.bottomPadding,
   }) : assert(
          (actionIcon == null) == (onAction == null),
          'actionIcon and onAction must be given together',
@@ -80,8 +80,10 @@ class BlueHeader extends StatelessWidget {
   /// Rounds the bottom corners over the page background (Settings, hubs).
   final bool rounded;
 
-  /// Extra blue space under a standard header (Settings uses 22 px).
-  final double bottomPadding;
+  /// Extra blue space under the header; a standard header defaults to none and
+  /// a large one to the hub padding. Screen 09 asks for 22 px, screen 06 for
+  /// the 20 px default.
+  final double? bottomPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -99,17 +101,17 @@ class BlueHeader extends StatelessWidget {
             : null,
       ),
       padding: large
-          ? const EdgeInsets.fromLTRB(
+          ? EdgeInsets.fromLTRB(
               AppSizes.screenPadding,
               AppSizes.hubHeaderPaddingTop,
               AppSizes.screenPadding,
-              AppSizes.hubHeaderPaddingBottom,
+              bottomPadding ?? AppSizes.hubHeaderPaddingBottom,
             )
           : EdgeInsets.fromLTRB(
               AppSizes.screenPadding,
               AppSizes.headerPaddingTop,
               AppSizes.screenPadding,
-              bottomPadding,
+              bottomPadding ?? 0,
             ),
       child: large ? _buildLarge(palette) : _buildStandard(palette),
     );

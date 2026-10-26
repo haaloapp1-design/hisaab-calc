@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget wrap(Widget child) =>
-      MaterialApp(theme: AppTheme.light(), home: Scaffold(body: child));
+  Widget wrap(Widget child) => MaterialApp(
+    theme: AppTheme.light(),
+    home: Scaffold(body: child),
+  );
 
   Container headerBox(WidgetTester tester) =>
       tester.widget<Container>(find.byKey(const Key('blue-header')));
@@ -140,6 +142,28 @@ void main() {
     expect(
       rounded.borderRadius,
       const BorderRadius.vertical(bottom: Radius.circular(AppRadii.header)),
+    );
+  });
+
+  testWidgets('a large header accepts its own bottom padding', (tester) async {
+    await tester.pumpWidget(
+      wrap(
+        const BlueHeader(
+          title: 'Tools',
+          large: true,
+          bottomPadding: AppSizes.toolsHeaderPaddingBottom,
+        ),
+      ),
+    );
+
+    expect(
+      headerBox(tester).padding,
+      const EdgeInsets.fromLTRB(
+        AppSizes.screenPadding,
+        AppSizes.hubHeaderPaddingTop,
+        AppSizes.screenPadding,
+        AppSizes.toolsHeaderPaddingBottom,
+      ),
     );
   });
 

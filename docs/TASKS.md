@@ -117,7 +117,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 
 ## Phase 9 — Tools
 
-- [ ] **T41 Tool scaffold and hub** — Screens 09–10 (`docs/screens/09-tools-hub.html`, `10-loan-emi.html`; layout only). Done when: hub grid opens each tool page (placeholders).
+- [x] **T41 Tool scaffold and hub** — Screens 09–10 (`docs/screens/09-tools-hub.html`, `10-loan-emi.html`; layout only). Done when: hub grid opens each tool page (placeholders).
 - [ ] **T42 Loan logic** — Read: §14 Loan. Done when: example check (EMI 22,244.45) and r = 0 case and schedule ending at 0 tested.
 - [ ] **T43 Loan page** — Screen 10 (`docs/screens/10-loan-emi.html`). Done when: live results, rate input, years/months, bar, schedule table.
 - [ ] **T44 Percentage, Discount and tax, Tip and split** — Read: §14. Done when: logic tested + 3 pages.

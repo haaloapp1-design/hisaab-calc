@@ -321,6 +321,35 @@ abstract final class AppSizes {
   static const double currencyPickerChipHeight = 32;
   static const double currencyPickerCheck = 20;
 
+  // Tools hub (screen 09)
+  static const double toolsHeaderPaddingBottom = 22;
+  static const double toolsContentPaddingTop = 16;
+  static const double toolsContentPaddingBottom = 16;
+  static const double toolsGridGap = 10;
+  static const double toolsCardHeight = 92;
+  static const double toolsCardPaddingV = 12;
+  static const double toolsCardPaddingH = 14;
+  static const double toolsCardTextGap = 1;
+  static const double toolsChipHeight = 30;
+  static const double toolsChipMinWidth = 36;
+  static const double toolsChipPaddingH = 8;
+  static const int toolsGridColumns = 2;
+
+  // Tool page (screen 10)
+  static const double toolShareIcon = 20;
+  static const double toolResultPaddingTop = 14;
+  static const double toolResultPaddingSide = 24;
+  static const double toolResultPaddingBottom = 24;
+  static const double toolResultGap = 4;
+  static const double toolSheetPaddingTop = 12;
+  static const double toolSheetPaddingSide = 20;
+  static const double toolSheetPaddingBottom = 18;
+  static const double toolSheetGap = 14;
+  static const double toolActionHeight = 52;
+  static const double toolActionRadius = 16;
+  static const double toolNotePadding = 16;
+  static const double toolNoteGap = 8;
+
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
   static const double icon = 24;
@@ -551,6 +580,42 @@ abstract final class AppTypography {
   static const TextStyle currencyAdd = TextStyle(
     fontFamily: fontFamily,
     fontSize: 15,
+    fontWeight: medium,
+  );
+
+  // Tools (screens 09–10)
+  static const TextStyle toolSymbol = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: bold,
+    height: 1,
+  );
+  static const TextStyle toolName = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: medium,
+    height: 1.2,
+  );
+  static const TextStyle toolSubtitle = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: regular,
+    height: 1.2,
+  );
+  static const TextStyle toolResultLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
+  );
+  static const TextStyle toolResult = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 48,
+    fontWeight: medium,
+    height: 1.05,
+  );
+  static const TextStyle toolAction = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
     fontWeight: medium,
   );
   static const TextStyle segmentedLabel = TextStyle(

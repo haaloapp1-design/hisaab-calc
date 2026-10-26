@@ -5,6 +5,7 @@ import 'package:calculator/features/calculator/widgets/display.dart';
 import 'package:calculator/features/calculator/widgets/keypad.dart';
 import 'package:calculator/features/history/history_page.dart';
 import 'package:calculator/features/shell/shell_page.dart';
+import 'package:calculator/features/tools/tools_hub_page.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
 import 'package:calculator/shared/widgets/bottom_nav.dart';
 import 'package:calculator/shared/widgets/segmented.dart';
@@ -52,6 +53,7 @@ void main() {
     expect(stack(tester).children.length, 4);
     expect(find.byType(CalculatorPage), findsOneWidget);
     expect(find.byType(HistoryPage, skipOffstage: false), findsOneWidget);
+    expect(find.byType(ToolsHubPage, skipOffstage: false), findsOneWidget);
     expect(inCalculator(find.byType(BlueHeader)), findsOneWidget);
     expect(inCalculator(find.byType(Segmented)), findsOneWidget);
     expect(inCalculator(find.byType(Display)), findsOneWidget);
