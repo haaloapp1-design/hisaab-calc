@@ -1,7 +1,9 @@
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
+import 'package:calculator/core/units/converter_memory.dart';
 import 'package:calculator/core/units/unit_catalog.dart';
 import 'package:calculator/features/converter/converter_hub_page.dart';
+import 'package:calculator/features/converter/converter_memory_controller.dart';
 import 'package:calculator/features/converter/converter_page.dart';
 import 'package:calculator/features/converter/widgets/hub_search_field.dart';
 import 'package:calculator/shared/widgets/blue_header.dart';
@@ -15,8 +17,9 @@ void main() {
     ValueChanged<UnitCategory>? onCategorySelected,
     ValueChanged<UnitMatch>? onUnitSelected,
     VoidCallback? onCurrencyTap,
+    MemoryKvStore? store,
   }) => ProviderScope(
-    overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+    overrides: [kvStoreProvider.overrideWithValue(store ?? MemoryKvStore())],
     child: MaterialApp(
       theme: AppTheme.light(),
       home: ConverterHubPage(
@@ -226,5 +229,92 @@ void main() {
     );
     expect(unitPage.category, UnitCategory.area);
     expect(unitPage.from?.id, 'marla');
+  });
+
+  testWidgets('has no favourites card before a pair is starred', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('hub-favourites')), findsNothing);
+  });
+
+  testWidgets('shows the starred pairs and opens one', (tester) async {
+    designSurface(tester);
+    final ConverterPair pair = ConverterPair(
+      category: UnitCategory.length,
+      from: UnitCatalog.byId('km')!,
+      to: UnitCatalog.byId('mi')!,
+    );
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      ConverterMemoryController.key: ConverterMemory(
+        last: pair,
+        favourites: <ConverterPair>[pair],
+      ).encode(),
+    });
+
+    await tester.pumpWidget(app(store: store));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('hub-favourites')), findsOneWidget);
+    expect(find.text('Favourites'), findsOneWidget);
+    expect(find.text('Length'), findsWidgets);
+    expect(find.text('km → mi'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('hub-favourite-length-km-mi')));
+    await tester.pumpAndSettle();
+
+    final ConverterPage page = tester.widget<ConverterPage>(
+      find.byType(ConverterPage),
+    );
+    expect(page.category, UnitCategory.length);
+    expect(page.from?.id, 'km');
+    expect(page.to?.id, 'mi');
+  });
+
+  testWidgets('a starred pair from the page appears on the hub', (
+    tester,
+  ) async {
+    designSurface(tester);
+    await tester.pumpWidget(app());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('hub-category-length')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Add to favourites'));
+    await tester.pumpAndSettle();
+
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('hub-favourites')), findsOneWidget);
+    expect(find.byKey(const Key('hub-favourite-length-km-mi')), findsOneWidget);
+  });
+
+  testWidgets('opens a category on its remembered pair', (tester) async {
+    designSurface(tester);
+    final MemoryKvStore store = MemoryKvStore(<String, String>{
+      ConverterMemoryController.key: ConverterMemory(
+        last: ConverterPair(
+          category: UnitCategory.length,
+          from: UnitCatalog.byId('m')!,
+          to: UnitCatalog.byId('ft')!,
+        ),
+      ).encode(),
+    });
+
+    await tester.pumpWidget(app(store: store));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('hub-category-length')));
+    await tester.pumpAndSettle();
+
+    final ConverterPage page = tester.widget<ConverterPage>(
+      find.byType(ConverterPage),
+    );
+    expect(page.from, isNull);
+    expect(page.to, isNull);
+    expect(find.text('1 m = 3.28084 ft'), findsOneWidget);
   });
 }

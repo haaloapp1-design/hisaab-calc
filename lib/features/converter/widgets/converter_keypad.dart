@@ -11,11 +11,15 @@ class ConverterKeypad extends StatelessWidget {
   const ConverterKeypad({
     super.key,
     required this.onKey,
+    this.onLongPress,
     this.haptics = true,
     this.sounds = false,
   });
 
   final ValueChanged<ConverterKey> onKey;
+
+  /// Long-press actions; `Copy` saves the result to history (T38).
+  final ValueChanged<ConverterKey>? onLongPress;
 
   /// SPEC §3 "Vibrate on key press".
   final bool haptics;
@@ -60,6 +64,14 @@ class ConverterKeypad extends StatelessWidget {
                         _feedback();
                         onKey(ConverterKey.values[row * 4 + column]);
                       },
+                      onLongPress: onLongPress == null
+                          ? null
+                          : () {
+                              _feedback();
+                              onLongPress!(
+                                ConverterKey.values[row * 4 + column],
+                              );
+                            },
                     ),
                   ),
                 ],
@@ -73,10 +85,15 @@ class ConverterKeypad extends StatelessWidget {
 }
 
 class _ConverterKeyButton extends StatelessWidget {
-  const _ConverterKeyButton({required this.converterKey, required this.onTap});
+  const _ConverterKeyButton({
+    required this.converterKey,
+    required this.onTap,
+    this.onLongPress,
+  });
 
   final ConverterKey converterKey;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +106,9 @@ class _ConverterKeyButton extends StatelessWidget {
       child: Semantics(
         button: true,
         label: converterKey.semanticLabel,
+        hint: converterKey == ConverterKey.copy
+            ? 'Long-press to save to history'
+            : null,
         excludeSemantics: true,
         child: Material(
           color: isFunction ? palette.keyOperator : palette.keyNumber,
@@ -97,6 +117,7 @@ class _ConverterKeyButton extends StatelessWidget {
             key: Key('converter-key-${converterKey.name}'),
             borderRadius: radius,
             onTap: onTap,
+            onLongPress: onLongPress,
             child: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(

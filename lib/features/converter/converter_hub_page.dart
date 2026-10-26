@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/units/converter_memory.dart';
 import '../../core/units/unit_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import 'converter_memory_controller.dart';
 import 'converter_page.dart';
 import 'widgets/category_grid.dart';
 import 'widgets/currency_card.dart';
+import 'widgets/favourites_card.dart';
 import 'widgets/hub_search_field.dart';
 import 'widgets/unit_search_results.dart';
 
-/// The Convert tab: currency card, twelve category tiles and unit search
-/// (SPEC §4, screen `06-converter-hub.html`).
+/// The Convert tab: favourites, currency card, twelve category tiles and unit
+/// search (SPEC §4, screen `06-converter-hub.html`).
 ///
 /// It owns only the search text. A category or a search result opens the unit
-/// converter (T37) unless the caller supplies its own callback; the currency
-/// card stays a callback for T39.
-class ConverterHubPage extends StatefulWidget {
+/// converter unless the caller supplies its own callback; a favourite pair
+/// opens it with both sides; the currency card stays a callback for T39.
+class ConverterHubPage extends ConsumerStatefulWidget {
   const ConverterHubPage({
     super.key,
     this.onCategorySelected,
@@ -34,10 +38,10 @@ class ConverterHubPage extends StatefulWidget {
   final VoidCallback? onCurrencyTap;
 
   @override
-  State<ConverterHubPage> createState() => _ConverterHubPageState();
+  ConsumerState<ConverterHubPage> createState() => _ConverterHubPageState();
 }
 
-class _ConverterHubPageState extends State<ConverterHubPage> {
+class _ConverterHubPageState extends ConsumerState<ConverterHubPage> {
   final TextEditingController _search = TextEditingController();
 
   @override
@@ -92,6 +96,10 @@ class _ConverterHubPageState extends State<ConverterHubPage> {
   }
 
   Widget _buildHub(BuildContext context) {
+    final List<ConverterPair> favourites = ref
+        .watch(converterMemoryProvider)
+        .favourites;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
         AppSizes.screenPadding,
@@ -101,6 +109,10 @@ class _ConverterHubPageState extends State<ConverterHubPage> {
       ),
       child: Column(
         children: <Widget>[
+          if (favourites.isNotEmpty) ...<Widget>[
+            FavouritesCard(favourites: favourites, onSelected: _openPair),
+            const SizedBox(height: AppSizes.hubContentGap),
+          ],
           CurrencyCard(onTap: widget.onCurrencyTap),
           const SizedBox(height: AppSizes.hubContentGap),
           CategoryGrid(onSelected: _selectCategory),
@@ -127,11 +139,15 @@ class _ConverterHubPageState extends State<ConverterHubPage> {
     _openConverter(match.category, from: match.unit);
   }
 
-  void _openConverter(UnitCategory category, {Unit? from}) {
+  void _openPair(ConverterPair pair) {
+    _openConverter(pair.category, from: pair.from, to: pair.to);
+  }
+
+  void _openConverter(UnitCategory category, {Unit? from, Unit? to}) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) =>
-            ConverterPage(category: category, from: from),
+            ConverterPage(category: category, from: from, to: to),
       ),
     );
   }

@@ -246,6 +246,13 @@ abstract final class AppSizes {
   static const double hubResultPaddingH = 16;
   static const double hubResultGap = 2;
   static const int hubGridColumns = 3;
+  static const double hubFavouritePaddingV = 14;
+  static const double hubFavouritePaddingH = 16;
+  static const double hubFavouriteTitleGap = 6;
+  static const double hubFavouriteRowHeight = 48;
+  static const double hubFavouriteIcon = 18;
+  static const double hubFavouriteGap = 12;
+  static const double hubFavouriteChevron = 20;
 
   // Unit converter (screen 07)
   static const double converterCardsTopGap = 16;

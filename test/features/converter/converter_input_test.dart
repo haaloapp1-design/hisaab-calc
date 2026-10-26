@@ -1,5 +1,6 @@
 import 'package:calculator/core/engine/formatter.dart';
 import 'package:calculator/features/converter/converter_input.dart';
+import 'package:calculator/features/converter/converter_key.dart';
 import 'package:decimal/decimal.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -89,5 +90,20 @@ void main() {
     expect(const ConverterInput('5'), isNot(const ConverterInput('6')));
     expect(const ConverterInput('5').hashCode, '5'.hashCode);
     expect(const ConverterInput('5').toString(), 'ConverterInput(5)');
+  });
+
+  test('applies every keypad key', () {
+    ConverterInput input = const ConverterInput();
+    input = input.apply(ConverterKey.five);
+    input = input.apply(ConverterKey.doubleZero);
+    input = input.apply(ConverterKey.dot);
+    expect(input.source, '500.');
+    input = input.apply(ConverterKey.backspace);
+    input = input.apply(ConverterKey.toggleSign);
+    expect(input.source, '-500');
+    input = input.apply(ConverterKey.clear);
+    expect(input.source, '');
+    input = input.apply(ConverterKey.seven);
+    expect(input.apply(ConverterKey.copy), input);
   });
 }

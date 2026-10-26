@@ -2,7 +2,10 @@ import 'package:calculator/core/engine/angle_mode.dart';
 import 'package:calculator/core/memory/memory_slots.dart';
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
+import 'package:calculator/core/units/converter_memory.dart';
+import 'package:calculator/core/units/unit_catalog.dart';
 import 'package:calculator/features/calculator/calculator_controller.dart';
+import 'package:calculator/features/converter/converter_memory_controller.dart';
 import 'package:calculator/features/history/history_controller.dart';
 import 'package:calculator/features/history/history_entry.dart';
 import 'package:calculator/features/history/history_log.dart';
@@ -380,6 +383,13 @@ void main() {
       MemoryController.key: MemorySlots.encode(<Decimal?>[
         Decimal.fromInt(128),
       ]),
+      ConverterMemoryController.key: ConverterMemory(
+        last: ConverterPair(
+          category: UnitCategory.length,
+          from: UnitCatalog.byId('km')!,
+          to: UnitCatalog.byId('mi')!,
+        ),
+      ).encode(),
     });
     await tester.pumpWidget(app(store));
     await tester.pumpAndSettle();
@@ -401,6 +411,7 @@ void main() {
     expect(await store.getString(CalculatorController.ansKey), '42');
     expect(await store.getString(HistoryController.key), isNotNull);
     expect(await store.getString(MemoryController.key), isNotNull);
+    expect(await store.getString(ConverterMemoryController.key), isNotNull);
 
     await tester.tap(find.byKey(const Key('clear-data')));
     await tester.pumpAndSettle();
@@ -412,6 +423,7 @@ void main() {
     expect(await store.getString(CalculatorController.modeKey), isNull);
     expect(await store.getString(HistoryController.key), isNull);
     expect(await store.getString(MemoryController.key), isNull);
+    expect(await store.getString(ConverterMemoryController.key), isNull);
     expect(
       tester.widget<ThemeSelector>(find.byType(ThemeSelector)).value,
       AppThemeMode.system,

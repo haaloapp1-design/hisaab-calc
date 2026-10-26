@@ -1,19 +1,22 @@
-import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/engine/formatter.dart';
 import '../../core/units/converter.dart';
+import '../../core/units/converter_memory.dart';
 import '../../core/units/unit_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
+import '../history/history_controller.dart';
+import '../history/history_entry.dart';
 import '../settings/settings_controller.dart';
 import '../settings/settings_format.dart';
 import '../settings/settings_model.dart';
 import 'converter_defaults.dart';
 import 'converter_input.dart';
 import 'converter_key.dart';
+import 'converter_memory_controller.dart';
+import 'converter_readout.dart';
 import 'widgets/also_list.dart';
 import 'widgets/converter_cards.dart';
 import 'widgets/converter_keypad.dart';
@@ -23,7 +26,8 @@ import 'widgets/unit_picker_sheet.dart';
 ///
 /// The typed amount lives in [ConverterInput]; every change converts through
 /// [UnitConverter], so the To card, the rule line and the "is also" rows are
-/// always in sync. T38 adds the favourite star and the remembered pair.
+/// always in sync. The star and the last pair are stored through
+/// [ConverterMemoryController] (T38).
 class ConverterPage extends ConsumerStatefulWidget {
   const ConverterPage({
     super.key,
@@ -41,7 +45,7 @@ class ConverterPage extends ConsumerStatefulWidget {
   /// The To unit; [defaultUnits] fills it when omitted.
   final Unit? to;
 
-  /// T38's favourite action; the star is shown either way (screen 07).
+  /// Overrides the star action (tests); otherwise the pair is starred.
   final VoidCallback? onFavourite;
 
   @override
@@ -53,6 +57,10 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
   late Unit _to;
   ConverterInput _input = const ConverterInput();
 
+  /// True once the user picked, swapped or typed, so the stored pair no longer
+  /// replaces what is on screen.
+  bool _touched = false;
+
   @override
   void initState() {
     super.initState();
@@ -63,38 +71,52 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
     );
     _from = pair.from;
     _to = pair.to;
+    _restorePair();
   }
 
-  NumberFormatOptions get _options =>
-      numberFormatFor(ref.read(settingsProvider));
+  ConverterPair get _pair =>
+      ConverterPair(category: widget.category, from: _from, to: _to);
+
+  ConverterReadout get _readout => ConverterReadout(
+    category: widget.category,
+    from: _from,
+    to: _to,
+    input: _input,
+    options: numberFormatFor(ref.read(settingsProvider)),
+  );
+
+  /// Adopts the remembered pair for this category, then remembers the pair
+  /// actually shown. An explicit pair or a user change wins over it.
+  Future<void> _restorePair() async {
+    final ConverterMemoryController memory = ref.read(
+      converterMemoryProvider.notifier,
+    );
+    await memory.restoreDone;
+    if (!mounted) {
+      return;
+    }
+    final bool explicit = widget.from != null || widget.to != null;
+    final ConverterPair? last = ref.read(converterMemoryProvider).last;
+    if (!explicit &&
+        !_touched &&
+        last != null &&
+        last.category == widget.category) {
+      setState(() {
+        _from = last.from;
+        _to = last.to;
+      });
+    }
+    memory.remember(_pair);
+  }
 
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
     final Settings settings = ref.watch(settingsProvider);
-    final NumberFormatOptions options = numberFormatFor(settings);
-    final ConversionResult result = UnitConverter.convert(
-      _input.value,
-      category: widget.category,
-      from: _from,
-      to: _to,
-    );
-    final String toText = switch (result) {
-      ConversionSuccess(:final Decimal value) => formatConversionValue(
-        value,
-        options: options,
-      ),
-      ConversionFailure(:final ConversionError error) => error.message,
-    };
-    final String fromText = _input.display(options: options);
-    final List<AlsoRow> also = <AlsoRow>[
-      for (final Unit unit in UnitConverter.isAlso(
-        category: widget.category,
-        from: _from,
-        to: _to,
-      ))
-        AlsoRow(unit, _valueIn(unit, _input.value, options)),
-    ];
+    final ConverterReadout readout = _readout;
+    final bool favourite = ref
+        .watch(converterMemoryProvider)
+        .isFavourite(_pair);
 
     return Scaffold(
       backgroundColor: palette.primary,
@@ -105,34 +127,31 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
             BlueHeader(
               title: widget.category.label,
               onBack: () => Navigator.of(context).maybePop(),
-              actionIcon: Icons.star_border_rounded,
-              actionTooltip: 'Add to favourites',
-              onAction: widget.onFavourite ?? () {},
+              actionIcon: favourite
+                  ? Icons.star_rounded
+                  : Icons.star_border_rounded,
+              actionTooltip: favourite
+                  ? 'Remove from favourites'
+                  : 'Add to favourites',
+              onAction: _toggleFavourite,
             ),
             ConverterCards(
               from: _from,
               to: _to,
-              fromText: fromText,
-              toText: toText,
-              toIsError: result is ConversionFailure,
-              rule: UnitConverter.ruleLine(
-                category: widget.category,
-                from: _from,
-                to: _to,
-                options: options,
-              ),
+              fromText: readout.fromText,
+              toText: readout.toText,
+              toIsError: readout.isError,
+              rule: readout.rule,
               onPickFrom: _pickFrom,
               onPickTo: _pickTo,
               onSwap: _swap,
             ),
             Expanded(
-              child: AlsoList(
-                heading: '$fromText ${_from.symbol} is also',
-                rows: also,
-              ),
+              child: AlsoList(heading: readout.heading, rows: readout.also),
             ),
             ConverterKeypad(
               onKey: _onKey,
+              onLongPress: _onKeyLongPress,
               haptics: settings.haptics,
               sounds: settings.keySounds,
             ),
@@ -142,70 +161,61 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
     );
   }
 
-  String _valueIn(Unit unit, Decimal value, NumberFormatOptions options) {
-    final ConversionResult result = UnitConverter.convert(
-      value,
-      category: widget.category,
-      from: _from,
-      to: unit,
-    );
-    return switch (result) {
-      ConversionSuccess(:final Decimal value) => formatConversionValue(
-        value,
-        options: options,
-      ),
-      ConversionFailure() => '—',
-    };
-  }
-
   void _onKey(ConverterKey key) {
     if (key == ConverterKey.copy) {
       _copy();
       return;
     }
-    setState(() {
-      _input = switch (key) {
-        ConverterKey.zero => _input.digit('0'),
-        ConverterKey.one => _input.digit('1'),
-        ConverterKey.two => _input.digit('2'),
-        ConverterKey.three => _input.digit('3'),
-        ConverterKey.four => _input.digit('4'),
-        ConverterKey.five => _input.digit('5'),
-        ConverterKey.six => _input.digit('6'),
-        ConverterKey.seven => _input.digit('7'),
-        ConverterKey.eight => _input.digit('8'),
-        ConverterKey.nine => _input.digit('9'),
-        ConverterKey.doubleZero => _input.doubleZero(),
-        ConverterKey.dot => _input.dot(),
-        ConverterKey.toggleSign => _input.toggleSign(),
-        ConverterKey.backspace => _input.backspace(),
-        ConverterKey.clear => _input.clear(),
-        ConverterKey.copy => _input,
-      };
-    });
+    setState(() => _input = _input.apply(key));
+  }
+
+  void _onKeyLongPress(ConverterKey key) {
+    if (key == ConverterKey.copy) {
+      _saveToHistory();
+    }
+  }
+
+  void _toggleFavourite() {
+    final VoidCallback? callback = widget.onFavourite;
+    if (callback != null) {
+      callback();
+      return;
+    }
+    final bool now = ref
+        .read(converterMemoryProvider.notifier)
+        .toggleFavourite(_pair);
+    _toast(now ? 'Added to favourites' : 'Removed from favourites');
   }
 
   Future<void> _copy() async {
-    final ConversionResult result = UnitConverter.convert(
-      _input.value,
-      category: widget.category,
-      from: _from,
-      to: _to,
-    );
-    if (result is! ConversionSuccess) {
+    final ConverterReadout readout = _readout;
+    if (readout.result is! ConversionSuccess) {
       return;
     }
-    final String text = formatConversionValue(
-      result.value,
-      options: _options,
-    ).replaceAll('−', '-');
-    await Clipboard.setData(ClipboardData(text: text));
+    await Clipboard.setData(
+      ClipboardData(text: readout.toText.replaceAll('−', '-')),
+    );
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Copied')));
+    _toast('Copied');
+  }
+
+  /// SPEC §2/§10: a converter result can be saved to history. Long-pressing
+  /// Copy keeps screen 07's keypad unchanged.
+  void _saveToHistory() {
+    final ConverterReadout readout = _readout;
+    if (readout.result is! ConversionSuccess) {
+      return;
+    }
+    final HistoryEntry? entry = ref
+        .read(historyProvider.notifier)
+        .add(
+          expression: '${readout.fromText} ${_from.symbol} → ${_to.symbol}',
+          result: readout.toText,
+          mode: HistoryMode.converter,
+        );
+    _toast(entry == null ? 'Already in history' : 'Saved to history');
   }
 
   Future<void> _pickFrom() async {
@@ -218,13 +228,7 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
     if (unit == null || !mounted) {
       return;
     }
-    final Unit previousFrom = _from;
-    setState(() {
-      _from = unit;
-      if (_to.id == unit.id) {
-        _to = previousFrom;
-      }
-    });
+    _applyPair(unit, _to.id == unit.id ? _from : _to);
   }
 
   Future<void> _pickTo() async {
@@ -237,20 +241,23 @@ class _ConverterPageState extends ConsumerState<ConverterPage> {
     if (unit == null || !mounted) {
       return;
     }
-    final Unit previousTo = _to;
-    setState(() {
-      _to = unit;
-      if (_from.id == unit.id) {
-        _from = previousTo;
-      }
-    });
+    _applyPair(_from.id == unit.id ? _to : _from, unit);
   }
 
-  void _swap() {
+  void _swap() => _applyPair(_to, _from);
+
+  void _applyPair(Unit from, Unit to) {
     setState(() {
-      final Unit from = _from;
-      _from = _to;
-      _to = from;
+      _from = from;
+      _to = to;
+      _touched = true;
     });
+    ref.read(converterMemoryProvider.notifier).remember(_pair);
+  }
+
+  void _toast(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

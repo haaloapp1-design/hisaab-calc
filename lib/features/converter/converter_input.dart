@@ -1,6 +1,7 @@
 import 'package:decimal/decimal.dart';
 
 import '../../core/engine/formatter.dart';
+import 'converter_key.dart';
 
 /// The typed amount on the unit converter's From card (screen 07).
 ///
@@ -84,6 +85,27 @@ final class ConverterInput {
   }
 
   ConverterInput clear() => const ConverterInput();
+
+  /// Applies one keypad key. `Copy` does not edit the amount, so it returns
+  /// this instance and the page can keep the copy action to itself.
+  ConverterInput apply(ConverterKey key) => switch (key) {
+    ConverterKey.zero => digit('0'),
+    ConverterKey.one => digit('1'),
+    ConverterKey.two => digit('2'),
+    ConverterKey.three => digit('3'),
+    ConverterKey.four => digit('4'),
+    ConverterKey.five => digit('5'),
+    ConverterKey.six => digit('6'),
+    ConverterKey.seven => digit('7'),
+    ConverterKey.eight => digit('8'),
+    ConverterKey.nine => digit('9'),
+    ConverterKey.doubleZero => doubleZero(),
+    ConverterKey.dot => dot(),
+    ConverterKey.toggleSign => toggleSign(),
+    ConverterKey.backspace => backspace(),
+    ConverterKey.clear => clear(),
+    ConverterKey.copy => this,
+  };
 
   int get _digits => source.replaceAll(RegExp('[^0-9]'), '').length;
 

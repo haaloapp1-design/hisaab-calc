@@ -6,6 +6,7 @@ import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import '../calculator/calculator_controller.dart';
+import '../converter/converter_memory_controller.dart';
 import '../history/history_controller.dart';
 import '../history/memory_controller.dart';
 import 'settings_controller.dart';
@@ -195,8 +196,8 @@ class SettingsPage extends ConsumerWidget {
 
   /// SPEC §3 "Clear all saved data (confirm dialog)".
   ///
-  /// The settings, calculator, history and memory controllers own their own
-  /// keys; the currency cache adds its clear here too.
+  /// The settings, calculator, history, memory and converter controllers own
+  /// their own keys; the currency cache adds its clear here too.
   Future<void> _confirmClear(BuildContext context, WidgetRef ref) async {
     final SettingsController settings = ref.read(settingsProvider.notifier);
     final CalculatorController calculator = ref.read(
@@ -204,6 +205,9 @@ class SettingsPage extends ConsumerWidget {
     );
     final HistoryController history = ref.read(historyProvider.notifier);
     final MemoryController memory = ref.read(memoryProvider.notifier);
+    final ConverterMemoryController converter = ref.read(
+      converterMemoryProvider.notifier,
+    );
 
     final bool confirmed =
         await showDialog<bool>(
@@ -244,5 +248,6 @@ class SettingsPage extends ConsumerWidget {
     await calculator.clearSavedData();
     await history.clear();
     await memory.clear();
+    await converter.clear();
   }
 }

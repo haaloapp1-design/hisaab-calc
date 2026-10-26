@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/units/unit_catalog.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
-
-/// One row of the "is also" list: a unit and the same amount in it.
-class AlsoRow {
-  const AlsoRow(this.unit, this.value);
-
-  final Unit unit;
-  final String value;
-}
+import '../converter_readout.dart';
 
 /// The "5 km is also" list under the rule line (screen 07).
 class AlsoList extends StatelessWidget {
