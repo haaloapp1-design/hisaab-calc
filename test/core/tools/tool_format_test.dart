@@ -39,4 +39,17 @@ void main() {
     expect(formatToolNumber(d('-1234.5')), '−1,234.50');
     expect(formatToolNumber(d('1234.5'), decimalPlaces: 0), '1,235');
   });
+
+  test('formats whole counts with grouping and no decimals', () {
+    expect(formatToolCount(13449), '13,449');
+    expect(formatToolCount(0), '0');
+    expect(formatToolCount(-30), '−30');
+    expect(
+      formatToolCount(
+        13449,
+        options: const NumberFormatOptions(useGrouping: false),
+      ),
+      '13449',
+    );
+  });
 }

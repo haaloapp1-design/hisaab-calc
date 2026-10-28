@@ -1,6 +1,8 @@
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/tools/tool_catalog.dart';
+import 'package:calculator/features/tools/pages/age_page.dart';
+import 'package:calculator/features/tools/pages/date_difference_page.dart';
 import 'package:calculator/features/tools/pages/discount_page.dart';
 import 'package:calculator/features/tools/pages/loan_page.dart';
 import 'package:calculator/features/tools/pages/percentage_page.dart';
@@ -145,6 +147,12 @@ void main() {
       } else if (tool.id == 'tip') {
         expect(find.byType(TipPage), findsOneWidget);
         expect(find.text('Per person'), findsWidgets);
+      } else if (tool.id == 'age') {
+        expect(find.byType(AgePage), findsOneWidget);
+        expect(find.text('Date of birth'), findsOneWidget);
+      } else if (tool.id == 'date-diff') {
+        expect(find.byType(DateDifferencePage), findsOneWidget);
+        expect(find.text('Days between'), findsOneWidget);
       } else {
         expect(
           find.byType(ToolPlaceholderPage),

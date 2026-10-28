@@ -19,3 +19,13 @@ String formatToolNumber(
     groupSeparator: options.groupSeparator,
   ),
 );
+
+/// Formats a whole count (days, weeks) with the Settings grouping.
+String formatToolCount(
+  int value, {
+  NumberFormatOptions options = const NumberFormatOptions(),
+}) => formatToolNumber(
+  Decimal.fromInt(value),
+  options: options,
+  decimalPlaces: 0,
+);

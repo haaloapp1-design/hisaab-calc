@@ -121,7 +121,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T42 Loan logic** — Read: §14 Loan. Done when: example check (EMI 22,244.45) and r = 0 case and schedule ending at 0 tested.
 - [x] **T43 Loan page** — Screen 10 (`docs/screens/10-loan-emi.html`). Done when: live results, rate input, years/months, bar, schedule table.
 - [x] **T44 Percentage, Discount and tax, Tip and split** — Read: §14. Done when: logic tested + 3 pages.
-- [ ] **T45 Age and Date difference** — Read: §14. Done when: 29 Feb, month-borrow, include-end-date tested + 2 pages.
+- [x] **T45 Age and Date difference** — Read: §14. Done when: 29 Feb, month-borrow, include-end-date tested + 2 pages.
 - [ ] **T46 BMI and GPA** — Read: §14. Done when: unit conversions, categories, weighted GPA tested + 2 pages.
 - [ ] **T47 Equation solver and Statistics** — Read: §14. Done when: all quadratic cases, median even/odd, mode, SDs tested + 2 pages.
 

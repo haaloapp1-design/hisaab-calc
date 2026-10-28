@@ -9,16 +9,15 @@ import '../../../core/currency/currency_amount.dart';
 import '../../../core/engine/formatter.dart';
 import '../../../core/tools/tip.dart';
 import '../../../core/tools/tool_format.dart';
-import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 import '../../settings/settings_controller.dart';
 import '../../settings/settings_format.dart';
 import '../../settings/settings_model.dart';
-import '../../settings/widgets/toggle_switch.dart';
 import '../tool_scaffold.dart';
 import '../widgets/tool_amount_field.dart';
 import '../widgets/tool_field.dart';
 import '../widgets/tool_summary_card.dart';
+import '../widgets/tool_toggle_row.dart';
 
 /// The Tip and split tool (SPEC §6, screen-10 pattern).
 ///
@@ -115,9 +114,13 @@ class _TipPageState extends ConsumerState<TipPage> {
           ],
         ),
         const SizedBox(height: AppSizes.toolSheetGap),
-        _RoundUpRow(
+        ToolToggleRow(
+          title: 'Round up per person',
+          subtitle: 'To the next whole currency unit',
           value: _roundUp,
           onChanged: (bool value) => setState(() => _roundUp = value),
+          switchKey: const Key('tip-round-up'),
+          semanticLabel: 'Round up per person',
         ),
         const SizedBox(height: AppSizes.toolSheetGap),
         ToolSummaryCard(
@@ -187,64 +190,5 @@ class _TipPageState extends ConsumerState<TipPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(const SnackBar(content: Text('Copied')));
-  }
-}
-
-/// The round-up switch in the tool's card language.
-class _RoundUpRow extends StatelessWidget {
-  const _RoundUpRow({required this.value, required this.onChanged});
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.toolBreakdownPadding),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: palette.keyNumberBorder,
-          width: AppSizes.borderWidth,
-        ),
-        borderRadius: BorderRadius.circular(AppRadii.card),
-      ),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  'Round up per person',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.toolBreakdownTotal.copyWith(
-                    color: palette.ink,
-                  ),
-                ),
-                const SizedBox(height: AppSizes.toolScheduleTitleGap),
-                Text(
-                  'To the next whole currency unit',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.toolSubtitle.copyWith(
-                    color: palette.inkMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ToggleSwitch(
-            key: const Key('tip-round-up'),
-            value: value,
-            onChanged: onChanged,
-            semanticLabel: 'Round up per person',
-          ),
-        ],
-      ),
-    );
   }
 }

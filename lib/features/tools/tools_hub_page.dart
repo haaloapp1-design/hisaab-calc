@@ -4,6 +4,8 @@ import '../../core/tools/tool_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import 'pages/age_page.dart';
+import 'pages/date_difference_page.dart';
 import 'pages/discount_page.dart';
 import 'pages/loan_page.dart';
 import 'pages/percentage_page.dart';
@@ -73,6 +75,8 @@ class ToolsHubPage extends StatelessWidget {
           'percentage' => const PercentagePage(),
           'discount' => const DiscountPage(),
           'tip' => const TipPage(),
+          'age' => const AgePage(),
+          'date-diff' => const DateDifferencePage(),
           _ => ToolPlaceholderPage(tool: tool),
         },
       ),
