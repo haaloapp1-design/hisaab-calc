@@ -154,38 +154,44 @@ class _UnitCard extends StatelessWidget {
         children: <Widget>[
           Align(
             alignment: Alignment.centerLeft,
-            child: Material(
-              color: onPrimary ? palette.sheet : palette.keyFunction,
-              borderRadius: BorderRadius.circular(AppRadii.chip),
-              child: InkWell(
-                key: pickerKey,
+            child: Semantics(
+              button: true,
+              label: 'Change ${onPrimary ? 'to' : 'from'} unit, ${unit.label}',
+              onTap: onPick,
+              excludeSemantics: true,
+              child: Material(
+                color: onPrimary ? palette.sheet : palette.keyFunction,
                 borderRadius: BorderRadius.circular(AppRadii.chip),
-                onTap: onPick,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.converterUnitPillPaddingH,
-                    vertical: AppSizes.converterUnitPillPaddingV,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Flexible(
-                        child: Text(
-                          unit.label,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTypography.converterUnitPill.copyWith(
-                            color: palette.primary,
+                child: InkWell(
+                  key: pickerKey,
+                  borderRadius: BorderRadius.circular(AppRadii.chip),
+                  onTap: onPick,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.converterUnitPillPaddingH,
+                      vertical: AppSizes.converterUnitPillPaddingV,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Flexible(
+                          child: Text(
+                            unit.label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.converterUnitPill.copyWith(
+                              color: palette.primary,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: AppSizes.converterUnitPillGap),
-                      Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        size: AppSizes.converterUnitPillIcon,
-                        color: palette.primary,
-                      ),
-                    ],
+                        const SizedBox(width: AppSizes.converterUnitPillGap),
+                        Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: AppSizes.converterUnitPillIcon,
+                          color: palette.primary,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -230,25 +236,31 @@ class _SwapButton extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     const CircleBorder shape = CircleBorder();
 
-    return SizedBox(
-      width: AppSizes.converterSwapSize,
-      height: AppSizes.converterSwapSize,
-      child: Material(
-        color: palette.sheet,
-        shape: shape.copyWith(
-          side: BorderSide(
-            color: palette.primary,
-            width: AppSizes.converterSwapBorder,
+    return Semantics(
+      button: true,
+      label: 'Swap units',
+      onTap: onTap,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: AppSizes.converterSwapSize,
+        height: AppSizes.converterSwapSize,
+        child: Material(
+          color: palette.sheet,
+          shape: shape.copyWith(
+            side: BorderSide(
+              color: palette.primary,
+              width: AppSizes.converterSwapBorder,
+            ),
           ),
-        ),
-        child: InkWell(
-          key: const Key('converter-swap'),
-          customBorder: shape,
-          onTap: onTap,
-          child: Icon(
-            Icons.swap_vert_rounded,
-            size: AppSizes.converterSwapIcon,
-            color: palette.primary,
+          child: InkWell(
+            key: const Key('converter-swap'),
+            customBorder: shape,
+            onTap: onTap,
+            child: Icon(
+              Icons.swap_vert_rounded,
+              size: AppSizes.converterSwapIcon,
+              color: palette.primary,
+            ),
           ),
         ),
       ),

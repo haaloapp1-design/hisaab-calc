@@ -94,24 +94,30 @@ class _RowAction extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final Color color = danger ? palette.danger : palette.primary;
 
-    return SizedBox(
-      height: AppSizes.historyMenuRowHeight,
-      child: InkWell(
-        key: Key(actionKey),
-        onTap: onTap,
-        child: Row(
-          children: <Widget>[
-            Icon(icon, size: AppSizes.historyMenuIcon, color: color),
-            const SizedBox(width: AppSizes.currencyRowGap),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTypography.historyMenu.copyWith(
-                  color: danger ? palette.danger : palette.ink,
+    return Semantics(
+      button: true,
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: SizedBox(
+        height: AppSizes.historyMenuRowHeight,
+        child: InkWell(
+          key: Key(actionKey),
+          onTap: onTap,
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: AppSizes.historyMenuIcon, color: color),
+              const SizedBox(width: AppSizes.currencyRowGap),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.historyMenu.copyWith(
+                    color: danger ? palette.danger : palette.ink,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

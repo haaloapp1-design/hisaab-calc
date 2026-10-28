@@ -33,38 +33,44 @@ class CurrencyTop extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Material(
-                color: palette.sheet,
-                borderRadius: BorderRadius.circular(
-                  AppSizes.currencyBasePillRadius,
-                ),
-                child: InkWell(
-                  key: const Key('currency-base'),
+              Semantics(
+                button: true,
+                label: 'Change base currency, ${readout.base}',
+                onTap: onPickBase,
+                excludeSemantics: true,
+                child: Material(
+                  color: palette.sheet,
                   borderRadius: BorderRadius.circular(
                     AppSizes.currencyBasePillRadius,
                   ),
-                  onTap: onPickBase,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.currencyBasePillPaddingH,
-                      vertical: AppSizes.currencyBasePillPaddingV,
+                  child: InkWell(
+                    key: const Key('currency-base'),
+                    borderRadius: BorderRadius.circular(
+                      AppSizes.currencyBasePillRadius,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Text(
-                          readout.base,
-                          style: AppTypography.currencyBaseCode.copyWith(
+                    onTap: onPickBase,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSizes.currencyBasePillPaddingH,
+                        vertical: AppSizes.currencyBasePillPaddingV,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text(
+                            readout.base,
+                            style: AppTypography.currencyBaseCode.copyWith(
+                              color: palette.primary,
+                            ),
+                          ),
+                          const SizedBox(width: AppSizes.currencyBasePillGap),
+                          Icon(
+                            Icons.expand_more_rounded,
+                            size: AppSizes.currencyBaseArrow,
                             color: palette.primary,
                           ),
-                        ),
-                        const SizedBox(width: AppSizes.currencyBasePillGap),
-                        Icon(
-                          Icons.expand_more_rounded,
-                          size: AppSizes.currencyBaseArrow,
-                          color: palette.primary,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

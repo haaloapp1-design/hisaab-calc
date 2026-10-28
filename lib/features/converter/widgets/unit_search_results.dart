@@ -58,54 +58,56 @@ class _UnitResultTile extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final BorderRadius radius = BorderRadius.circular(AppRadii.card);
 
-    return Material(
-      color: palette.sheet,
-      borderRadius: radius,
-      child: InkWell(
-        key: Key('hub-result-${match.category.name}-${match.unit.id}'),
+    return MergeSemantics(
+      child: Material(
+        color: palette.sheet,
         borderRadius: radius,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.hubResultPaddingH,
-            vertical: AppSizes.hubResultPaddingV,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: palette.keyNumberBorder,
-              width: AppSizes.borderWidth,
+        child: InkWell(
+          key: Key('hub-result-${match.category.name}-${match.unit.id}'),
+          borderRadius: radius,
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.hubResultPaddingH,
+              vertical: AppSizes.hubResultPaddingV,
             ),
-            borderRadius: radius,
-          ),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      match.unit.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.body.copyWith(color: palette.ink),
-                    ),
-                    const SizedBox(height: AppSizes.hubResultGap),
-                    Text(
-                      match.category.label,
-                      style: AppTypography.small.copyWith(
-                        color: palette.inkMuted,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: palette.keyNumberBorder,
+                width: AppSizes.borderWidth,
+              ),
+              borderRadius: radius,
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        match.unit.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.body.copyWith(color: palette.ink),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSizes.hubResultGap),
+                      Text(
+                        match.category.label,
+                        style: AppTypography.small.copyWith(
+                          color: palette.inkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: AppSizes.hubCurrencyChevron,
-                color: palette.primary,
-              ),
-            ],
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: AppSizes.hubCurrencyChevron,
+                  color: palette.primary,
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -236,60 +236,67 @@ class _CurrencyPickerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
 
-    return SizedBox(
-      height: AppSizes.currencyPickerRowHeight,
-      child: InkWell(
-        key: Key('currency-pick-${currency.code}'),
-        onTap: () => Navigator.of(context).pop(currency.code),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: palette.divider,
-                width: AppSizes.borderWidth,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${currency.code}, ${currency.name}',
+      onTap: () => Navigator.of(context).pop(currency.code),
+      excludeSemantics: true,
+      child: SizedBox(
+        height: AppSizes.currencyPickerRowHeight,
+        child: InkWell(
+          key: Key('currency-pick-${currency.code}'),
+          onTap: () => Navigator.of(context).pop(currency.code),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: palette.divider,
+                  width: AppSizes.borderWidth,
+                ),
               ),
             ),
-          ),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: AppSizes.currencyPickerChipWidth,
-                height: AppSizes.currencyPickerChipHeight,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: palette.keyOperator,
-                  borderRadius: BorderRadius.circular(
-                    AppSizes.currencyCodeRadius,
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: AppSizes.currencyPickerChipWidth,
+                  height: AppSizes.currencyPickerChipHeight,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: palette.keyOperator,
+                    borderRadius: BorderRadius.circular(
+                      AppSizes.currencyCodeRadius,
+                    ),
+                  ),
+                  child: Text(
+                    currency.code,
+                    style: AppTypography.currencyCode.copyWith(
+                      color: palette.primary,
+                    ),
                   ),
                 ),
-                child: Text(
-                  currency.code,
-                  style: AppTypography.currencyCode.copyWith(
+                const SizedBox(width: AppSizes.currencyRowGap),
+                Expanded(
+                  child: Text(
+                    currency.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body.copyWith(
+                      color: selected ? palette.primary : palette.ink,
+                      fontWeight: selected
+                          ? AppTypography.medium
+                          : AppTypography.regular,
+                    ),
+                  ),
+                ),
+                if (selected)
+                  Icon(
+                    Icons.check_rounded,
+                    size: AppSizes.currencyPickerCheck,
                     color: palette.primary,
                   ),
-                ),
-              ),
-              const SizedBox(width: AppSizes.currencyRowGap),
-              Expanded(
-                child: Text(
-                  currency.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.body.copyWith(
-                    color: selected ? palette.primary : palette.ink,
-                    fontWeight: selected
-                        ? AppTypography.medium
-                        : AppTypography.regular,
-                  ),
-                ),
-              ),
-              if (selected)
-                Icon(
-                  Icons.check_rounded,
-                  size: AppSizes.currencyPickerCheck,
-                  color: palette.primary,
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

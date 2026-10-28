@@ -87,42 +87,49 @@ class _UnitRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
 
-    return SizedBox(
-      height: AppSizes.converterPickerRowHeight,
-      child: InkWell(
-        key: Key('picker-unit-${unit.id}'),
-        onTap: () => Navigator.of(context).pop(unit),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: palette.divider,
-                width: AppSizes.borderWidth,
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: unit.label,
+      onTap: () => Navigator.of(context).pop(unit),
+      excludeSemantics: true,
+      child: SizedBox(
+        height: AppSizes.converterPickerRowHeight,
+        child: InkWell(
+          key: Key('picker-unit-${unit.id}'),
+          onTap: () => Navigator.of(context).pop(unit),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: palette.divider,
+                  width: AppSizes.borderWidth,
+                ),
               ),
             ),
-          ),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  unit.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.body.copyWith(
-                    color: selected ? palette.primary : palette.ink,
-                    fontWeight: selected
-                        ? AppTypography.medium
-                        : AppTypography.regular,
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    unit.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body.copyWith(
+                      color: selected ? palette.primary : palette.ink,
+                      fontWeight: selected
+                          ? AppTypography.medium
+                          : AppTypography.regular,
+                    ),
                   ),
                 ),
-              ),
-              if (selected)
-                Icon(
-                  Icons.check_rounded,
-                  size: AppSizes.converterPickerCheck,
-                  color: palette.primary,
-                ),
-            ],
+                if (selected)
+                  Icon(
+                    Icons.check_rounded,
+                    size: AppSizes.converterPickerCheck,
+                    color: palette.primary,
+                  ),
+              ],
+            ),
           ),
         ),
       ),

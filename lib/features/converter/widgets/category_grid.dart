@@ -45,52 +45,56 @@ class _CategoryCell extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final BorderRadius radius = BorderRadius.circular(AppRadii.card);
 
-    return Material(
-      color: palette.sheet,
-      borderRadius: radius,
-      child: InkWell(
-        key: Key('hub-category-${category.name}'),
+    return MergeSemantics(
+      child: Material(
+        color: palette.sheet,
         borderRadius: radius,
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: palette.keyNumberBorder,
-              width: AppSizes.borderWidth,
+        child: InkWell(
+          key: Key('hub-category-${category.name}'),
+          borderRadius: radius,
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: palette.keyNumberBorder,
+                width: AppSizes.borderWidth,
+              ),
+              borderRadius: radius,
             ),
-            borderRadius: radius,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                key: Key('hub-chip-${category.name}'),
-                constraints: const BoxConstraints(
-                  minWidth: AppSizes.hubChipMinWidth,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  key: Key('hub-chip-${category.name}'),
+                  constraints: const BoxConstraints(
+                    minWidth: AppSizes.hubChipMinWidth,
+                  ),
+                  height: AppSizes.hubChipHeight,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.hubChipPaddingH,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: palette.keyOperator,
+                    borderRadius: BorderRadius.circular(AppRadii.chip),
+                  ),
+                  child: Text(
+                    category.hubSymbol,
+                    maxLines: 1,
+                    style: AppTypography.hubChip.copyWith(
+                      color: palette.primary,
+                    ),
+                  ),
                 ),
-                height: AppSizes.hubChipHeight,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.hubChipPaddingH,
-                ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: palette.keyOperator,
-                  borderRadius: BorderRadius.circular(AppRadii.chip),
-                ),
-                child: Text(
-                  category.hubSymbol,
+                const SizedBox(height: AppSizes.hubCellGap),
+                Text(
+                  category.label,
                   maxLines: 1,
-                  style: AppTypography.hubChip.copyWith(color: palette.primary),
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.small.copyWith(color: palette.ink),
                 ),
-              ),
-              const SizedBox(height: AppSizes.hubCellGap),
-              Text(
-                category.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTypography.small.copyWith(color: palette.ink),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

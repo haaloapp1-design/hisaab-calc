@@ -7,7 +7,9 @@ import '../../../theme/app_tokens.dart';
 /// when the header's search action is on.
 ///
 /// It is the blue counterpart of the settings inputs: same 14 px radius,
-/// white text and a faint hint, because it lives on the primary surface.
+/// white text and a muted hint, because it lives on the primary surface. The
+/// hint and the magnifier use `onPrimaryMuted` (4.81:1 on the track) rather
+/// than `onPrimaryFaint` (4.07:1) so the small text stays at AA (T48).
 class HistorySearchField extends StatelessWidget {
   const HistorySearchField({
     super.key,
@@ -45,7 +47,7 @@ class HistorySearchField extends StatelessWidget {
             Icon(
               Icons.search_rounded,
               size: AppSizes.searchIcon,
-              color: palette.onPrimaryFaint,
+              color: palette.onPrimaryMuted,
             ),
             const SizedBox(width: AppSizes.historySearchPaddingH),
             Expanded(
@@ -62,7 +64,7 @@ class HistorySearchField extends StatelessWidget {
                   border: InputBorder.none,
                   hintText: 'Search history',
                   hintStyle: AppTypography.body.copyWith(
-                    color: palette.onPrimaryFaint,
+                    color: palette.onPrimaryMuted,
                   ),
                 ),
               ),

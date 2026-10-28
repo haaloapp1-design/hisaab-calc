@@ -27,86 +27,88 @@ class CurrencyRow extends StatelessWidget {
       AppSizes.currencyRowRadius,
     );
 
-    return Material(
-      color: palette.keyNumberScientific,
-      borderRadius: radius,
-      child: InkWell(
-        key: Key('currency-row-${row.currency.code}'),
+    return MergeSemantics(
+      child: Material(
+        color: palette.keyNumberScientific,
         borderRadius: radius,
-        onTap: onTap,
-        onLongPress: onLongPress,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.currencyRowPaddingH,
-            vertical: AppSizes.currencyRowPaddingV,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: palette.keyNumberBorder,
-              width: AppSizes.borderWidth,
+        child: InkWell(
+          key: Key('currency-row-${row.currency.code}'),
+          borderRadius: radius,
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.currencyRowPaddingH,
+              vertical: AppSizes.currencyRowPaddingV,
             ),
-            borderRadius: radius,
-          ),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: AppSizes.currencyCodeWidth,
-                height: AppSizes.currencyCodeHeight,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: palette.keyOperator,
-                  borderRadius: BorderRadius.circular(
-                    AppSizes.currencyCodeRadius,
-                  ),
-                ),
-                child: Text(
-                  row.currency.code,
-                  style: AppTypography.currencyCode.copyWith(
-                    color: palette.primary,
-                  ),
-                ),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: palette.keyNumberBorder,
+                width: AppSizes.borderWidth,
               ),
-              const SizedBox(width: AppSizes.currencyRowGap),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Text(
-                      row.currency.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.currencyName.copyWith(
-                        color: palette.ink,
-                      ),
+              borderRadius: radius,
+            ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: AppSizes.currencyCodeWidth,
+                  height: AppSizes.currencyCodeHeight,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: palette.keyOperator,
+                    borderRadius: BorderRadius.circular(
+                      AppSizes.currencyCodeRadius,
                     ),
-                    const SizedBox(height: AppSizes.currencyRowContentGap),
-                    Text(
-                      row.rate,
-                      key: Key('currency-rate-${row.currency.code}'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.currencyRate.copyWith(
-                        color: palette.inkMuted,
-                      ),
+                  ),
+                  child: Text(
+                    row.currency.code,
+                    style: AppTypography.currencyCode.copyWith(
+                      color: palette.primary,
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: AppSizes.currencyRowGap),
-              Flexible(
-                child: Text(
-                  row.value,
-                  key: Key('currency-value-${row.currency.code}'),
-                  textAlign: TextAlign.right,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypography.currencyValue.copyWith(
-                    color: palette.ink,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: AppSizes.currencyRowGap),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Text(
+                        row.currency.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.currencyName.copyWith(
+                          color: palette.ink,
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.currencyRowContentGap),
+                      Text(
+                        row.rate,
+                        key: Key('currency-rate-${row.currency.code}'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.currencyRate.copyWith(
+                          color: palette.inkMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: AppSizes.currencyRowGap),
+                Flexible(
+                  child: Text(
+                    row.value,
+                    key: Key('currency-value-${row.currency.code}'),
+                    textAlign: TextAlign.right,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.currencyValue.copyWith(
+                      color: palette.ink,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

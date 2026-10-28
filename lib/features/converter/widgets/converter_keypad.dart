@@ -109,6 +109,8 @@ class _ConverterKeyButton extends StatelessWidget {
         hint: converterKey == ConverterKey.copy
             ? 'Long-press to save to history'
             : null,
+        onTap: onTap,
+        onLongPress: onLongPress,
         excludeSemantics: true,
         child: Material(
           color: isFunction ? palette.keyOperator : palette.keyNumber,

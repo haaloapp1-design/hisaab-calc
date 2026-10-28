@@ -254,27 +254,33 @@ class _AddCourseButton extends StatelessWidget {
 
     return SizedBox(
       height: AppSizes.toolRateChipHeight,
-      child: Material(
-        color: palette.keyNumber,
-        borderRadius: radius,
-        child: InkWell(
-          key: const Key('gpa-add'),
+      child: Semantics(
+        button: true,
+        label: 'Add course',
+        onTap: onTap,
+        excludeSemantics: true,
+        child: Material(
+          color: palette.keyNumber,
           borderRadius: radius,
-          onTap: onTap,
-          child: Container(
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              border: Border.all(
-                color: palette.keyOperatorBorder,
-                width: AppSizes.borderWidth,
+          child: InkWell(
+            key: const Key('gpa-add'),
+            borderRadius: radius,
+            onTap: onTap,
+            child: Container(
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                border: Border.all(
+                  color: palette.keyOperatorBorder,
+                  width: AppSizes.borderWidth,
+                ),
               ),
-            ),
-            child: Text(
-              'Add course',
-              style: AppTypography.toolRateChip.copyWith(
-                color: palette.primary,
-                fontWeight: AppTypography.regular,
+              child: Text(
+                'Add course',
+                style: AppTypography.toolRateChip.copyWith(
+                  color: palette.primary,
+                  fontWeight: AppTypography.regular,
+                ),
               ),
             ),
           ),

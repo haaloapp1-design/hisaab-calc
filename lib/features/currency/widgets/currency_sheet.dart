@@ -146,15 +146,21 @@ class _AddCurrencyButton extends StatelessWidget {
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(AppSizes.currencyAddRadius),
-          child: InkWell(
-            key: const Key('currency-add'),
-            borderRadius: BorderRadius.circular(AppSizes.currencyAddRadius),
+          child: Semantics(
+            button: true,
+            label: 'Add currency',
             onTap: onTap,
-            child: Center(
-              child: Text(
-                'Add currency',
-                style: AppTypography.currencyAdd.copyWith(
-                  color: palette.primary,
+            excludeSemantics: true,
+            child: InkWell(
+              key: const Key('currency-add'),
+              borderRadius: BorderRadius.circular(AppSizes.currencyAddRadius),
+              onTap: onTap,
+              child: Center(
+                child: Text(
+                  'Add currency',
+                  style: AppTypography.currencyAdd.copyWith(
+                    color: palette.primary,
+                  ),
                 ),
               ),
             ),

@@ -237,18 +237,24 @@ class _ToolAction extends StatelessWidget {
 
     return SizedBox(
       height: AppSizes.toolActionHeight,
-      child: Material(
-        color: palette.primary,
-        borderRadius: radius,
-        child: InkWell(
-          key: const Key('tool-action'),
+      child: Semantics(
+        button: true,
+        label: label,
+        onTap: onTap,
+        excludeSemantics: true,
+        child: Material(
+          color: palette.primary,
           borderRadius: radius,
-          onTap: onTap,
-          child: Center(
-            child: Text(
-              label,
-              style: AppTypography.toolAction.copyWith(
-                color: palette.onPrimary,
+          child: InkWell(
+            key: const Key('tool-action'),
+            borderRadius: radius,
+            onTap: onTap,
+            child: Center(
+              child: Text(
+                label,
+                style: AppTypography.toolAction.copyWith(
+                  color: palette.onPrimary,
+                ),
               ),
             ),
           ),

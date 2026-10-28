@@ -12,15 +12,21 @@ class ToolGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double textScale = MediaQuery.textScalerOf(context).scale(1);
+
     return GridView.builder(
       key: const Key('tools-grid'),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: AppSizes.toolsGridColumns,
         mainAxisSpacing: AppSizes.toolsGridGap,
         crossAxisSpacing: AppSizes.toolsGridGap,
-        mainAxisExtent: AppSizes.toolsCardHeight,
+        // The 92 px design card fits the 1.0× type. At a larger text scale the
+        // chip and the two text lines need more room, so the card grows with
+        // the scale instead of overflowing (SPEC §7).
+        mainAxisExtent:
+            AppSizes.toolsCardHeight * (textScale < 1 ? 1 : textScale),
       ),
       itemCount: ToolCatalog.tools.length,
       itemBuilder: (BuildContext context, int index) {
@@ -34,7 +40,9 @@ class ToolGrid extends StatelessWidget {
   }
 }
 
-/// One 92 px white card: symbol chip on top, name and subtitle at the bottom.
+/// One 92 px white card at 1.0× (taller at a larger text scale): symbol chip on
+/// top, name and subtitle at the bottom. The whole card is one semantics node
+/// labelled with its name and subtitle.
 class _ToolCard extends StatelessWidget {
   const _ToolCard({required this.tool, this.onTap});
 
@@ -46,73 +54,77 @@ class _ToolCard extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     final BorderRadius radius = BorderRadius.circular(AppRadii.card);
 
-    return Material(
-      color: palette.sheet,
-      borderRadius: radius,
-      child: InkWell(
-        key: Key('tool-card-${tool.id}'),
+    return MergeSemantics(
+      child: Material(
+        color: palette.sheet,
         borderRadius: radius,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.toolsCardPaddingH,
-            vertical: AppSizes.toolsCardPaddingV,
-          ),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: palette.keyNumberBorder,
-              width: AppSizes.borderWidth,
+        child: InkWell(
+          key: Key('tool-card-${tool.id}'),
+          borderRadius: radius,
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.toolsCardPaddingH,
+              vertical: AppSizes.toolsCardPaddingV,
             ),
-            borderRadius: radius,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                key: Key('tool-chip-${tool.id}'),
-                constraints: const BoxConstraints(
-                  minWidth: AppSizes.toolsChipMinWidth,
-                ),
-                height: AppSizes.toolsChipHeight,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.toolsChipPaddingH,
-                ),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: palette.keyOperator,
-                  borderRadius: BorderRadius.circular(AppRadii.chip),
-                ),
-                child: Text(
-                  tool.symbol,
-                  maxLines: 1,
-                  style: AppTypography.toolSymbol.copyWith(
-                    color: palette.primary,
-                  ),
-                ),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: palette.keyNumberBorder,
+                width: AppSizes.borderWidth,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    tool.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.toolName.copyWith(color: palette.ink),
+              borderRadius: radius,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  key: Key('tool-chip-${tool.id}'),
+                  constraints: const BoxConstraints(
+                    minWidth: AppSizes.toolsChipMinWidth,
                   ),
-                  const SizedBox(height: AppSizes.toolsCardTextGap),
-                  Text(
-                    tool.subtitle,
+                  height: AppSizes.toolsChipHeight,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.toolsChipPaddingH,
+                  ),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: palette.keyOperator,
+                    borderRadius: BorderRadius.circular(AppRadii.chip),
+                  ),
+                  child: Text(
+                    tool.symbol,
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.toolSubtitle.copyWith(
-                      color: palette.inkMuted,
+                    style: AppTypography.toolSymbol.copyWith(
+                      color: palette.primary,
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      tool.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.toolName.copyWith(
+                        color: palette.ink,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.toolsCardTextGap),
+                    Text(
+                      tool.subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.toolSubtitle.copyWith(
+                        color: palette.inkMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

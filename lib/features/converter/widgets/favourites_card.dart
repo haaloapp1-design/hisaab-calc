@@ -79,62 +79,64 @@ class _FavouriteRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
 
-    return InkWell(
-      key: Key(
-        'hub-favourite-${pair.category.name}-${pair.from.id}-${pair.to.id}',
-      ),
-      onTap: onTap,
-      child: Container(
-        height: AppSizes.hubFavouriteRowHeight,
-        decoration: BoxDecoration(
-          border: showDivider
-              ? Border(
-                  top: BorderSide(
-                    color: palette.navDivider,
-                    width: AppSizes.borderWidth,
-                  ),
-                )
-              : null,
+    return MergeSemantics(
+      child: InkWell(
+        key: Key(
+          'hub-favourite-${pair.category.name}-${pair.from.id}-${pair.to.id}',
         ),
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.star_rounded,
-              size: AppSizes.hubFavouriteIcon,
-              color: palette.primary,
-            ),
-            const SizedBox(width: AppSizes.hubFavouriteGap),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    pair.category.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.body.copyWith(
-                      color: palette.ink,
-                      fontWeight: AppTypography.medium,
+        onTap: onTap,
+        child: Container(
+          height: AppSizes.hubFavouriteRowHeight,
+          decoration: BoxDecoration(
+            border: showDivider
+                ? Border(
+                    top: BorderSide(
+                      color: palette.navDivider,
+                      width: AppSizes.borderWidth,
                     ),
-                  ),
-                  Text(
-                    '${pair.from.symbol} → ${pair.to.symbol}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.small.copyWith(
-                      color: palette.inkMuted,
-                    ),
-                  ),
-                ],
+                  )
+                : null,
+          ),
+          child: Row(
+            children: <Widget>[
+              Icon(
+                Icons.star_rounded,
+                size: AppSizes.hubFavouriteIcon,
+                color: palette.primary,
               ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: AppSizes.hubFavouriteChevron,
-              color: palette.primary,
-            ),
-          ],
+              const SizedBox(width: AppSizes.hubFavouriteGap),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      pair.category.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body.copyWith(
+                        color: palette.ink,
+                        fontWeight: AppTypography.medium,
+                      ),
+                    ),
+                    Text(
+                      '${pair.from.symbol} → ${pair.to.symbol}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.small.copyWith(
+                        color: palette.inkMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: AppSizes.hubFavouriteChevron,
+                color: palette.primary,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -73,6 +73,7 @@ class _ThemePill extends StatelessWidget {
       button: true,
       selected: selected,
       label: '$label theme',
+      onTap: onTap,
       excludeSemantics: true,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
