@@ -2,8 +2,10 @@ import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/tools/tool_catalog.dart';
 import 'package:calculator/features/tools/pages/age_page.dart';
+import 'package:calculator/features/tools/pages/bmi_page.dart';
 import 'package:calculator/features/tools/pages/date_difference_page.dart';
 import 'package:calculator/features/tools/pages/discount_page.dart';
+import 'package:calculator/features/tools/pages/gpa_page.dart';
 import 'package:calculator/features/tools/pages/loan_page.dart';
 import 'package:calculator/features/tools/pages/percentage_page.dart';
 import 'package:calculator/features/tools/pages/tip_page.dart';
@@ -153,6 +155,12 @@ void main() {
       } else if (tool.id == 'date-diff') {
         expect(find.byType(DateDifferencePage), findsOneWidget);
         expect(find.text('Days between'), findsOneWidget);
+      } else if (tool.id == 'bmi') {
+        expect(find.byType(BmiPage), findsOneWidget);
+        expect(find.text('Height (cm)'), findsOneWidget);
+      } else if (tool.id == 'gpa') {
+        expect(find.byType(GpaPage), findsOneWidget);
+        expect(find.text('Grade points'), findsWidgets);
       } else {
         expect(
           find.byType(ToolPlaceholderPage),

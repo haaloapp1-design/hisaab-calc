@@ -5,8 +5,10 @@ import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
 import 'pages/age_page.dart';
+import 'pages/bmi_page.dart';
 import 'pages/date_difference_page.dart';
 import 'pages/discount_page.dart';
+import 'pages/gpa_page.dart';
 import 'pages/loan_page.dart';
 import 'pages/percentage_page.dart';
 import 'pages/tip_page.dart';
@@ -77,6 +79,8 @@ class ToolsHubPage extends StatelessWidget {
           'tip' => const TipPage(),
           'age' => const AgePage(),
           'date-diff' => const DateDifferencePage(),
+          'bmi' => const BmiPage(),
+          'gpa' => const GpaPage(),
           _ => ToolPlaceholderPage(tool: tool),
         },
       ),

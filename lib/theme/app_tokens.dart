@@ -360,6 +360,7 @@ abstract final class AppSizes {
   static const double toolFieldPaddingH = 14;
   static const double toolLabelGap = 6;
   static const double toolDateIcon = 18;
+  static const double toolDeleteIcon = 20;
   static const double toolRateChipHeight = 44;
   static const double toolRateChipGap = 8;
   static const double toolTenureGap = 10;
