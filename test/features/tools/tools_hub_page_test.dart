@@ -5,9 +5,11 @@ import 'package:calculator/features/tools/pages/age_page.dart';
 import 'package:calculator/features/tools/pages/bmi_page.dart';
 import 'package:calculator/features/tools/pages/date_difference_page.dart';
 import 'package:calculator/features/tools/pages/discount_page.dart';
+import 'package:calculator/features/tools/pages/equation_page.dart';
 import 'package:calculator/features/tools/pages/gpa_page.dart';
 import 'package:calculator/features/tools/pages/loan_page.dart';
 import 'package:calculator/features/tools/pages/percentage_page.dart';
+import 'package:calculator/features/tools/pages/statistics_page.dart';
 import 'package:calculator/features/tools/pages/tip_page.dart';
 import 'package:calculator/features/tools/pages/tool_placeholder_page.dart';
 import 'package:calculator/features/tools/tools_hub_page.dart';
@@ -161,6 +163,12 @@ void main() {
       } else if (tool.id == 'gpa') {
         expect(find.byType(GpaPage), findsOneWidget);
         expect(find.text('Grade points'), findsWidgets);
+      } else if (tool.id == 'equation') {
+        expect(find.byType(EquationPage), findsOneWidget);
+        expect(find.text('Quadratic'), findsOneWidget);
+      } else if (tool.id == 'statistics') {
+        expect(find.byType(StatisticsPage), findsOneWidget);
+        expect(find.text('Values (comma separated)'), findsOneWidget);
       } else {
         expect(
           find.byType(ToolPlaceholderPage),
