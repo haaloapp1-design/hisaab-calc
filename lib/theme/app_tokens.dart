@@ -101,6 +101,11 @@ abstract final class AppRadii {
 
   static const double settingsTrack = 10;
   static const double settingsPill = 8;
+
+  // Tool pages (screen 10)
+  static const double toolField = 14;
+  static const double toolRateChip = 12;
+  static const double toolSegmentPill = 11;
 }
 
 /// Heights, paddings, gaps and other measurements.
@@ -349,6 +354,30 @@ abstract final class AppSizes {
   static const double toolActionRadius = 16;
   static const double toolNotePadding = 16;
   static const double toolNoteGap = 8;
+
+  // Loan page (screen 10)
+  static const double toolFieldHeight = 50;
+  static const double toolFieldPaddingH = 14;
+  static const double toolLabelGap = 6;
+  static const double toolRateChipHeight = 44;
+  static const double toolRateChipGap = 8;
+  static const double toolTenureGap = 10;
+  static const double toolSegmentPadding = 3;
+  static const double toolBreakdownPadding = 14;
+  static const double toolBreakdownGap = 8;
+  static const double toolBarHeight = 12;
+  static const double toolBarRadius = 6;
+  static const double toolLegendSize = 10;
+  static const double toolLegendRadius = 3;
+  static const double toolLegendGap = 6;
+  static const double toolTotalPaddingTop = 8;
+  static const double toolScheduleHeightFactor = 0.85;
+  static const double toolScheduleTitleGap = 2;
+  static const double toolScheduleHeaderGap = 10;
+  static const double toolScheduleRowPaddingV = 8;
+  static const double toolScheduleRowPaddingH = 4;
+  static const double toolScheduleMonthWidth = 44;
+  static const double toolScheduleClose = 20;
 
   static const double minTapTarget = 44;
   static const double borderWidth = 1;
@@ -617,6 +646,43 @@ abstract final class AppTypography {
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: medium,
+  );
+
+  // Loan page (screen 10)
+  static const TextStyle toolFieldLabel = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: medium,
+  );
+  static const TextStyle toolFieldValue = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: regular,
+  );
+  static const TextStyle toolRateChip = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: bold,
+  );
+  static const TextStyle toolBreakdownRow = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: regular,
+  );
+  static const TextStyle toolBreakdownTotal = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: bold,
+  );
+  static const TextStyle toolScheduleHeader = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: medium,
+  );
+  static const TextStyle toolScheduleCell = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: regular,
   );
   static const TextStyle segmentedLabel = TextStyle(
     fontFamily: fontFamily,

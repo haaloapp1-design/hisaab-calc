@@ -1,15 +1,22 @@
+import 'package:calculator/core/storage/kv_store_provider.dart';
+import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/tools/tool_catalog.dart';
+import 'package:calculator/features/tools/pages/loan_page.dart';
 import 'package:calculator/features/tools/pages/tool_placeholder_page.dart';
 import 'package:calculator/features/tools/tools_hub_page.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:calculator/theme/app_tokens.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget app({ValueChanged<Tool>? onToolSelected}) => MaterialApp(
-    theme: AppTheme.light(),
-    home: ToolsHubPage(onToolSelected: onToolSelected),
+  Widget app({ValueChanged<Tool>? onToolSelected}) => ProviderScope(
+    overrides: [kvStoreProvider.overrideWithValue(MemoryKvStore())],
+    child: MaterialApp(
+      theme: AppTheme.light(),
+      home: ToolsHubPage(onToolSelected: onToolSelected),
+    ),
   );
 
   /// The screens in `docs/screens/` are 390×844.
@@ -123,18 +130,27 @@ void main() {
       await tester.tap(find.byKey(Key('tool-card-${tool.id}')));
       await tester.pumpAndSettle();
 
-      expect(find.byType(ToolPlaceholderPage), findsOneWidget, reason: tool.id);
-      expect(find.byKey(Key('tool-note-${tool.id}')), findsOneWidget);
-      expect(
-        find.descendant(
-          of: find.byKey(Key('tool-note-${tool.id}')),
-          matching: find.text(tool.name),
-        ),
-        findsWidgets,
-        reason: tool.id,
-      );
-      expect(find.text('Coming soon'), findsOneWidget, reason: tool.id);
-      expect(find.text('—'), findsOneWidget, reason: tool.id);
+      if (tool.id == 'loan') {
+        expect(find.byType(LoanPage), findsOneWidget);
+        expect(find.text('Monthly instalment'), findsOneWidget);
+      } else {
+        expect(
+          find.byType(ToolPlaceholderPage),
+          findsOneWidget,
+          reason: tool.id,
+        );
+        expect(find.byKey(Key('tool-note-${tool.id}')), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(Key('tool-note-${tool.id}')),
+            matching: find.text(tool.name),
+          ),
+          findsWidgets,
+          reason: tool.id,
+        );
+        expect(find.text('Coming soon'), findsOneWidget, reason: tool.id);
+        expect(find.text('—'), findsOneWidget, reason: tool.id);
+      }
 
       await tester.pageBack();
       await tester.pumpAndSettle();

@@ -4,6 +4,7 @@ import '../../core/tools/tool_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import 'pages/loan_page.dart';
 import 'pages/tool_placeholder_page.dart';
 import 'widgets/tool_grid.dart';
 
@@ -64,7 +65,10 @@ class ToolsHubPage extends StatelessWidget {
     }
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => ToolPlaceholderPage(tool: tool),
+        builder: (BuildContext context) => switch (tool.id) {
+          'loan' => const LoanPage(),
+          _ => ToolPlaceholderPage(tool: tool),
+        },
       ),
     );
   }
