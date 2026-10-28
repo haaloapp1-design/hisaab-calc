@@ -1,7 +1,10 @@
 import 'package:calculator/core/storage/kv_store_provider.dart';
 import 'package:calculator/core/storage/memory_kv_store.dart';
 import 'package:calculator/core/tools/tool_catalog.dart';
+import 'package:calculator/features/tools/pages/discount_page.dart';
 import 'package:calculator/features/tools/pages/loan_page.dart';
+import 'package:calculator/features/tools/pages/percentage_page.dart';
+import 'package:calculator/features/tools/pages/tip_page.dart';
 import 'package:calculator/features/tools/pages/tool_placeholder_page.dart';
 import 'package:calculator/features/tools/tools_hub_page.dart';
 import 'package:calculator/theme/app_theme.dart';
@@ -133,6 +136,15 @@ void main() {
       if (tool.id == 'loan') {
         expect(find.byType(LoanPage), findsOneWidget);
         expect(find.text('Monthly instalment'), findsOneWidget);
+      } else if (tool.id == 'percentage') {
+        expect(find.byType(PercentagePage), findsOneWidget);
+        expect(find.text('X% of Y'), findsOneWidget);
+      } else if (tool.id == 'discount') {
+        expect(find.byType(DiscountPage), findsOneWidget);
+        expect(find.text('Final price'), findsWidgets);
+      } else if (tool.id == 'tip') {
+        expect(find.byType(TipPage), findsOneWidget);
+        expect(find.text('Per person'), findsWidgets);
       } else {
         expect(
           find.byType(ToolPlaceholderPage),

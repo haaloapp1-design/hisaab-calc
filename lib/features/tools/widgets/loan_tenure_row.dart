@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
-import 'loan_field.dart';
+import 'tool_field.dart';
 
 /// The unit the tenure field is counted in (screen 10).
 ///
@@ -56,10 +56,10 @@ class LoanTenureRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Expanded(
-          child: LoanField(
+          child: ToolField(
             label: 'Tenure',
-            child: LoanFieldBox(
-              child: LoanTextField(
+            child: ToolFieldBox(
+              child: ToolTextField(
                 fieldKey: const Key('loan-tenure'),
                 controller: controller,
                 keyboardType: TextInputType.number,

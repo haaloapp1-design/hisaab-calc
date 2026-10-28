@@ -4,7 +4,10 @@ import '../../core/tools/tool_catalog.dart';
 import '../../shared/widgets/blue_header.dart';
 import '../../theme/app_palette.dart';
 import '../../theme/app_tokens.dart';
+import 'pages/discount_page.dart';
 import 'pages/loan_page.dart';
+import 'pages/percentage_page.dart';
+import 'pages/tip_page.dart';
 import 'pages/tool_placeholder_page.dart';
 import 'widgets/tool_grid.dart';
 
@@ -67,6 +70,9 @@ class ToolsHubPage extends StatelessWidget {
       MaterialPageRoute<void>(
         builder: (BuildContext context) => switch (tool.id) {
           'loan' => const LoanPage(),
+          'percentage' => const PercentagePage(),
+          'discount' => const DiscountPage(),
+          'tip' => const TipPage(),
           _ => ToolPlaceholderPage(tool: tool),
         },
       ),

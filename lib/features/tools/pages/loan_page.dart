@@ -13,11 +13,11 @@ import '../../settings/settings_controller.dart';
 import '../../settings/settings_format.dart';
 import '../../settings/settings_model.dart';
 import '../tool_scaffold.dart';
-import '../widgets/loan_amount_field.dart';
 import '../widgets/loan_breakdown.dart';
 import '../widgets/loan_rate_chips.dart';
 import '../widgets/loan_schedule_sheet.dart';
 import '../widgets/loan_tenure_row.dart';
+import '../widgets/tool_amount_field.dart';
 
 /// The Loan / EMI tool (SPEC §6, screen `10-loan-emi.html`).
 ///
@@ -80,7 +80,9 @@ class _LoanPageState extends ConsumerState<LoanPage> {
       onAction: () =>
           showLoanScheduleSheet(context, result: result, options: options),
       children: <Widget>[
-        LoanAmountField(
+        ToolAmountField(
+          label: 'Loan amount (PKR)',
+          fieldKey: const Key('loan-amount'),
           initialAmount: _amount,
           options: options,
           onChanged: (CurrencyAmount amount) =>

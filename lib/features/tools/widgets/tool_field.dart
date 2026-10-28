@@ -7,9 +7,10 @@ import '../../../theme/app_tokens.dart';
 /// A labelled input on a tool page (SPEC §6, screen 10).
 ///
 /// The label is the 13 px muted line above the 50 px box; [child] is usually a
-/// [LoanTextField] but the tenure row also puts its unit toggle beside one.
-class LoanField extends StatelessWidget {
-  const LoanField({super.key, required this.label, required this.child});
+/// [ToolTextField] but a row also puts a unit toggle or a second field beside
+/// one.
+class ToolField extends StatelessWidget {
+  const ToolField({super.key, required this.label, required this.child});
 
   final String label;
   final Widget child;
@@ -39,8 +40,8 @@ class LoanField extends StatelessWidget {
 ///
 /// It is the surface only: a white/blue-tinted fill, the 1 px border and the
 /// 14 px side padding from `10-loan-emi.html`.
-class LoanFieldBox extends StatelessWidget {
-  const LoanFieldBox({super.key, required this.child});
+class ToolFieldBox extends StatelessWidget {
+  const ToolFieldBox({super.key, required this.child});
 
   final Widget child;
 
@@ -67,12 +68,12 @@ class LoanFieldBox extends StatelessWidget {
   }
 }
 
-/// The 18 px text field inside a [LoanFieldBox].
+/// The 18 px text field inside a [ToolFieldBox].
 ///
 /// The page owns the [controller] so it can read the typed value on every
 /// change and rebuild the result; the field itself is a pure view.
-class LoanTextField extends StatelessWidget {
-  const LoanTextField({
+class ToolTextField extends StatelessWidget {
+  const ToolTextField({
     super.key,
     required this.controller,
     required this.onChanged,

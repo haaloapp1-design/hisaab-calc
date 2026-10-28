@@ -3,30 +3,38 @@ import 'package:flutter/services.dart';
 
 import '../../../core/currency/currency_amount.dart';
 import '../../../core/engine/formatter.dart';
-import 'loan_field.dart';
+import 'tool_field.dart';
 
-/// The loan amount input on screen 10.
+/// A grouped decimal input on a tool page (screen 10 pattern).
 ///
 /// The field keeps its own [TextEditingController] because typing should not
 /// rebuild the page on every key; each change is reported as a
-/// [CurrencyAmount] and the page recalculates the loan from it.
-class LoanAmountField extends StatefulWidget {
-  const LoanAmountField({
+/// [CurrencyAmount] and the page recalculates from [CurrencyAmount.value].
+class ToolAmountField extends StatefulWidget {
+  const ToolAmountField({
     super.key,
+    required this.label,
+    required this.fieldKey,
     required this.initialAmount,
     required this.options,
     required this.onChanged,
   });
+
+  /// The 13 px label above the box, e.g. `Loan amount (PKR)`.
+  final String label;
+
+  /// The key on the inner [TextField], used by the tests.
+  final Key fieldKey;
 
   final CurrencyAmount initialAmount;
   final NumberFormatOptions options;
   final ValueChanged<CurrencyAmount> onChanged;
 
   @override
-  State<LoanAmountField> createState() => _LoanAmountFieldState();
+  State<ToolAmountField> createState() => _ToolAmountFieldState();
 }
 
-class _LoanAmountFieldState extends State<LoanAmountField> {
+class _ToolAmountFieldState extends State<ToolAmountField> {
   late final TextEditingController _controller = TextEditingController(
     text: widget.initialAmount.display(options: widget.options),
   );
@@ -39,15 +47,15 @@ class _LoanAmountFieldState extends State<LoanAmountField> {
 
   @override
   Widget build(BuildContext context) {
-    return LoanField(
-      label: 'Loan amount (PKR)',
-      child: LoanFieldBox(
-        child: LoanTextField(
-          fieldKey: const Key('loan-amount'),
+    return ToolField(
+      label: widget.label,
+      child: ToolFieldBox(
+        child: ToolTextField(
+          fieldKey: widget.fieldKey,
           controller: _controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: <TextInputFormatter>[
-            _LoanAmountFormatter(widget.options),
+            _ToolAmountFormatter(widget.options),
           ],
           onChanged: (String text) => widget.onChanged(
             CurrencyAmount.fromInput(text, options: widget.options),
@@ -62,8 +70,8 @@ class _LoanAmountFieldState extends State<LoanAmountField> {
 ///
 /// It mirrors the currency amount field: the caret sits at the end after every
 /// edit, and the amount is numeric, so this matches how the field is used.
-class _LoanAmountFormatter extends TextInputFormatter {
-  const _LoanAmountFormatter(this.options);
+class _ToolAmountFormatter extends TextInputFormatter {
+  const _ToolAmountFormatter(this.options);
 
   final NumberFormatOptions options;
 
