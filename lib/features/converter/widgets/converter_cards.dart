@@ -180,7 +180,7 @@ class _UnitCard extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.converterUnitPill.copyWith(
-                              color: palette.primary,
+                              color: palette.primaryText,
                             ),
                           ),
                         ),
@@ -188,7 +188,7 @@ class _UnitCard extends StatelessWidget {
                         Icon(
                           Icons.keyboard_arrow_down_rounded,
                           size: AppSizes.converterUnitPillIcon,
-                          color: palette.primary,
+                          color: palette.primaryText,
                         ),
                       ],
                     ),
@@ -248,7 +248,7 @@ class _SwapButton extends StatelessWidget {
           color: palette.sheet,
           shape: shape.copyWith(
             side: BorderSide(
-              color: palette.primary,
+              color: palette.primaryText,
               width: AppSizes.converterSwapBorder,
             ),
           ),
@@ -259,7 +259,7 @@ class _SwapButton extends StatelessWidget {
             child: Icon(
               Icons.swap_vert_rounded,
               size: AppSizes.converterSwapIcon,
-              color: palette.primary,
+              color: palette.primaryText,
             ),
           ),
         ),

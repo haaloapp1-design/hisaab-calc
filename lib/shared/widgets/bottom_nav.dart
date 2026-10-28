@@ -52,9 +52,11 @@ class BottomNav extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          for (int index = 0; index < NavDestination.values.length; index++) ...<
-            Widget
-          >[
+          for (
+            int index = 0;
+            index < NavDestination.values.length;
+            index++
+          ) ...<Widget>[
             if (index > 0) const SizedBox(width: AppSizes.navGap),
             Expanded(
               child: _NavItem(
@@ -84,7 +86,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final Color color = selected ? palette.primary : palette.inkMuted;
+    final Color color = selected ? palette.primaryText : palette.inkMuted;
 
     return Semantics(
       selected: selected,

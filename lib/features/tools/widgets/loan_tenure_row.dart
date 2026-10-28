@@ -161,7 +161,7 @@ class _UnitPill extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: AppTypography.segmentedLabel.copyWith(
-                color: selected ? palette.primary : palette.inkMuted,
+                color: selected ? palette.primaryText : palette.inkMuted,
                 fontWeight: selected
                     ? AppTypography.bold
                     : AppTypography.regular,

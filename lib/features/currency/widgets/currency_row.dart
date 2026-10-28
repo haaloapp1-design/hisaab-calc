@@ -63,7 +63,7 @@ class CurrencyRow extends StatelessWidget {
                   child: Text(
                     row.currency.code,
                     style: AppTypography.currencyCode.copyWith(
-                      color: palette.primary,
+                      color: palette.primaryText,
                     ),
                   ),
                 ),

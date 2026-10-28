@@ -60,14 +60,14 @@ class CurrencyTop extends StatelessWidget {
                           Text(
                             readout.base,
                             style: AppTypography.currencyBaseCode.copyWith(
-                              color: palette.primary,
+                              color: palette.primaryText,
                             ),
                           ),
                           const SizedBox(width: AppSizes.currencyBasePillGap),
                           Icon(
                             Icons.expand_more_rounded,
                             size: AppSizes.currencyBaseArrow,
-                            color: palette.primary,
+                            color: palette.primaryText,
                           ),
                         ],
                       ),

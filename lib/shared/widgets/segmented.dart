@@ -99,7 +99,7 @@ class _Segment extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.segmentedLabel.copyWith(
-              color: selected ? palette.primary : palette.segmentedInactive,
+              color: selected ? palette.primaryText : palette.segmentedInactive,
               fontWeight: selected
                   ? AppTypography.medium
                   : AppTypography.regular,

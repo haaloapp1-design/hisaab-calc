@@ -64,7 +64,7 @@ class SettingsValue extends StatelessWidget {
       text,
       maxLines: 1,
       style: AppTypography.settingsValue.copyWith(
-        color: AppPalette.of(context).primary,
+        color: AppPalette.of(context).primaryText,
       ),
     );
   }

@@ -59,7 +59,7 @@ class WordSizeMenu extends StatelessWidget {
                         Icon(
                           Icons.check_rounded,
                           size: AppSizes.historyMenuIcon,
-                          color: palette.primary,
+                          color: palette.primaryText,
                         ),
                     ],
                   ),

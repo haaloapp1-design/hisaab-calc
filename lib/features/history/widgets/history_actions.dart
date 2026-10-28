@@ -82,7 +82,7 @@ class _HistoryActionButton extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTypography.historyAction.copyWith(
-              color: danger ? palette.danger : palette.primary,
+              color: danger ? palette.danger : palette.primaryText,
             ),
           ),
         ),

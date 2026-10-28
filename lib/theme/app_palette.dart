@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_tokens.dart';
+import 'contrast.dart';
 
 /// The colours of one theme + accent combination, exposed as a
 /// [ThemeExtension] so widgets can read them from `Theme.of(context)`.
@@ -19,6 +20,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.primary,
     required this.primaryDeep,
     required this.primaryTrack,
+    required this.primaryText,
     required this.onPrimary,
     required this.onPrimaryMuted,
     required this.onPrimaryFaint,
@@ -52,6 +54,13 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color primary;
   final Color primaryDeep;
   final Color primaryTrack;
+
+  /// The accent as a *foreground* colour: text, icons and cursors on a sheet,
+  /// a key or the background. It equals [primary] in light mode; in dark mode
+  /// the accent itself is too dark for a dark surface, so this is the lightest
+  /// tint of it that still reaches AA (T49).
+  final Color primaryText;
+
   final Color onPrimary;
   final Color onPrimaryMuted;
   final Color onPrimaryFaint;
@@ -86,6 +95,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     primary: AppColors.primary,
     primaryDeep: AppColors.primaryDeep,
     primaryTrack: AppColors.primaryTrack,
+    primaryText: AppColors.primary,
     onPrimary: AppColors.onPrimary,
     onPrimaryMuted: AppColors.onPrimaryMuted,
     onPrimaryFaint: AppColors.onPrimaryFaint,
@@ -116,6 +126,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     dangerSurface: AppColors.dangerSurface,
   );
 
+  /// The dark theme with the cobalt accent, matching [AppTheme.dark]'s default.
+  static final AppPalette darkCobalt = AppPalette.dark(AppColors.primary);
+
   /// The light theme for any accent. Cobalt keeps the exact design tokens.
   factory AppPalette.light(Color accent) {
     if (accent == AppColors.primary) {
@@ -125,6 +138,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       primary: accent,
       primaryDeep: _mixBlack(accent, 0.28),
       primaryTrack: _mixWhite(accent, 0.08),
+      primaryText: accent,
       onPrimary: AppColors.onPrimary,
       onPrimaryMuted: _mixWhite(accent, 0.84),
       onPrimaryFaint: _mixWhite(accent, 0.73),
@@ -159,21 +173,25 @@ class AppPalette extends ThemeExtension<AppPalette> {
   /// The dark theme from DESIGN "Dark theme": #10142B background, #181D3A
   /// sheet, #222849 keys and #E8EBFA ink; the accent stays `primary`.
   ///
-  /// T49 polishes every screen in dark mode; these values already give the
-  /// whole app a readable dark surface.
+  /// On dark surfaces the accent itself is too dark to read (cobalt is only
+  /// 2.11:1 on the sheet), so every accent *foreground* is derived as the
+  /// lightest tint that still reaches AA: [primaryText] on the surfaces and the
+  /// on-blue tints on the header. T49.
   factory AppPalette.dark(Color accent) {
     final Color sheet = _darkSheet;
+    final Color track = _mixWhite(accent, 0.08);
     return AppPalette(
       primary: accent,
       primaryDeep: _mixBlack(accent, 0.18),
-      primaryTrack: _mixWhite(accent, 0.08),
+      primaryTrack: track,
+      primaryText: _tintUntil(accent, _darkFunction, Contrast.normalText),
       onPrimary: AppColors.onPrimary,
-      onPrimaryMuted: _mixWhite(accent, 0.70),
-      onPrimaryFaint: _mixWhite(accent, 0.58),
+      onPrimaryMuted: _tintUntil(accent, track, Contrast.normalText),
+      onPrimaryFaint: _tintUntil(accent, track, Contrast.normalText),
       dividerOnPrimary: _mixWhite(accent, 0.22),
       historyDivider: _mixWhite(accent, 0.22),
       memoryButtonBorder: _mixWhite(accent, 0.45),
-      converterCardBorder: Color.lerp(accent, sheet, 0.55)!,
+      converterCardBorder: _mixWhite(accent, 0.55),
       sheet: sheet,
       background: _darkBackground,
       keyNumber: _darkKeys,
@@ -184,7 +202,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       keyOperatorBorder: Color.lerp(accent, sheet, 0.56)!,
       ink: _darkInk,
       inkMuted: _darkInkMuted,
-      segmentedInactive: _darkInactive,
+      segmentedInactive: _tintUntil(accent, track, Contrast.normalText),
       divider: _darkDivider,
       selectorTrack: _darkKeys,
       switchOff: _darkSwitchOff,
@@ -207,7 +225,6 @@ class AppPalette extends ThemeExtension<AppPalette> {
   static const Color _darkFunction = Color(0xFF2A3054);
   static const Color _darkInk = Color(0xFFE8EBFA);
   static const Color _darkInkMuted = Color(0xFFA9B2D6);
-  static const Color _darkInactive = Color(0xFF3A4270);
   static const Color _darkDivider = Color(0xFF2A3054);
   static const Color _darkSwitchOff = Color(0xFF4A5178);
   static const Color _darkDisabled = Color(0xFF6B739A);
@@ -222,6 +239,19 @@ class AppPalette extends ThemeExtension<AppPalette> {
   static Color _mixBlack(Color colour, double amount) =>
       Color.lerp(colour, const Color(0xFF000000), amount)!;
 
+  /// Mixes [colour] with white in 1 % steps until it reaches [target] contrast
+  /// against [surface], and returns the first tint that does. Used by the dark
+  /// palette, where the accent has to become a light tint to be readable (T49).
+  static Color _tintUntil(Color colour, Color surface, double target) {
+    for (int step = 30; step < 100; step++) {
+      final Color tint = _mixWhite(colour, step / 100);
+      if (Contrast.ratio(tint, surface) >= target) {
+        return tint;
+      }
+    }
+    return AppColors.onPrimary;
+  }
+
   /// The palette of the current theme, or [lightCobalt] when a test pumps a
   /// bare `MaterialApp` without [AppTheme] (never in the app itself).
   static AppPalette of(BuildContext context) =>
@@ -234,6 +264,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? primary,
     Color? primaryDeep,
     Color? primaryTrack,
+    Color? primaryText,
     Color? onPrimary,
     Color? onPrimaryMuted,
     Color? onPrimaryFaint,
@@ -266,6 +297,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     primary: primary ?? this.primary,
     primaryDeep: primaryDeep ?? this.primaryDeep,
     primaryTrack: primaryTrack ?? this.primaryTrack,
+    primaryText: primaryText ?? this.primaryText,
     onPrimary: onPrimary ?? this.onPrimary,
     onPrimaryMuted: onPrimaryMuted ?? this.onPrimaryMuted,
     onPrimaryFaint: onPrimaryFaint ?? this.onPrimaryFaint,
@@ -306,6 +338,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
       primary: blend(primary, other.primary),
       primaryDeep: blend(primaryDeep, other.primaryDeep),
       primaryTrack: blend(primaryTrack, other.primaryTrack),
+      primaryText: blend(primaryText, other.primaryText),
       onPrimary: blend(onPrimary, other.onPrimary),
       onPrimaryMuted: blend(onPrimaryMuted, other.onPrimaryMuted),
       onPrimaryFaint: blend(onPrimaryFaint, other.onPrimaryFaint),

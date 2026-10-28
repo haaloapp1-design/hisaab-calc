@@ -231,7 +231,7 @@ _KeyStyle _styleFor(
         basic ? palette.keyNumber : palette.keyFunction,
       ),
       border: palette.keyNumberBorder,
-      foreground: palette.primary,
+      foreground: palette.primaryText,
       textStyle: basic
           ? AppTypography.keyFunctionBasic
           : AppTypography.keyFunction,
@@ -240,7 +240,7 @@ _KeyStyle _styleFor(
       background: palette.keyNumberScientific,
       pressedBackground: pressed(palette.keyNumberScientific),
       border: palette.keyNumberBorder,
-      foreground: palette.primary,
+      foreground: palette.primaryText,
       textStyle: basic
           ? AppTypography.keyFunctionBasic
           : AppTypography.keyFunctionStrong,
@@ -255,7 +255,7 @@ _KeyStyle _styleFor(
       background: palette.keyOperator,
       pressedBackground: pressed(palette.keyOperator),
       border: palette.keyOperatorBorder,
-      foreground: palette.primary,
+      foreground: palette.primaryText,
       textStyle: basic
           ? AppTypography.keyOperatorBasic
           : AppTypography.keyOperatorScientific,

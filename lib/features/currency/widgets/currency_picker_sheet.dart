@@ -134,7 +134,7 @@ class _CurrencyPickerSheetState extends State<_CurrencyPickerSheet> {
                 width: AppSizes.handleWidth,
                 height: AppSizes.handleHeight,
                 decoration: BoxDecoration(
-                  color: palette.primary,
+                  color: palette.primaryText,
                   borderRadius: BorderRadius.circular(AppRadii.handle),
                 ),
               ),
@@ -271,7 +271,7 @@ class _CurrencyPickerRow extends StatelessWidget {
                   child: Text(
                     currency.code,
                     style: AppTypography.currencyCode.copyWith(
-                      color: palette.primary,
+                      color: palette.primaryText,
                     ),
                   ),
                 ),
@@ -282,7 +282,7 @@ class _CurrencyPickerRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.body.copyWith(
-                      color: selected ? palette.primary : palette.ink,
+                      color: selected ? palette.primaryText : palette.ink,
                       fontWeight: selected
                           ? AppTypography.medium
                           : AppTypography.regular,
@@ -293,7 +293,7 @@ class _CurrencyPickerRow extends StatelessWidget {
                   Icon(
                     Icons.check_rounded,
                     size: AppSizes.currencyPickerCheck,
-                    color: palette.primary,
+                    color: palette.primaryText,
                   ),
               ],
             ),

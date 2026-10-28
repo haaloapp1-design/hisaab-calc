@@ -278,7 +278,7 @@ class _AddCourseButton extends StatelessWidget {
               child: Text(
                 'Add course',
                 style: AppTypography.toolRateChip.copyWith(
-                  color: palette.primary,
+                  color: palette.primaryText,
                   fontWeight: AppTypography.regular,
                 ),
               ),

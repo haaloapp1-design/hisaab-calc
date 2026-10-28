@@ -99,7 +99,7 @@ class _RateChip extends StatelessWidget {
               child: Text(
                 '$rate%',
                 style: AppTypography.toolRateChip.copyWith(
-                  color: selected ? palette.onPrimary : palette.primary,
+                  color: selected ? palette.onPrimary : palette.primaryText,
                   fontWeight: selected
                       ? AppTypography.bold
                       : AppTypography.regular,

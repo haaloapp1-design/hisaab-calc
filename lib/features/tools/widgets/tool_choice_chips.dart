@@ -91,7 +91,7 @@ class _ChoiceChip extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: AppTypography.toolRateChip.copyWith(
-                  color: selected ? palette.onPrimary : palette.primary,
+                  color: selected ? palette.onPrimary : palette.primaryText,
                   fontWeight: selected
                       ? AppTypography.bold
                       : AppTypography.regular,

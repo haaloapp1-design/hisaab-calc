@@ -92,7 +92,7 @@ class _RowAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final Color color = danger ? palette.danger : palette.primary;
+    final Color color = danger ? palette.danger : palette.primaryText;
 
     return Semantics(
       button: true,

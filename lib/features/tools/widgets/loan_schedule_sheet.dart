@@ -60,7 +60,7 @@ class _LoanScheduleSheet extends StatelessWidget {
               width: AppSizes.handleWidth,
               height: AppSizes.handleHeight,
               decoration: BoxDecoration(
-                color: palette.primary,
+                color: palette.primaryText,
                 borderRadius: BorderRadius.circular(AppRadii.handle),
               ),
             ),

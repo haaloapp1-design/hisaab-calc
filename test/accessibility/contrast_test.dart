@@ -142,4 +142,87 @@ void main() {
 
     normal('dark danger on dangerSurface', dark.danger, dark.dangerSurface);
   });
+
+  // T49: the accent itself is only 2.11:1 on the dark sheet, so every accent
+  // *foreground* in dark mode is `primaryText` — the lightest tint of the
+  // accent that still reaches AA. These are the surfaces it is painted on.
+  test('dark primaryText reaches AA on every dark surface', () {
+    for (final AccentSwatch swatch in AccentSwatch.values) {
+      final AppPalette dark = AppPalette.dark(swatch.color);
+
+      for (final (String name, Color surface) in <(String, Color)>[
+        ('sheet', dark.sheet),
+        ('background', dark.background),
+        ('keyNumber', dark.keyNumber),
+        ('keyNumberScientific', dark.keyNumberScientific),
+        ('keyFunction', dark.keyFunction),
+        ('keyOperator', dark.keyOperator),
+        ('selectorTrack', dark.selectorTrack),
+        ('dangerSurface', dark.dangerSurface),
+      ]) {
+        normal(
+          '${swatch.name} primaryText on $name',
+          dark.primaryText,
+          surface,
+        );
+      }
+
+      // `primaryText` is the accent itself in light mode, so the light
+      // assertions above already cover the light theme.
+      expect(AppPalette.light(swatch.color).primaryText, swatch.color);
+    }
+  });
+
+  test('dark on-primary tints reach AA on the accent header', () {
+    for (final AccentSwatch swatch in AccentSwatch.values) {
+      final AppPalette dark = AppPalette.dark(swatch.color);
+
+      normal(
+        '${swatch.name} onPrimary on primary',
+        dark.onPrimary,
+        dark.primary,
+      );
+      normal(
+        '${swatch.name} onPrimary on primaryTrack',
+        dark.onPrimary,
+        dark.primaryTrack,
+      );
+
+      // The expression line, status line, angle controls, unselected segmented
+      // pills and inactive programmer rows.
+      normal(
+        '${swatch.name} onPrimaryMuted on primary',
+        dark.onPrimaryMuted,
+        dark.primary,
+      );
+      normal(
+        '${swatch.name} onPrimaryMuted on primaryTrack',
+        dark.onPrimaryMuted,
+        dark.primaryTrack,
+      );
+      normal(
+        '${swatch.name} onPrimaryFaint on primary',
+        dark.onPrimaryFaint,
+        dark.primary,
+      );
+      normal(
+        '${swatch.name} segmentedInactive on primary',
+        dark.segmentedInactive,
+        dark.primary,
+      );
+    }
+  });
+
+  test('dark warning and danger stay readable', () {
+    final AppPalette dark = AppPalette.dark(AccentSwatch.cobalt.color);
+
+    atLeast(
+      'dark warning on primary',
+      dark.warning,
+      dark.primary,
+      Contrast.largeText,
+    );
+    normal('dark danger on sheet', dark.danger, dark.sheet);
+    normal('dark danger on keyNumber', dark.danger, dark.keyNumber);
+  });
 }

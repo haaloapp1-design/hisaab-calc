@@ -82,7 +82,7 @@ class _CategoryCell extends StatelessWidget {
                     category.hubSymbol,
                     maxLines: 1,
                     style: AppTypography.hubChip.copyWith(
-                      color: palette.primary,
+                      color: palette.primaryText,
                     ),
                   ),
                 ),

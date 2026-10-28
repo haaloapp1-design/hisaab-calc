@@ -102,7 +102,7 @@ class _FavouriteRow extends StatelessWidget {
               Icon(
                 Icons.star_rounded,
                 size: AppSizes.hubFavouriteIcon,
-                color: palette.primary,
+                color: palette.primaryText,
               ),
               const SizedBox(width: AppSizes.hubFavouriteGap),
               Expanded(
@@ -133,7 +133,7 @@ class _FavouriteRow extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 size: AppSizes.hubFavouriteChevron,
-                color: palette.primary,
+                color: palette.primaryText,
               ),
             ],
           ),

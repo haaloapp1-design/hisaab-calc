@@ -234,7 +234,9 @@ class _LoadingSheet extends StatelessWidget {
           top: Radius.circular(AppRadii.sheet),
         ),
       ),
-      child: Center(child: CircularProgressIndicator(color: palette.primary)),
+      child: Center(
+        child: CircularProgressIndicator(color: palette.primaryText),
+      ),
     );
   }
 }

@@ -139,7 +139,7 @@ class _ConverterKeyButton extends StatelessWidget {
                             ? AppTypography.converterKeyFunction
                             : AppTypography.converterKeyNumber)
                         .copyWith(
-                          color: isFunction ? palette.primary : palette.ink,
+                          color: isFunction ? palette.primaryText : palette.ink,
                         ),
               ),
             ),

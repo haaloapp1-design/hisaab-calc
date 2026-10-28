@@ -80,7 +80,7 @@ class CurrencyCard extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 size: AppSizes.hubCurrencyChevron,
-                color: palette.primary,
+                color: palette.primaryText,
               ),
             ],
           ),

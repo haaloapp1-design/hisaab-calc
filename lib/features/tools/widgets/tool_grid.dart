@@ -96,7 +96,7 @@ class _ToolCard extends StatelessWidget {
                     tool.symbol,
                     maxLines: 1,
                     style: AppTypography.toolSymbol.copyWith(
-                      color: palette.primary,
+                      color: palette.primaryText,
                     ),
                   ),
                 ),

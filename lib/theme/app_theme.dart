@@ -22,22 +22,23 @@ abstract final class AppTheme {
       fontFamily: AppTypography.fontFamily,
     );
 
-    final ColorScheme colors = ColorScheme.fromSeed(
-      seedColor: palette.primary,
-      brightness: brightness,
-    ).copyWith(
-      primary: palette.primary,
-      onPrimary: palette.onPrimary,
-      primaryContainer: palette.keyOperator,
-      onPrimaryContainer: palette.ink,
-      secondary: palette.warning,
-      onSecondary: palette.ink,
-      surface: palette.sheet,
-      onSurface: palette.ink,
-      outline: palette.keyNumberBorder,
-      error: palette.danger,
-      onError: palette.onPrimary,
-    );
+    final ColorScheme colors =
+        ColorScheme.fromSeed(
+          seedColor: palette.primary,
+          brightness: brightness,
+        ).copyWith(
+          primary: palette.primary,
+          onPrimary: palette.onPrimary,
+          primaryContainer: palette.keyOperator,
+          onPrimaryContainer: palette.ink,
+          secondary: palette.warning,
+          onSecondary: palette.ink,
+          surface: palette.sheet,
+          onSurface: palette.ink,
+          outline: palette.keyNumberBorder,
+          error: palette.danger,
+          onError: palette.onPrimary,
+        );
 
     final TextTheme textTheme = base.textTheme
         .apply(
@@ -103,16 +104,45 @@ abstract final class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: palette.primary,
           foregroundColor: palette.onPrimary,
-          minimumSize: const Size(
-            AppSizes.minTapTarget,
-            AppSizes.minTapTarget,
-          ),
+          minimumSize: const Size(AppSizes.minTapTarget, AppSizes.minTapTarget),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(AppRadii.keyConverter),
             ),
           ),
         ),
+      ),
+      // Text buttons and the date picker sit on the sheet, so their accent
+      // text uses `primaryText`; the raw accent is only 2.11:1 on the dark
+      // sheet (T49).
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: palette.primaryText,
+          minimumSize: const Size(AppSizes.minTapTarget, AppSizes.minTapTarget),
+        ),
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: palette.sheet,
+        headerBackgroundColor: palette.primary,
+        headerForegroundColor: palette.onPrimary,
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return palette.disabled;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return palette.onPrimary;
+          }
+          return palette.ink;
+        }),
+        yearForegroundColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return palette.disabled;
+          }
+          if (states.contains(WidgetState.selected)) {
+            return palette.onPrimary;
+          }
+          return palette.ink;
+        }),
       ),
       extensions: <ThemeExtension<dynamic>>[palette],
     );

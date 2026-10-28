@@ -51,7 +51,7 @@ class ToolPlaceholderPage extends StatelessWidget {
                 child: Text(
                   tool.symbol,
                   style: AppTypography.toolSymbol.copyWith(
-                    color: palette.primary,
+                    color: palette.primaryText,
                   ),
                 ),
               ),

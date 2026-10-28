@@ -105,7 +105,7 @@ class ToolTextField extends StatelessWidget {
       textInputAction: TextInputAction.done,
       maxLines: 1,
       style: AppTypography.toolFieldValue.copyWith(color: palette.ink),
-      cursorColor: palette.primary,
+      cursorColor: palette.primaryText,
       decoration: const InputDecoration(
         border: InputBorder.none,
         isCollapsed: true,

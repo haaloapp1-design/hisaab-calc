@@ -106,7 +106,7 @@ class _StepButton extends StatelessWidget {
           child: Text(
             glyph,
             style: AppTypography.stepperGlyph.copyWith(
-              color: palette.primary,
+              color: palette.primaryText,
             ),
           ),
         ),

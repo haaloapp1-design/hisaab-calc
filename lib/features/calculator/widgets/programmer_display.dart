@@ -173,7 +173,9 @@ class _BaseRow extends StatelessWidget {
     final AppPalette palette = AppPalette.of(context);
     // The design's inactive row text is #E4E9FF, the same value as the
     // segmented control's inactive label.
-    final Color colour = selected ? palette.primary : palette.segmentedInactive;
+    final Color colour = selected
+        ? palette.primaryText
+        : palette.segmentedInactive;
 
     return Semantics(
       button: true,

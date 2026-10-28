@@ -115,7 +115,7 @@ class _UnitRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.body.copyWith(
-                      color: selected ? palette.primary : palette.ink,
+                      color: selected ? palette.primaryText : palette.ink,
                       fontWeight: selected
                           ? AppTypography.medium
                           : AppTypography.regular,
@@ -126,7 +126,7 @@ class _UnitRow extends StatelessWidget {
                   Icon(
                     Icons.check_rounded,
                     size: AppSizes.converterPickerCheck,
-                    color: palette.primary,
+                    color: palette.primaryText,
                   ),
               ],
             ),

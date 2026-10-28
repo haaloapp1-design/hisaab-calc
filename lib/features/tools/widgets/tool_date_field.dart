@@ -87,7 +87,7 @@ class ToolDateField extends StatelessWidget {
                   Icon(
                     Icons.calendar_today_rounded,
                     size: AppSizes.toolDateIcon,
-                    color: palette.primary,
+                    color: palette.primaryText,
                   ),
                 ],
               ),

@@ -43,7 +43,7 @@ class HubSearchField extends StatelessWidget {
                   key: const Key('hub-search-field'),
                   controller: controller,
                   style: AppTypography.body.copyWith(color: palette.ink),
-                  cursorColor: palette.primary,
+                  cursorColor: palette.primaryText,
                   textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
                     isDense: true,

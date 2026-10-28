@@ -54,14 +54,14 @@ class CurrencySheet extends StatelessWidget {
             width: AppSizes.handleWidth,
             height: AppSizes.handleHeight,
             decoration: BoxDecoration(
-              color: palette.primary,
+              color: palette.primaryText,
               borderRadius: BorderRadius.circular(AppRadii.handle),
             ),
           ),
           const SizedBox(height: AppSizes.currencySheetGap),
           Expanded(
             child: RefreshIndicator(
-              color: palette.primary,
+              color: palette.primaryText,
               onRefresh: onRefresh,
               child: rows.isEmpty
                   ? _EmptyRows(palette: palette)
@@ -159,7 +159,7 @@ class _AddCurrencyButton extends StatelessWidget {
                 child: Text(
                   'Add currency',
                   style: AppTypography.currencyAdd.copyWith(
-                    color: palette.primary,
+                    color: palette.primaryText,
                   ),
                 ),
               ),

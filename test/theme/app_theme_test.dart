@@ -1,6 +1,7 @@
 import 'package:calculator/theme/app_palette.dart';
 import 'package:calculator/theme/app_theme.dart';
 import 'package:calculator/theme/app_tokens.dart';
+import 'package:calculator/theme/contrast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -76,6 +77,45 @@ void main() {
       expect(theme.canvasColor, const Color(0xFF181D3A));
       expect(theme.textTheme.bodyMedium?.color, const Color(0xFFE8EBFA));
     });
+
+    test('derives readable accent text and a themed date picker', () {
+      final ThemeData theme = AppTheme.dark(accent: AppColors.accentTeal);
+      final AppPalette palette = theme.extension<AppPalette>()!;
+
+      // The raw accent is too dark for a dark surface (T49).
+      expect(
+        Contrast.ratio(palette.primaryText, palette.sheet),
+        greaterThanOrEqualTo(Contrast.normalText),
+      );
+      expect(
+        Contrast.ratio(palette.primaryText, palette.keyFunction),
+        greaterThanOrEqualTo(Contrast.normalText),
+      );
+      expect(
+        theme.textButtonTheme.style!.foregroundColor!.resolve(<WidgetState>{}),
+        palette.primaryText,
+      );
+
+      expect(theme.datePickerTheme.backgroundColor, palette.sheet);
+      expect(theme.datePickerTheme.headerBackgroundColor, palette.primary);
+      expect(theme.datePickerTheme.headerForegroundColor, palette.onPrimary);
+      expect(
+        theme.datePickerTheme.dayForegroundColor!.resolve(<WidgetState>{
+          WidgetState.selected,
+        }),
+        palette.onPrimary,
+      );
+      expect(
+        theme.datePickerTheme.dayForegroundColor!.resolve(<WidgetState>{}),
+        palette.ink,
+      );
+      expect(
+        theme.datePickerTheme.dayForegroundColor!.resolve(<WidgetState>{
+          WidgetState.disabled,
+        }),
+        palette.disabled,
+      );
+    });
   });
 
   test('Material colours follow the palette, not fixed constants', () {
@@ -87,6 +127,12 @@ void main() {
     expect(theme.bottomSheetTheme.backgroundColor, palette.sheet);
     expect(
       theme.filledButtonTheme.style!.backgroundColor!.resolve(<WidgetState>{}),
+      palette.primary,
+    );
+    // Light mode's `primaryText` is the accent itself, so text buttons keep
+    // the DESIGN accent colour.
+    expect(
+      theme.textButtonTheme.style!.foregroundColor!.resolve(<WidgetState>{}),
       palette.primary,
     );
   });
