@@ -211,6 +211,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-29 - The splash background is the same `#2D46B9` as the adaptive-icon background, so on Android 12+ the launcher tile blends into the splash and only the white حساب glyph and the two amber bars are visible (the intended brand mark).
 - 2026-10-29 - The release APK keeps the Flutter template's debug-keystore signing (`android/app/build.gradle.kts`) so it can be installed over the debug build on the phone; the README says so and names a real keystore as the step before publishing. A signed AAB/Play upload is out of scope for T50.
 - 2026-10-29 - Phones are locked to portrait (Android `screenOrientation="portrait"`, iPhone `UISupportedInterfaceOrientations` portrait only; iPad list left as is for multitasking) - every screen overflowed in landscape and the design is portrait-only.
+- 2026-10-29 - Upload keystore lives outside the repo (`C:/Users/Ghulam abbas/hisaab-upload-keystore.jks`, alias `upload`, PKCS12, RSA 2048, 10000 days) and its random password only in git-ignored `android/key.properties`; without that file release falls back to debug signing with a Gradle warning - keeps `flutter run --release` working on other machines while Play uploads need the real key.
 
 ## Log entry template
 
@@ -602,3 +603,10 @@ Changed: `android/app/src/main/AndroidManifest.xml` (`android.permission.INTERNE
 Tests: found during a full review — the installed T50 release APK showed "Offline · No rates yet" on the itel NOTE 24 with Wi-Fi on, and `dumpsys package` listed no INTERNET permission. After the fix: `flutter build apk --release`, `adb install -r` → Success, `INTERNET: granted=true`, Currency shows "Live rates" (10,000 PKR → 36.11 USD at 276.9); forcing `user_rotation 1` keeps the app in portrait. `flutter analyze` clean; `flutter test` 1085/1085 pass (no Dart changes).
 Notes for next session: any future network feature needs nothing more on Android. Remaining known issues: a 360×640 dp phone may still overflow in Scientific; text scale 1.3 + small-screen shell untested; release is debug-signed (real keystore + AAB needed for Play Store).
 Next: none — propose the next task
+
+### T54 — Play upload signing — 2026-10-29
+Status: DONE
+Changed: `android/app/build.gradle.kts` (`import java.util.Properties`, loads `key.properties`, `signingConfigs.release`, debug fallback with warning); `README.md` (signing + version-bump notes); git-ignored, not committed: `android/key.properties` and the keystore outside the repo.
+Tests: `flutter build appbundle --release` → `app-release.aab` 51.5 MB; `keytool -printcert -jarfile` on the bundle shows `CN=Ghulam abbas, O=Hisab` with SHA-256 97:6A:B2:70:…:00:D0, identical to the keystore. No Dart changes.
+Notes for next session: a release APK signed with the upload key will NOT install over the debug-signed build already on the phone (signature mismatch) — uninstall first, or test via the Play closed-testing track. Note `java.util.Properties` must be imported at the top of the .kts (inside the script `java` resolves to Gradle's java extension). Bump `version:` in pubspec before every Play upload.
+Next: none — Play Console listing (screenshots, data safety, privacy policy) is the user's step

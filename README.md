@@ -48,16 +48,19 @@ flutter test             # full unit + widget suite
 ## Build
 
 ```sh
-flutter build apk --release        # Android, debug-signed for now (see below)
+flutter build apk --release        # Android APK (signed, see below)
 flutter build appbundle --release  # Play Store bundle
 flutter build ipa --release        # iOS (needs a signing team)
 ```
 
-The Android release build currently signs with the debug keystore
-(`android/app/build.gradle.kts`), so it installs for testing but is **not**
-ready for the Play Store. Replace the `release` `signingConfig` with a real
-keystore before publishing. The version comes from `pubspec.yaml`
-(`version: 1.0.0+1`).
+Android release builds are signed with the Play **upload key** when
+`android/key.properties` exists (git-ignored). It holds `storePassword`,
+`keyPassword`, `keyAlias=upload` and `storeFile` (path to the `.jks`, kept
+outside the repo). Without that file the build falls back to the debug key
+and prints a warning — Play Console rejects such uploads. Back up the `.jks`
+and `key.properties` together: every update must be signed with the same key.
+Bump `version:` in `pubspec.yaml` before each upload (the `+N` build number
+must increase). Current version: (`version: 1.0.0+1`).
 
 ## Project layout
 

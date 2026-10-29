@@ -147,3 +147,5 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   adds it to the debug/profile manifests), so Currency showed "Offline · No rates yet" on a phone with Wi-Fi.
   Also lock phones to portrait (landscape overflowed on every screen). Done when: release APK on the phone shows live rates
   and stays portrait when rotated.
+- [x] **T54 Play upload signing** — Release builds sign with an upload keystore read from git-ignored
+  `android/key.properties`; build `app-release.aab`. Done when: the bundle's signer matches the upload key.
