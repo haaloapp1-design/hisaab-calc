@@ -210,6 +210,7 @@ At the start of each session, read the "Decisions" section and the last 3 log en
 - 2026-10-29 - T50 builds the splash from plain Android resources instead of adding `flutter_native_splash`: before Android 12 the launch window is a `layer-list` with the cobalt `ic_launcher_background` and the existing `ic_launcher_foreground` bitmap centred; Android 12+ gets a `values-v31` `LaunchTheme` with `windowSplashScreenBackground` (cobalt) and `windowSplashScreenAnimatedIcon` (`@mipmap/launcher_icon`), duplicated in `values-night-v31` because the night `styles.xml` would otherwise win and fall back to the stock black launch theme. No package was added, so ARCHITECTURE's dependency list is unchanged.
 - 2026-10-29 - The splash background is the same `#2D46B9` as the adaptive-icon background, so on Android 12+ the launcher tile blends into the splash and only the white حساب glyph and the two amber bars are visible (the intended brand mark).
 - 2026-10-29 - The release APK keeps the Flutter template's debug-keystore signing (`android/app/build.gradle.kts`) so it can be installed over the debug build on the phone; the README says so and names a real keystore as the step before publishing. A signed AAB/Play upload is out of scope for T50.
+- 2026-10-29 - Phones are locked to portrait (Android `screenOrientation="portrait"`, iPhone `UISupportedInterfaceOrientations` portrait only; iPad list left as is for multitasking) - every screen overflowed in landscape and the design is portrait-only.
 
 ## Log entry template
 
@@ -595,3 +596,9 @@ Tests: `flutter build apk --release` succeeds (`app-release.apk`, 52.8 MB, all A
 Notes for next session: all planned tasks are now done — the task list is empty. Remaining known issues, in priority order: (1) landscape is broken on every screen (~253 px overflow on the 360×736 phone; the app follows the sensor and there is no portrait lock), (2) a 360×640 dp phone would still overflow ~77 px in Scientific, (3) text scale 1.3 combined with the small-screen shell is untested. The release build is debug-signed, so a real keystore and a Play Store AAB are the publishing follow-up. Choose one and add it to `docs/TASKS.md` before starting.
 Next: none — propose the next task
 
+### T53 — Release internet permission + portrait lock — 2026-10-29
+Status: DONE
+Changed: `android/app/src/main/AndroidManifest.xml` (`android.permission.INTERNET`, `android:screenOrientation="portrait"` on MainActivity); `ios/Runner/Info.plist` (iPhone orientations portrait only).
+Tests: found during a full review — the installed T50 release APK showed "Offline · No rates yet" on the itel NOTE 24 with Wi-Fi on, and `dumpsys package` listed no INTERNET permission. After the fix: `flutter build apk --release`, `adb install -r` → Success, `INTERNET: granted=true`, Currency shows "Live rates" (10,000 PKR → 36.11 USD at 276.9); forcing `user_rotation 1` keeps the app in portrait. `flutter analyze` clean; `flutter test` 1085/1085 pass (no Dart changes).
+Notes for next session: any future network feature needs nothing more on Android. Remaining known issues: a 360×640 dp phone may still overflow in Scientific; text scale 1.3 + small-screen shell untested; release is debug-signed (real keystore + AAB needed for Play Store).
+Next: none — propose the next task

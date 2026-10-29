@@ -143,3 +143,7 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   and "Calculator" in docs/SPEC.md. Do NOT change the Dart package name or applicationId.
   Add `flutter_launcher_icons` as a dev dependency, run `dart run flutter_launcher_icons`.
   Done when: `flutter analyze` clean, app installs on a phone showing "Hisab" with the حساب icon.
+- [x] **T53 Release internet permission + portrait lock** — The release APK had no `INTERNET` permission (Flutter only
+  adds it to the debug/profile manifests), so Currency showed "Offline · No rates yet" on a phone with Wi-Fi.
+  Also lock phones to portrait (landscape overflowed on every screen). Done when: release APK on the phone shows live rates
+  and stays portrait when rotated.
