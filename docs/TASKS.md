@@ -152,3 +152,5 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T55 Programmer display fits real phones** — On the 360×772 dp phone the 232 dp Programmer display got ~148 dp and its
   reverse scroll view hid the expression, word-size chip and big value behind the mode switcher. Done when: the chip and all
   four base rows are visible on 360×772 in the shell, with a layout test that fails on the old code.
+- [x] **T56 Play listing kit** — `release/play-listing/`: store text, 512 icon, 1024×500 feature graphic, 8 phone
+  screenshots from the real phone, privacy policy, App content answers, release notes, step-by-step README.
