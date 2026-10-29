@@ -236,6 +236,11 @@ abstract final class AppSizes {
   static const double baseRowPaddingH = 12;
   static const double baseRowNameWidth = 40;
   static const double baseRowGap = 12;
+  // Tight programmer display: phones that leave < ~190 dp above the keypad.
+  static const double programmerDisplayGapTight = 4;
+  static const double programmerDisplayBottomTight = 8;
+  static const double baseRowPaddingVTight = 3;
+  static const double baseRowSpacingTight = 2;
 
   // Converter hub (screen 06)
   static const double hubHeaderGap = 14;

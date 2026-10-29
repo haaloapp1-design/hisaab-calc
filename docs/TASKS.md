@@ -149,3 +149,6 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
   and stays portrait when rotated.
 - [x] **T54 Play upload signing** — Release builds sign with an upload keystore read from git-ignored
   `android/key.properties`; build `app-release.aab`. Done when: the bundle's signer matches the upload key.
+- [x] **T55 Programmer display fits real phones** — On the 360×772 dp phone the 232 dp Programmer display got ~148 dp and its
+  reverse scroll view hid the expression, word-size chip and big value behind the mode switcher. Done when: the chip and all
+  four base rows are visible on 360×772 in the shell, with a layout test that fails on the old code.

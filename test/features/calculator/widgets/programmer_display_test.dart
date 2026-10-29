@@ -26,9 +26,11 @@ void main() {
     ValueChanged<NumberBase>? onBaseSelected,
     VoidCallback? onWordSizeTap,
     NumberFormatOptions options = const NumberFormatOptions(),
+    ProgrammerDensity density = ProgrammerDensity.full,
   }) => ProgrammerDisplay(
     state: state,
     options: options,
+    density: density,
     onBaseSelected: onBaseSelected ?? (NumberBase base) {},
     onWordSizeTap: onWordSizeTap ?? () {},
   );
@@ -242,5 +244,80 @@ void main() {
       area.bottom - tester.getRect(find.byKey(const Key('base-bin'))).bottom,
       AppSizes.programmerDisplayBottom,
     );
+  });
+
+  group('densities', () {
+    test('each density is shorter than the one before', () {
+      final double full = ProgrammerDisplay.heightFor(ProgrammerDensity.full);
+      final double condensed = ProgrammerDisplay.heightFor(
+        ProgrammerDensity.condensed,
+      );
+      final double tight = ProgrammerDisplay.heightFor(ProgrammerDensity.tight);
+      expect(condensed, lessThan(full));
+      expect(tight, lessThan(condensed));
+    });
+
+    test('densityFor picks the roomiest layout that fits', () {
+      for (final ProgrammerDensity density in ProgrammerDensity.values) {
+        expect(
+          ProgrammerDisplay.densityFor(ProgrammerDisplay.heightFor(density)),
+          density,
+        );
+      }
+      expect(ProgrammerDisplay.densityFor(1000), ProgrammerDensity.full);
+      expect(ProgrammerDisplay.densityFor(0), ProgrammerDensity.tight);
+    });
+
+    for (final ProgrammerDensity density in <ProgrammerDensity>[
+      ProgrammerDensity.condensed,
+      ProgrammerDensity.tight,
+    ]) {
+      testWidgets('$density puts the expression beside the chip', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          wrap(display(state(source: '2021 AND 7'), density: density)),
+        );
+
+        expect(find.byKey(const Key('programmer-value')), findsNothing);
+        final Rect chip = tester.getRect(
+          find.byKey(const Key('word-size-chip')),
+        );
+        final Rect expression = tester.getRect(
+          find.byKey(const Key('programmer-expression')),
+        );
+        expect(expression.center.dy, closeTo(chip.center.dy, 1));
+        expect(
+          tester
+              .widget<Text>(find.byKey(const Key('programmer-expression')))
+              .data,
+          '2021 AND 7',
+        );
+        // The active row still carries the value.
+        expect(baseText(tester, NumberBase.dec).data, '2,021');
+        expect(
+          tester.getSize(find.byKey(const Key('programmer-display'))).height,
+          closeTo(ProgrammerDisplay.heightFor(density), 1),
+        );
+      });
+    }
+
+    testWidgets('a condensed error replaces the expression', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          display(
+            state(source: '1 ÷ 0', error: CalcError.divideByZero),
+            density: ProgrammerDensity.condensed,
+          ),
+        ),
+      );
+
+      final Text error = tester.widget<Text>(
+        find.byKey(const Key('programmer-error')),
+      );
+      expect(error.data, CalcError.divideByZero.displayText);
+      expect(error.style?.color, AppColors.warning);
+      expect(find.byKey(const Key('programmer-expression')), findsNothing);
+    });
   });
 }

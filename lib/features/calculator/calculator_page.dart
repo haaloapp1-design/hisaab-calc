@@ -128,18 +128,24 @@ class CalculatorPage extends ConsumerWidget {
                         ),
                       if (programmer)
                         Flexible(
-                          // A scroll view keeps the fixed rows usable on
-                          // shorter screens instead of overflowing; it is at
-                          // the bottom so the value and base rows stay in view.
-                          child: SingleChildScrollView(
-                            reverse: true,
-                            child: ProgrammerDisplay(
-                              state: prog,
-                              options: format,
-                              onBaseSelected: progController.selectBase,
-                              onWordSizeTap: () =>
-                                  _showWordSizeMenu(context, ref),
-                            ),
+                          // The display picks the roomiest layout that fits;
+                          // scrolling is only a last resort for phones
+                          // shorter than the tight layout.
+                          child: LayoutBuilder(
+                            builder: (_, BoxConstraints space) =>
+                                SingleChildScrollView(
+                                  reverse: true,
+                                  child: ProgrammerDisplay(
+                                    state: prog,
+                                    options: format,
+                                    density: ProgrammerDisplay.densityFor(
+                                      space.maxHeight,
+                                    ),
+                                    onBaseSelected: progController.selectBase,
+                                    onWordSizeTap: () =>
+                                        _showWordSizeMenu(context, ref),
+                                  ),
+                                ),
                           ),
                         )
                       else

@@ -108,6 +108,33 @@ void main() {
     );
   });
 
+  testWidgets(
+    'Programmer shows the chip and every base row on a 360x772 phone',
+    (tester) async {
+      // On the itel NOTE 24 the 232 dp full display got ~148 dp; the scroll view
+      // hid the expression, the word-size chip and the big value above the
+      // mode switcher.
+      await pumpPhone(tester, const ShellPage());
+      await tester.tap(find.text('Programmer'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      final double switcherBottom = tester
+          .getRect(find.text('Programmer').first)
+          .bottom;
+      final Rect chip = tester.getRect(find.byKey(const Key('word-size-chip')));
+      expect(chip.top, greaterThan(switcherBottom));
+      final double sheetTop = tester
+          .getRect(find.byKey(const Key('keypad')))
+          .top;
+      for (final String base in <String>['hex', 'dec', 'oct', 'bin']) {
+        final Rect row = tester.getRect(find.byKey(Key('base-$base')));
+        expect(row.top, greaterThan(switcherBottom), reason: base);
+        expect(row.bottom, lessThan(sheetTop), reason: base);
+      }
+    },
+  );
+
   testWidgets('the design surface keeps the full key sizes', (tester) async {
     await pumpDesign(tester, const CalculatorPage());
     await tester.tap(find.text('Scientific'));

@@ -5,6 +5,16 @@ import '../../../core/programmer/base_format.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_tokens.dart';
 import '../prog_state.dart';
+import 'programmer_rows.dart';
+
+/// How much of the Programmer display fits above the keypad.
+///
+/// [full] is screen 03 plus the expression line. Phones with less room
+/// (a status bar and the shell's bottom nav eat ~80 dp of the 844 dp design)
+/// drop the big value — the active base row already shows it on a white
+/// pill — and put the expression next to the word-size chip. [tight] also
+/// shrinks the base rows so 360×772 dp phones fit without scrolling.
+enum ProgrammerDensity { full, condensed, tight }
 
 /// The Programmer blue area (SPEC §1.4, `03-programmer.html`).
 ///
@@ -19,6 +29,7 @@ class ProgrammerDisplay extends StatelessWidget {
     this.options = const NumberFormatOptions(),
     required this.onBaseSelected,
     required this.onWordSizeTap,
+    this.density = ProgrammerDensity.full,
   });
 
   final ProgState state;
@@ -28,6 +39,50 @@ class ProgrammerDisplay extends StatelessWidget {
 
   final ValueChanged<NumberBase> onBaseSelected;
   final VoidCallback onWordSizeTap;
+  final ProgrammerDensity density;
+
+  static double _line(TextStyle style) => style.fontSize! * style.height!;
+
+  /// The height each density needs, from the same tokens the layout uses.
+  static double heightFor(ProgrammerDensity density) {
+    final double expression = _line(AppTypography.programmerExpression);
+    final double chip =
+        expression + 2 * AppSizes.chipPaddingV + 2 * AppSizes.borderWidth;
+    final double header = chip > expression ? chip : expression;
+    final double rowText =
+        _line(AppTypography.baseRowValue) > _line(AppTypography.baseRowName)
+        ? _line(AppTypography.baseRowValue)
+        : _line(AppTypography.baseRowName);
+    double rows(double paddingV, double spacing) =>
+        4 * (rowText + 2 * paddingV) + 3 * spacing;
+    return switch (density) {
+      ProgrammerDensity.full =>
+        expression +
+            AppSizes.programmerDisplayGap +
+            _line(AppTypography.programmerValue) +
+            AppSizes.programmerDisplayGap +
+            rows(AppSizes.baseRowPaddingV, AppSizes.programmerDisplayGap) +
+            AppSizes.programmerDisplayBottom,
+      ProgrammerDensity.condensed =>
+        header +
+            AppSizes.programmerDisplayGap +
+            rows(AppSizes.baseRowPaddingV, AppSizes.programmerDisplayGap) +
+            AppSizes.programmerDisplayBottom,
+      ProgrammerDensity.tight =>
+        header +
+            AppSizes.programmerDisplayGapTight +
+            rows(AppSizes.baseRowPaddingVTight, AppSizes.baseRowSpacingTight) +
+            AppSizes.programmerDisplayBottomTight,
+    };
+  }
+
+  /// The roomiest density that fits [available] dp of height.
+  static ProgrammerDensity densityFor(double available) {
+    for (final ProgrammerDensity density in ProgrammerDensity.values) {
+      if (available >= heightFor(density)) return density;
+    }
+    return ProgrammerDensity.tight;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,193 +91,123 @@ class ProgrammerDisplay extends StatelessWidget {
     final TextStyle valueStyle = binary
         ? AppTypography.programmerValueBinary
         : AppTypography.programmerValue;
+    final bool full = density == ProgrammerDensity.full;
+    final bool tight = density == ProgrammerDensity.tight;
+    final double gap = tight
+        ? AppSizes.programmerDisplayGapTight
+        : AppSizes.programmerDisplayGap;
+    final double rowSpacing = tight
+        ? AppSizes.baseRowSpacingTight
+        : AppSizes.programmerDisplayGap;
+
+    final Widget expression = Text(
+      state.expression,
+      key: const Key('programmer-expression'),
+      maxLines: 1,
+      softWrap: false,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.right,
+      style: AppTypography.programmerExpression.copyWith(
+        color: palette.onPrimaryMuted,
+      ),
+    );
+    final Widget chip = WordSizeChip(
+      label: state.size.label,
+      onTap: onWordSizeTap,
+    );
 
     return Padding(
       key: const Key('programmer-display'),
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSizes.programmerDisplaySide,
         0,
         AppSizes.programmerDisplaySide,
-        AppSizes.programmerDisplayBottom,
+        tight
+            ? AppSizes.programmerDisplayBottomTight
+            : AppSizes.programmerDisplayBottom,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            state.expression,
-            key: const Key('programmer-expression'),
-            maxLines: 1,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.right,
-            style: AppTypography.programmerExpression.copyWith(
-              color: palette.onPrimaryMuted,
-            ),
-          ),
-          const SizedBox(height: AppSizes.programmerDisplayGap),
-          Row(
-            children: <Widget>[
-              _WordSizeChip(label: state.size.label, onTap: onWordSizeTap),
-              const SizedBox(width: AppSizes.displayGap),
-              Expanded(
-                child: Semantics(
-                  liveRegion: true,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      state.error?.displayText ??
-                          formatBaseValue(
-                            state.value,
-                            state.base,
-                            options: options,
-                          ),
-                      key: const Key('programmer-value'),
-                      maxLines: 1,
-                      softWrap: false,
-                      style: valueStyle.copyWith(
-                        color: state.error != null
-                            ? palette.warning
-                            : (state.preview
-                                  ? palette.onPrimaryMuted
-                                  : palette.onPrimary),
+          if (full) ...<Widget>[
+            expression,
+            SizedBox(height: gap),
+            Row(
+              children: <Widget>[
+                chip,
+                const SizedBox(width: AppSizes.displayGap),
+                Expanded(
+                  child: Semantics(
+                    liveRegion: true,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        state.error?.displayText ??
+                            formatBaseValue(
+                              state.value,
+                              state.base,
+                              options: options,
+                            ),
+                        key: const Key('programmer-value'),
+                        maxLines: 1,
+                        softWrap: false,
+                        style: valueStyle.copyWith(
+                          color: state.error != null
+                              ? palette.warning
+                              : (state.preview
+                                    ? palette.onPrimaryMuted
+                                    : palette.onPrimary),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSizes.programmerDisplayGap),
+              ],
+            ),
+          ] else
+            // No big value: an error takes the expression's place.
+            Row(
+              children: <Widget>[
+                chip,
+                const SizedBox(width: AppSizes.displayGap),
+                Expanded(
+                  child: state.error == null
+                      ? expression
+                      : Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            state.error!.displayText,
+                            key: const Key('programmer-error'),
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: AppTypography.programmerExpression.copyWith(
+                              color: palette.warning,
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          SizedBox(height: gap),
           for (final NumberBase base in NumberBase.values) ...<Widget>[
-            _BaseRow(
+            BaseRow(
               base: base,
               value: formatBaseValue(state.value, base, options: options),
               selected: base == state.base,
+              // Without the big line, the active row announces the result.
+              live: !full && base == state.base,
+              paddingV: tight
+                  ? AppSizes.baseRowPaddingVTight
+                  : AppSizes.baseRowPaddingV,
               onTap: () => onBaseSelected(base),
             ),
-            if (base != NumberBase.values.last)
-              const SizedBox(height: AppSizes.programmerDisplayGap),
+            if (base != NumberBase.values.last) SizedBox(height: rowSpacing),
           ],
         ],
-      ),
-    );
-  }
-}
-
-/// The `32-bit` chip: 13 px faint text on a 1 px border, radius 10.
-class _WordSizeChip extends StatelessWidget {
-  const _WordSizeChip({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-
-    return Semantics(
-      button: true,
-      label: 'Word size $label',
-      child: GestureDetector(
-        key: const Key('word-size-chip'),
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSizes.chipPaddingV,
-            horizontal: AppSizes.chipPaddingH,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadii.chip),
-            border: Border.all(
-              color: palette.dividerOnPrimary,
-              width: AppSizes.borderWidth,
-            ),
-          ),
-          child: Text(
-            label,
-            maxLines: 1,
-            style: AppTypography.programmerExpression.copyWith(
-              color: palette.onPrimaryFaint,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// One HEX/DEC/OCT/BIN row: white pill when it is the input base.
-class _BaseRow extends StatelessWidget {
-  const _BaseRow({
-    required this.base,
-    required this.value,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final NumberBase base;
-  final String value;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final AppPalette palette = AppPalette.of(context);
-    // The design's inactive row text is #E4E9FF, the same value as the
-    // segmented control's inactive label.
-    final Color colour = selected
-        ? palette.primaryText
-        : palette.segmentedInactive;
-
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '${base.label} base',
-      child: GestureDetector(
-        key: Key('base-${base.name}'),
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            vertical: AppSizes.baseRowPaddingV,
-            horizontal: AppSizes.baseRowPaddingH,
-          ),
-          decoration: BoxDecoration(
-            color: selected ? palette.sheet : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadii.chip),
-          ),
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                width: AppSizes.baseRowNameWidth,
-                child: Text(
-                  base.label,
-                  key: Key('base-name-${base.name}'),
-                  maxLines: 1,
-                  style: AppTypography.baseRowName.copyWith(color: colour),
-                ),
-              ),
-              const SizedBox(width: AppSizes.baseRowGap),
-              Expanded(
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  // The low bits matter most, so keep the end in view.
-                  reverse: true,
-                  child: Text(
-                    value,
-                    key: Key('base-value-${base.name}'),
-                    maxLines: 1,
-                    softWrap: false,
-                    style: AppTypography.baseRowValue.copyWith(color: colour),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
