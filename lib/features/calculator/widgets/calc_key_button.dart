@@ -69,6 +69,7 @@ class CalcKeyButton extends StatefulWidget {
     this.density = CalcKeyDensity.basic,
     this.haptics = true,
     this.sounds = false,
+    this.height,
   });
 
   final String label;
@@ -79,6 +80,9 @@ class CalcKeyButton extends StatefulWidget {
   final VoidCallback? onLongPress;
   final String? semanticLabel;
   final CalcKeyDensity density;
+
+  /// T52 short-screen override for `density.keyHeight`; null keeps it.
+  final double? height;
 
   /// SPEC §7 haptic tick; T25/T27 pass the user's setting.
   final bool haptics;
@@ -134,7 +138,7 @@ class _CalcKeyButtonState extends State<CalcKeyButton> {
       curve: Curves.easeOut,
       child: AnimatedContainer(
         duration: AppMotion.keyPress,
-        height: widget.density.keyHeight,
+        height: widget.height ?? widget.density.keyHeight,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: pressed ? style.pressedBackground : style.background,

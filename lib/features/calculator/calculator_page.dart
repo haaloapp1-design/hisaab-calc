@@ -69,141 +69,171 @@ class CalculatorPage extends ConsumerWidget {
     final bool programmer = calc.mode == CalcMode.programmer;
     final NumberFormatOptions format = numberFormatFor(settings);
 
-    return ColoredBox(
-      color: palette.primary,
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          children: <Widget>[
-            BlueHeader(
-              title: 'Hisab',
-              actionIcon: Icons.tune_rounded,
-              actionTooltip: 'Settings',
-              onAction: () => _openSettings(context),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSizes.screenPadding,
-                AppSizes.segmentedTopGap,
-                AppSizes.screenPadding,
-                0,
-              ),
-              child: Segmented(
-                labels: _modes,
-                selectedIndex: calc.mode.index,
-                onSelected: (int index) =>
-                    controller.setMode(CalcMode.values[index]),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  if (scientific)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSizes.displayPaddingSide,
-                        0,
-                        AppSizes.displayPaddingSide,
-                        AppSizes.angleRowBottomGap,
-                      ),
-                      child: AngleControls(
-                        angleMode: settings.angleMode,
-                        onChanged: ref
-                            .read(settingsProvider.notifier)
-                            .setAngleMode,
-                        openBrackets: calc.openBrackets,
-                      ),
-                    ),
-                  if (programmer)
-                    Flexible(
-                      // A scroll view keeps the fixed rows usable on shorter
-                      // screens instead of overflowing; it is at the bottom so
-                      // the value and base rows stay in view.
-                      child: SingleChildScrollView(
-                        reverse: true,
-                        child: ProgrammerDisplay(
-                          state: prog,
-                          options: format,
-                          onBaseSelected: progController.selectBase,
-                          onWordSizeTap: () => _showWordSizeMenu(context, ref),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // T52: phones in the 360×736 dp class leave ~700 dp for the calculator
+        // column (window height minus the shell's bottom nav and the status
+        // bar); that is 36 px short in Scientific mode, so the display, angle
+        // row and scientific/programmer keys switch to the compact metrics.
+        final bool compact = constraints.maxHeight < AppSizes.calcCompactHeight;
+
+        return ColoredBox(
+          color: palette.primary,
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              children: <Widget>[
+                BlueHeader(
+                  title: 'Hisab',
+                  actionIcon: Icons.tune_rounded,
+                  actionTooltip: 'Settings',
+                  onAction: () => _openSettings(context),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.screenPadding,
+                    AppSizes.segmentedTopGap,
+                    AppSizes.screenPadding,
+                    0,
+                  ),
+                  child: Segmented(
+                    labels: _modes,
+                    selectedIndex: calc.mode.index,
+                    onSelected: (int index) =>
+                        controller.setMode(CalcMode.values[index]),
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      if (scientific)
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            AppSizes.displayPaddingSide,
+                            0,
+                            AppSizes.displayPaddingSide,
+                            compact
+                                ? AppSizes.angleRowBottomGapCompact
+                                : AppSizes.angleRowBottomGap,
+                          ),
+                          child: AngleControls(
+                            angleMode: settings.angleMode,
+                            onChanged: ref
+                                .read(settingsProvider.notifier)
+                                .setAngleMode,
+                            openBrackets: calc.openBrackets,
+                          ),
                         ),
-                      ),
-                    )
-                  else
-                    Display(
-                      expression: calc.justEvaluated
-                          ? ''
-                          : formatExpression(
-                              calc.buffer.tokens,
+                      if (programmer)
+                        Flexible(
+                          // A scroll view keeps the fixed rows usable on
+                          // shorter screens instead of overflowing; it is at
+                          // the bottom so the value and base rows stay in view.
+                          child: SingleChildScrollView(
+                            reverse: true,
+                            child: ProgrammerDisplay(
+                              state: prog,
                               options: format,
+                              onBaseSelected: progController.selectBase,
+                              onWordSizeTap: () =>
+                                  _showWordSizeMenu(context, ref),
                             ),
-                      result: formatNumber(calc.displayValue, options: format),
-                      preview: calc.result == null && calc.preview != null,
-                      error: calc.error,
-                      memory: MemorySlots.showsChip(memory)
-                          ? formatNumber(
-                              MemorySlots.mainOrZero(memory),
-                              options: format,
-                            )
-                          : null,
-                      onMemoryLongPress: () => _showMemoryMenu(context, ref),
-                      density: scientific
-                          ? DisplayDensity.scientific
-                          : DisplayDensity.basic,
-                    ),
-                ],
-              ),
+                          ),
+                        )
+                      else
+                        Display(
+                          expression: calc.justEvaluated
+                              ? ''
+                              : formatExpression(
+                                  calc.buffer.tokens,
+                                  options: format,
+                                ),
+                          result: formatNumber(
+                            calc.displayValue,
+                            options: format,
+                          ),
+                          preview: calc.result == null && calc.preview != null,
+                          error: calc.error,
+                          memory: MemorySlots.showsChip(memory)
+                              ? formatNumber(
+                                  MemorySlots.mainOrZero(memory),
+                                  options: format,
+                                )
+                              : null,
+                          onMemoryLongPress: () =>
+                              _showMemoryMenu(context, ref),
+                          density: scientific
+                              ? DisplayDensity.scientific
+                              : DisplayDensity.basic,
+                          compact: compact,
+                        ),
+                    ],
+                  ),
+                ),
+                WhiteSheet(
+                  padding: scientific || programmer
+                      ? EdgeInsets.fromLTRB(
+                          AppSizes.sheetScientificPaddingSide,
+                          AppSizes.sheetPaddingTop,
+                          AppSizes.sheetScientificPaddingSide,
+                          AppSizes.sheetPaddingBottom,
+                        )
+                      : null,
+                  contentGap: scientific || programmer
+                      ? AppSizes.sheetScientificContentGap
+                      : null,
+                  child: programmer
+                      ? Keypad(
+                          key: ValueKey<CalcMode>(calc.mode),
+                          spec: programmerKeys(
+                            onKey: progController.onKey,
+                            base: prog.base,
+                          ),
+                          columns: 5,
+                          density: CalcKeyDensity.scientific,
+                          haptics: settings.haptics,
+                          sounds: settings.keySounds,
+                          keyHeight: compact
+                              ? AppSizes.keyHeightScientificCompact
+                              : null,
+                          keyGap: compact
+                              ? AppSizes.keyGapScientificCompact
+                              : null,
+                        )
+                      : scientific
+                      ? Keypad(
+                          key: ValueKey<CalcMode>(calc.mode),
+                          spec: scientificKeys(
+                            onKey: controller.onKey,
+                            second: calc.second,
+                            onSecond: controller.toggleSecond,
+                          ),
+                          columns: 5,
+                          density: CalcKeyDensity.scientific,
+                          haptics: settings.haptics,
+                          sounds: settings.keySounds,
+                          keyHeight: compact
+                              ? AppSizes.keyHeightScientificCompact
+                              : null,
+                          keyGap: compact
+                              ? AppSizes.keyGapScientificCompact
+                              : null,
+                        )
+                      : Keypad(
+                          key: ValueKey<CalcMode>(calc.mode),
+                          spec: basicKeys(controller.onKey),
+                          columns: 4,
+                          haptics: settings.haptics,
+                          sounds: settings.keySounds,
+                        ),
+                ),
+              ],
             ),
-            WhiteSheet(
-              padding: scientific || programmer
-                  ? const EdgeInsets.fromLTRB(
-                      AppSizes.sheetScientificPaddingSide,
-                      AppSizes.sheetPaddingTop,
-                      AppSizes.sheetScientificPaddingSide,
-                      AppSizes.sheetPaddingBottom,
-                    )
-                  : null,
-              contentGap: scientific || programmer
-                  ? AppSizes.sheetScientificContentGap
-                  : null,
-              child: programmer
-                  ? Keypad(
-                      key: ValueKey<CalcMode>(calc.mode),
-                      spec: programmerKeys(
-                        onKey: progController.onKey,
-                        base: prog.base,
-                      ),
-                      columns: 5,
-                      density: CalcKeyDensity.scientific,
-                      haptics: settings.haptics,
-                      sounds: settings.keySounds,
-                    )
-                  : scientific
-                  ? Keypad(
-                      key: ValueKey<CalcMode>(calc.mode),
-                      spec: scientificKeys(
-                        onKey: controller.onKey,
-                        second: calc.second,
-                        onSecond: controller.toggleSecond,
-                      ),
-                      columns: 5,
-                      density: CalcKeyDensity.scientific,
-                      haptics: settings.haptics,
-                      sounds: settings.keySounds,
-                    )
-                  : Keypad(
-                      key: ValueKey<CalcMode>(calc.mode),
-                      spec: basicKeys(controller.onKey),
-                      columns: 4,
-                      haptics: settings.haptics,
-                      sounds: settings.keySounds,
-                    ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

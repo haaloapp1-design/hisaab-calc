@@ -32,6 +32,7 @@ class Display extends StatelessWidget {
     this.memory,
     this.onMemoryLongPress,
     this.density = DisplayDensity.basic,
+    this.compact = false,
   });
 
   /// Line 1: what the user has typed.
@@ -54,10 +55,14 @@ class Display extends StatelessWidget {
 
   final DisplayDensity density;
 
+  /// T52: the short-screen variant used by the Scientific/Programmer modes
+  /// when the shell leaves too little height for the full metrics.
+  final bool compact;
+
   @override
   Widget build(BuildContext context) {
     final AppPalette palette = AppPalette.of(context);
-    final _DisplayMetrics metrics = _metricsFor(density);
+    final _DisplayMetrics metrics = _metricsFor(density, compact);
     final Color resultColour = error != null
         ? palette.warning
         : (preview ? palette.onPrimaryMuted : palette.onPrimary);
@@ -122,20 +127,30 @@ final class _DisplayMetrics {
   final double gap;
 }
 
-_DisplayMetrics _metricsFor(DisplayDensity density) => switch (density) {
-  DisplayDensity.basic => const _DisplayMetrics(
-    resultStyle: AppTypography.resultBasic,
-    expressionStyle: AppTypography.expression,
-    bottomPadding: AppSizes.displayPaddingBottom,
-    gap: AppSizes.displayGap,
-  ),
-  DisplayDensity.scientific => const _DisplayMetrics(
-    resultStyle: AppTypography.resultScientific,
-    expressionStyle: AppTypography.expressionScientific,
-    bottomPadding: AppSizes.displayScientificPaddingBottom,
-    gap: AppSizes.displayScientificGap,
-  ),
-};
+_DisplayMetrics _metricsFor(DisplayDensity density, bool compact) =>
+    switch (density) {
+      DisplayDensity.basic => const _DisplayMetrics(
+        resultStyle: AppTypography.resultBasic,
+        expressionStyle: AppTypography.expression,
+        bottomPadding: AppSizes.displayPaddingBottom,
+        gap: AppSizes.displayGap,
+      ),
+      // The compact metrics (T52) save the 6 px bottom padding, 2 px per gap
+      // and a row of the 52 px result so the three lines fit under the shell's
+      // bottom nav on a 360×736 dp phone.
+      DisplayDensity.scientific => _DisplayMetrics(
+        resultStyle: compact
+            ? AppTypography.resultScientificCompact
+            : AppTypography.resultScientific,
+        expressionStyle: AppTypography.expressionScientific,
+        bottomPadding: compact
+            ? AppSizes.displayScientificPaddingBottomCompact
+            : AppSizes.displayScientificPaddingBottom,
+        gap: compact
+            ? AppSizes.displayScientificGapCompact
+            : AppSizes.displayScientificGap,
+      ),
+    };
 
 /// The `M = 128` chip (13 px `#C7D1FF` on a 1 px `dividerOnPrimary` border).
 class _MemoryChip extends StatelessWidget {

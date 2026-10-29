@@ -40,6 +40,8 @@ class Keypad extends StatelessWidget {
     this.density = CalcKeyDensity.basic,
     this.haptics = true,
     this.sounds = false,
+    this.keyHeight,
+    this.keyGap,
   }) : assert(columns > 0, 'a keypad needs at least one column');
 
   final List<KeypadEntry> spec;
@@ -52,12 +54,18 @@ class Keypad extends StatelessWidget {
   /// SPEC §3 key sounds; T27 passes the user's setting.
   final bool sounds;
 
+  /// T52 short-screen overrides for the density's key height and gap; null
+  /// keeps the density's design measurements.
+  final double? keyHeight;
+  final double? keyGap;
+
   @override
   Widget build(BuildContext context) {
+    final double gap = keyGap ?? density.keyGap;
     final List<Widget> rows = <Widget>[];
     for (int start = 0; start < spec.length; start += columns) {
       if (start > 0) {
-        rows.add(SizedBox(height: density.keyGap));
+        rows.add(SizedBox(height: gap));
       }
       rows.add(_row(start));
     }
@@ -89,6 +97,7 @@ class Keypad extends StatelessWidget {
             density: density,
             haptics: haptics,
             sounds: sounds,
+            height: keyHeight,
           ),
         ),
       );

@@ -178,6 +178,17 @@ abstract final class AppSizes {
   static const double keyGapScientific = 8;
   static const double keyGapConverter = 10;
 
+  // Short-screen variants (T52): phones in the 360×736 dp class have ~700 dp of
+  // calculator column after the shell's bottom nav and the status-bar inset,
+  // which is 36 px short in Scientific mode. Below [calcCompactHeight] the page
+  // swaps these for the scientific sizes; 44 px keeps the T48 tap target.
+  static const double calcCompactHeight = 720;
+  static const double keyHeightScientificCompact = 44;
+  static const double keyGapScientificCompact = 6;
+  static const double displayScientificGapCompact = 6;
+  static const double displayScientificPaddingBottomCompact = 12;
+  static const double angleRowBottomGapCompact = 6;
+
   static const double segmentedHeight = 44;
   static const double handleWidth = 44;
   static const double handleHeight = 4;
@@ -421,6 +432,14 @@ abstract final class AppTypography {
   static const TextStyle resultScientific = TextStyle(
     fontFamily: fontFamily,
     fontSize: 52,
+    fontWeight: medium,
+    height: 1.05,
+  );
+
+  /// T52: the result in the compact scientific display (short screens).
+  static const TextStyle resultScientificCompact = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 46,
     fontWeight: medium,
     height: 1.05,
   );

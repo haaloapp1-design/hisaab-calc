@@ -130,6 +130,9 @@ If a task is too big, split it into `T07a`, `T07b` right here and do the first p
 - [x] **T48 Accessibility pass** — Semantic labels on every key/icon button, text scale 1.3 without overflow, contrast check.
 - [x] **T49 Dark theme** — Read: DESIGN (Dark theme). Done when: every screen readable in dark.
 - [ ] **T50 Release prep** — App name, icon, splash, Android release build runs on a real phone; update README.
+- [x] **T52 Small-screen fit (T49 follow-up)** — On a real phone (360×736 dp) Scientific mode overflows by 38 px;
+  every screen must fit 360×736 with system insets (edge-to-edge status bar / gesture bar), keeping all
+  390×844 goldens unchanged at the design size. Add a small-screen layout test and re-verify on the phone.
 
 
 ## Extra
